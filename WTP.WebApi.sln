@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.489
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WTP.WebAPI", "WTP.WebApi\WTP.WebAPI.csproj", "{911B1923-3B50-4B60-BDE5-5CB43008C95C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WTP.DAL", "WTP.DAL\WTP.DAL.csproj", "{24252591-E7DE-4D59-B61F-0FACD7F4C2C4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WTP.BLL", "WTP.BLL\WTP.BLL.csproj", "{0C488185-DFDB-4E5C-9C86-C9F9CC3020BF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{911B1923-3B50-4B60-BDE5-5CB43008C95C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{911B1923-3B50-4B60-BDE5-5CB43008C95C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{911B1923-3B50-4B60-BDE5-5CB43008C95C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{911B1923-3B50-4B60-BDE5-5CB43008C95C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{24252591-E7DE-4D59-B61F-0FACD7F4C2C4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{24252591-E7DE-4D59-B61F-0FACD7F4C2C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{24252591-E7DE-4D59-B61F-0FACD7F4C2C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{24252591-E7DE-4D59-B61F-0FACD7F4C2C4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0C488185-DFDB-4E5C-9C86-C9F9CC3020BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0C488185-DFDB-4E5C-9C86-C9F9CC3020BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0C488185-DFDB-4E5C-9C86-C9F9CC3020BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0C488185-DFDB-4E5C-9C86-C9F9CC3020BF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {61422C40-32A6-434D-B007-CD36BE534B88}
+	EndGlobalSection
+EndGlobal
