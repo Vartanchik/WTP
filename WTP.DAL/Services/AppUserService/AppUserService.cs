@@ -65,5 +65,10 @@ namespace WTP.WebApi.WTP.DAL.Services.AppUserServicea
 
             return await _userManager.CheckPasswordAsync(appUser, password);
         }
+
+        public async Task<string> GetPasswordResetTokenAsync(AppUser applicationUser)
+        {
+            return await _userManager.GeneratePasswordResetTokenAsync(applicationUser);
+        }
     }
 }

@@ -89,5 +89,12 @@ namespace WTP.BLL.Services.AppUserDtoService
         {
             return await _appUserService.CheckPasswordAsync(id, password);
         }
+
+        public async Task<string> GetPasswordResetTokenAsync(AppUserDto applicationUserDto)
+        {
+            var appUser = _mapper.Map<AppUser>(applicationUserDto);
+
+            return await _appUserService.GetPasswordResetTokenAsync(appUser);
+        }
     }
 }

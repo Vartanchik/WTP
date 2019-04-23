@@ -10,8 +10,8 @@ using WTP.WebApi.WTP.DAL;
 namespace WTP.WebAPI.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20190420181651_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20190422181858_initial")]
+    partial class initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

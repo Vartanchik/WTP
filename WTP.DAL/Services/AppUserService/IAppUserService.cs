@@ -13,5 +13,6 @@ namespace WTP.WebApi.WTP.DAL.Services.AppUserService
         Task<IdentityResult> UpdateAsync(AppUser applicationUser);
         Task<IList<string>> GetRolesAsync(AppUser applicationUser);
         Task<bool> CheckPasswordAsync(string id, string password);
+        Task<string> GetPasswordResetTokenAsync(AppUser applicationUser);
     }
 }
