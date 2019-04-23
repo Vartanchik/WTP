@@ -119,7 +119,6 @@ namespace GamePlatform_WebAPI.BusinessLogicLayer.Controllers
 
         [HttpPost("[action]")]
         [AllowAnonymous]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordViewModel formData)
         {
             var user = await _appUserDtoService.GetByEmailAsync(formData.Email);
@@ -132,7 +131,7 @@ namespace GamePlatform_WebAPI.BusinessLogicLayer.Controllers
                 emailService.SendEmail(
                     formData.Email,
                     "WTP Password Reset",
-                    @"<h1>Unfortunately the user with such Email is not found.</h1><br><a href=''>Please, try again!</a>");
+                    @"<h1>Unfortunately the user with such Email is not found.</h1><br>Please,<a href=''> try again!</a>");
 
                 return Ok();
             }
