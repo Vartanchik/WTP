@@ -14,5 +14,6 @@ namespace WTP.BLL.Services.AppUserDtoService
         Task<IList<string>> GetRolesAsync(AppUserDto applicationUserDto);
         Task<bool> CheckPasswordAsync(string id, string password);
         Task<string> GetPasswordResetTokenAsync(AppUserDto applicationUserDto);
+        Task SendEmailAsync(string email, string subject, string message);
     }
 }

@@ -123,15 +123,14 @@ namespace GamePlatform_WebAPI.BusinessLogicLayer.Controllers
         {
             var user = await _appUserDtoService.GetByEmailAsync(formData.Email);
 
-            EmailService emailService = new EmailService();
-
             if (user == null)
             {
                 // Sending Email about failed procedure 
-                emailService.SendEmail(
+                await _appUserDtoService.SendEmailAsync(
                     formData.Email,
                     "WTP Password Reset",
-                    @"<h1>Unfortunately the user with such Email is not found.</h1><br>Please,<a href=''> try again!</a>");
+                    @"<h2>Unfortunately the user with such Email wasn't found.</h2><br>
+                    <h3>Please, <a href='http://localhost:4200/account/forgot-password'>try again</a></h3>");
 
                 return Ok();
             }
@@ -143,14 +142,15 @@ namespace GamePlatform_WebAPI.BusinessLogicLayer.Controllers
                 //byte[] hashedRecoveryToken = new SHA256CryptoServiceProvider().ComputeHash(recoveryToken);
                 //var key = BitConverter.ToString(hashedRecoveryToken);
 
-                var key = await _appUserDtoService.GetPasswordResetTokenAsync(user);
+                var token = await _appUserDtoService.GetPasswordResetTokenAsync(user);
 
-                var callbackUrl = Url.Action("ResetPassword", "Account", new { userID = user.Id, code = key }, protocol: HttpContext.Request.Scheme);
+                var callbackUrl = Url.Action("ForgotPassword", "Account", new { userID = user.Id, code = token }, protocol: HttpContext.Request.Scheme);
 
-                emailService.SendEmail(
+                await _appUserDtoService.SendEmailAsync(
                     formData.Email,
                     "WTP Password Reset",
-                    $@"<h1>Click here to reset your password:</h1><br><a href='{callbackUrl}'>link</a>");
+                    $@"<h2>If You want to reset Your password, follow this link:</h2><br>
+                    <a href='{callbackUrl}'>{callbackUrl}</a>");
 
                 return Ok();
             }
@@ -170,26 +170,5 @@ namespace GamePlatform_WebAPI.BusinessLogicLayer.Controllers
         //{
         //    var user = await _appUserDtoService.GetAsync(formData.);
         //}
-    }
-
-
-    public class EmailService
-    {
-        public void SendEmail(string email, string subject, string message)
-        {
-            var emailMessage = new MailMessage("avg0test0@gmail.com", email);
-            emailMessage.Subject = subject;
-            emailMessage.IsBodyHtml = true;
-            emailMessage.Body = message;
-
-            using (var client = new SmtpClient())
-            {
-                client.Host = "smtp.gmail.com";
-                client.Port = 587;
-                client.EnableSsl = true;
-                client.Credentials = new NetworkCredential("avg0test0@gmail.com", "TeSt159357");
-                client.Send(emailMessage);
-            }
-        }
     }
 }
