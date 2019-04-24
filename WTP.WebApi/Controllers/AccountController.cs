@@ -132,7 +132,7 @@ namespace GamePlatform_WebAPI.BusinessLogicLayer.Controllers
                     @"<h2>Unfortunately the user with such Email wasn't found.</h2><br>
                     <h3>Please, <a href='http://localhost:4200/account/forgot-password'>try again</a></h3>");
 
-                return Ok();
+                return Ok(new {succeeded = true});
             }
             else
             {
@@ -144,7 +144,7 @@ namespace GamePlatform_WebAPI.BusinessLogicLayer.Controllers
 
                 var token = await _appUserDtoService.GetPasswordResetTokenAsync(user);
 
-                var callbackUrl = Url.Action("ForgotPassword", "Account", new { userID = user.Id, code = token }, protocol: HttpContext.Request.Scheme);
+                var callbackUrl = Url.Action("ForgotPassword", "Account", new { userId = user.Id, code = token }, protocol: HttpContext.Request.Scheme);
 
                 await _appUserDtoService.SendEmailAsync(
                     formData.Email,
@@ -152,23 +152,29 @@ namespace GamePlatform_WebAPI.BusinessLogicLayer.Controllers
                     $@"<h2>If You want to reset Your password, follow this link:</h2><br>
                     <a href='{callbackUrl}'>{callbackUrl}</a>");
 
-                return Ok();
+                return Ok(new { succeeded = true});
             }
         }
 
-        //[HttpGet("[action]")]
-        //[AllowAnonymous]
-        //public IActionResult ResetPassword(string code = null)
-        //{
-        //    return code == null ? View("Error") : View();
-        //}
+        [HttpGet("[action]")]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public IActionResult ForgotPasswordConfirmation([FromQuery] string userId = null, [FromQuery] string code = null)
+        {
+            if(ModelState.IsValid & code != null)
+            {
+                return RedirectToPage(@"http://localhost:4200/account/password-reset", new { Id = userId});
+            }
 
-        //[HttpPost("[action]")]
-        //[AllowAnonymous]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> ResetPasswordAsync([FromBody] ResetPasswordViewModel formData)
-        //{
-        //    var user = await _appUserDtoService.GetAsync(formData.);
-        //}
+            return RedirectToPage(@"http://localhost:4200/account/password-reset");
+        }
+
+        [HttpPost("[action]")]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ResetPasswordAsync([FromBody] ResetPasswordViewModel formData, [FromBody] string Id)
+        {
+            var user = await _appUserDtoService.GetAsync(formData.);
+        }
     }
 }
