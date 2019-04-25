@@ -14,5 +14,7 @@ namespace WTP.WebApi.WTP.DAL.Services.AppUserService
         Task<IList<string>> GetRolesAsync(AppUser applicationUser);
         Task<bool> CheckPasswordAsync(string id, string password);
         Task<string> GetPasswordResetTokenAsync(AppUser applicationUser);
+        Task<bool> IsEmailConfirmedAsync(AppUser applicationUser);
+        Task<IdentityResult> ResetPasswordAsync(AppUser applicationUser, string token, string newPassword);
     }
 }

@@ -99,6 +99,20 @@ namespace WTP.BLL.Services.AppUserDtoService
             return await _appUserService.GetPasswordResetTokenAsync(appUser);
         }
 
+        public async Task<bool> IsEmailConfirmedAsync(AppUserDto applicationUserDto)
+        {
+            var appUser = _mapper.Map<AppUser>(applicationUserDto);
+
+            return await _appUserService.IsEmailConfirmedAsync(appUser);
+        }
+
+        public async Task<IdentityResult> ResetPasswordAsync(AppUserDto applicationUserDto, string token, string newPassword)
+        {
+            var appUser = _mapper.Map<AppUser>(applicationUserDto);
+
+            return await _appUserService.ResetPasswordAsync(appUser, token, newPassword);
+        }
+
         public async Task SendEmailAsync(string email, string subject, string message)
         {
             var emailMessage = new MailMessage("avg0test0@gmail.com", email);

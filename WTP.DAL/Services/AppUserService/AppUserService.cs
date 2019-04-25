@@ -70,5 +70,15 @@ namespace WTP.WebApi.WTP.DAL.Services.AppUserServicea
         {
             return await _userManager.GeneratePasswordResetTokenAsync(applicationUser);
         }
+
+        public async Task<bool> IsEmailConfirmedAsync(AppUser appUser)
+        {
+            return await _userManager.IsEmailConfirmedAsync(appUser);
+        }
+
+        public async Task<IdentityResult> ResetPasswordAsync(AppUser applicationUser, string token, string newPassword)
+        {
+            return await _userManager.ResetPasswordAsync(applicationUser, token, newPassword);
+        }
     }
 }
