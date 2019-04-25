@@ -185,16 +185,12 @@ namespace GamePlatform_WebAPI.BusinessLogicLayer.Controllers
             }
             Log.Debug($"{this.ToString()}, action = ResetPasswordGET - userId={userId} and code={code} are not null");
 
-            var redirectUrl = Url.RouteUrl(@"http://localhost:4200/home/account/reset-password",
-                        new { id = userId, token = code }, protocol: HttpContext.Request.Scheme);
-
-            return RedirectToPage(redirectUrl);
-            //return RedirectToPage(@"http://localhost:4200/account/reset-password", new { id = userId, token = code });
+            return Redirect($"http://localhost:4200/account/reset-password?id={userId}&token={code}");
         }
 
         [HttpPost("[action]")]
         [AllowAnonymous]
-        [ValidateAntiForgeryToken]
+        //[ValidateAntiForgeryToken]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordViewModel formData)
         {
             Log.Debug($"{this.ToString()}, action = ResetPasswordPOST - Came request");
@@ -227,6 +223,8 @@ namespace GamePlatform_WebAPI.BusinessLogicLayer.Controllers
                 }
                 return BadRequest(new JsonResult(errorList));
             }
+            Log.Debug($"{this.ToString()}, action = ResetPasswordPOST - Model state isn't valid");
+
             return BadRequest(new { LoginError = "Please, redisplay reset password form - invalid value was entered!" });
         }
     }
