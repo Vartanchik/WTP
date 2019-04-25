@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using Serilog;
 using WTP.BLL.ModelsDto;
 using WTP.BLL.Services;
 using WTP.BLL.Services.AppUserDtoService;
@@ -37,6 +38,10 @@ namespace GamePlatform_WebAPI
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+            Log.Logger = new LoggerConfiguration()
+             .MinimumLevel.Verbose()
+             .WriteTo.ColoredConsole()
+             .CreateLogger();
         }
 
         public IConfiguration Configuration { get; }
@@ -60,6 +65,9 @@ namespace GamePlatform_WebAPI
             services.AddScoped<IMaintainableDto<LanguageDto>, LanguageDtoService>();
             services.AddScoped<IMaintainableDto<PlayerDto>, PlayerDtoService>();
             services.AddScoped<IMaintainableDto<TeamDto>, TeamDtoService>();
+
+            services.Configure<DataProtectionTokenProviderOptions>(options =>
+            options.TokenLifespan = TimeSpan.FromHours(3));
 
             //// In production, the Angular files will be served from this directory
             //services.AddSpaStaticFiles(configuration =>

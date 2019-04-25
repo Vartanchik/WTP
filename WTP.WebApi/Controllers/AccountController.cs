@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Serilog;
 using WTP.BLL.Services.AppUserDtoService;
 using WTP.BLL.TransferModels;
 using WTP.WebApi.Helpers;
@@ -121,60 +122,112 @@ namespace GamePlatform_WebAPI.BusinessLogicLayer.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordViewModel formData)
         {
-            var user = await _appUserDtoService.GetByEmailAsync(formData.Email);
+            Log.Debug($"{this.ToString()}, action = ForgotPassword - Came request");
 
-            if (user == null)
+            if (ModelState.IsValid)
             {
-                // Sending Email about failed procedure 
-                await _appUserDtoService.SendEmailAsync(
-                    formData.Email,
-                    "WTP Password Reset",
-                    @"<h2>Unfortunately the user with such Email wasn't found.</h2><br>
-                    <h3>Please, <a href='http://localhost:4200/account/forgot-password'>try again</a></h3>");
+                Log.Debug($"{this.ToString()}, action = ForgotPassword - Model state is valid");
 
-                return Ok(new {succeeded = true});
+                var user = await _appUserDtoService.GetByEmailAsync(formData.Email);
+                Log.Debug($"{this.ToString()}, action = ForgotPassword - user={user.UserName}");
+
+                var userEmailIsConfirmed = await _appUserDtoService.IsEmailConfirmedAsync(user);
+                Log.Debug($"{this.ToString()}, action = ForgotPassword - userEmailIsConfirmed={userEmailIsConfirmed}");
+
+                if (user == null /*|| !userEmailIsConfirmed*/)
+                {
+                    Log.Debug($"{this.ToString()}, action = ForgotPassword - User wasn't found");
+                    // Sending Email about failed procedure 
+                    await _appUserDtoService.SendEmailAsync(
+                        formData.Email,
+                        "WTP Password Reset",
+                        @"<h2>Unfortunately the user with such Email wasn't found. Or Your Email isn't confirmed.</h2><br>
+                    <h3>You can, <a href='http://localhost:4200/account/forgot-password'>try again</a></h3>");
+                    Log.Debug($"{this.ToString()}, action = ForgotPassword - Email with rejection has been sent");
+
+                    return Ok(new { succeeded = true });
+                }
+
+                else
+                {
+                    Log.Debug($"{this.ToString()}, action = ForgotPassword - User was found");
+
+                    var token = await _appUserDtoService.GetPasswordResetTokenAsync(user);
+                    Log.Debug($"{this.ToString()}, action = ForgotPassword - Token was generated {token}");
+
+                    var callbackUrl = Url.Action("ResetPassword", "Account", 
+                        new { userId = user.Id, code = token }, protocol: HttpContext.Request.Scheme);
+
+                    await _appUserDtoService.SendEmailAsync(
+                        formData.Email,
+                        "WTP Password Reset",
+                        $@"<h2>If You want to reset Your password, follow this link:</h2><br><a href='{callbackUrl}'>{callbackUrl}</a>");
+                    Log.Debug($"{this.ToString()}, action = ForgotPassword - Email with link has been sent");
+
+                    return Ok(new { succeeded = true });
+                }
             }
-            else
-            {
-                //byte[] recoveryToken = new byte[16];
-                //var rng = new RNGCryptoServiceProvider();
-                //rng.GetBytes(recoveryToken);
-                //byte[] hashedRecoveryToken = new SHA256CryptoServiceProvider().ComputeHash(recoveryToken);
-                //var key = BitConverter.ToString(hashedRecoveryToken);
 
-                var token = await _appUserDtoService.GetPasswordResetTokenAsync(user);
-
-                var callbackUrl = Url.Action("ForgotPassword", "Account", new { userId = user.Id, code = token }, protocol: HttpContext.Request.Scheme);
-
-                await _appUserDtoService.SendEmailAsync(
-                    formData.Email,
-                    "WTP Password Reset",
-                    $@"<h2>If You want to reset Your password, follow this link:</h2><br>
-                    <a href='{callbackUrl}'>{callbackUrl}</a>");
-
-                return Ok(new { succeeded = true});
-            }
+            return BadRequest(new { LoginError = "Please, redisplay forgot password form - invalid value was entered!" });
         }
 
         [HttpGet("[action]")]
         [AllowAnonymous]
-        [ValidateAntiForgeryToken]
-        public IActionResult ForgotPasswordConfirmation([FromQuery] string userId = null, [FromQuery] string code = null)
+        public IActionResult ResetPassword([FromQuery] string userId = null, [FromQuery] string code = null)
         {
-            if(ModelState.IsValid & code != null)
-            {
-                return RedirectToPage(@"http://localhost:4200/account/password-reset", new { Id = userId});
-            }
+            Log.Debug($"{this.ToString()}, action = ResetPasswordGET - Came request");
 
-            return RedirectToPage(@"http://localhost:4200/account/password-reset");
+            if (userId == null || code == null)
+            {
+                Log.Debug($"{this.ToString()}, action = ResetPasswordGET - userId={userId} or code={code} is null");
+
+                return RedirectToPage(@"http://localhost:4200/account/forgot-password");
+            }
+            Log.Debug($"{this.ToString()}, action = ResetPasswordGET - userId={userId} and code={code} are not null");
+
+            var redirectUrl = Url.RouteUrl(@"http://localhost:4200/home/account/reset-password",
+                        new { id = userId, token = code }, protocol: HttpContext.Request.Scheme);
+
+            return RedirectToPage(redirectUrl);
+            //return RedirectToPage(@"http://localhost:4200/account/reset-password", new { id = userId, token = code });
         }
 
         [HttpPost("[action]")]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ResetPasswordAsync([FromBody] ResetPasswordViewModel formData, [FromBody] string Id)
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordViewModel formData)
         {
-            var user = await _appUserDtoService.GetAsync(formData.);
+            Log.Debug($"{this.ToString()}, action = ResetPasswordPOST - Came request");
+
+            List<string> errorList = new List<string>();
+
+            if (ModelState.IsValid)
+            {
+                Log.Debug($"{this.ToString()}, action = ResetPasswordPOST - Model state is valid");
+
+                var user = await _appUserDtoService.GetAsync(formData.Id);
+                Log.Debug($"{this.ToString()}, action = ResetPasswordPOST - user={user}");
+
+                var result = await _appUserDtoService.ResetPasswordAsync(user, formData.Code, formData.Password);
+
+                if (result.Succeeded)
+                {
+                    Log.Debug($"{this.ToString()}, action = ResetPasswordPOST - ResetPassword is Succeeded");
+
+                    return Ok(result);
+                }
+                else
+                {
+                    Log.Debug($"{this.ToString()}, action = ResetPasswordPOST - ResetPassword isn't Succeeded");
+
+                    foreach (var error in result.Errors)
+                    {
+                        errorList.Add(error.Code);
+                    }
+                }
+                return BadRequest(new JsonResult(errorList));
+            }
+            return BadRequest(new { LoginError = "Please, redisplay reset password form - invalid value was entered!" });
         }
     }
 }
