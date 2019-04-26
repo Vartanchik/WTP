@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
-using WTP.DAL.DomainModels;
 
-namespace WTP.WebApi.WTP.DAL.DomainModels
+namespace WTP.DAL.DomainModels
 {
-    public class Language
+    public class Language : IEntity
     {
         public int Id { get; set; }
         public string Name { get; set; }

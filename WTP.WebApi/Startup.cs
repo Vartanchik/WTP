@@ -10,27 +10,20 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using WTP.BLL.ModelsDto;
-using WTP.BLL.Services;
-using WTP.BLL.Services.AppUserDtoService;
-using WTP.BLL.Services.CountryDtoService;
-using WTP.BLL.Services.GenderDtoService;
-using WTP.BLL.Services.LanguageDtoService;
-using WTP.BLL.Services.PlayerDtoService;
-using WTP.BLL.Services.TeamDtoService;
-using WTP.DAL.Services;
-using WTP.WebApi.Helpers;
-using WTP.WebApi.WTP.DAL;
-using WTP.WebApi.WTP.DAL.DomainModels;
-using WTP.WebApi.WTP.DAL.Services.AppUserService;
-using WTP.WebApi.WTP.DAL.Services.AppUserServicea;
-using WTP.WebApi.WTP.DAL.Services.CountryService;
-using WTP.WebApi.WTP.DAL.Services.GenderService;
-using WTP.WebApi.WTP.DAL.Services.LanguageService;
-using WTP.WebApi.WTP.DAL.Services.PlayerService;
-using WTP.WebApi.WTP.DAL.Services.TeamService;
+using WTP.BLL.Services.Concrete.AppUserService;
+using WTP.BLL.Services.Concrete.CountryService;
+using WTP.BLL.Services.Concrete.GenderService;
+using WTP.BLL.Services.Concrete.LanguageService;
+using WTP.BLL.Services.Concrete.PlayerService;
+using WTP.BLL.Services.Concrete.TeamService;
+using WTP.DAL;
+using WTP.DAL.DomainModels;
+using WTP.DAL.Repositories.ConcreteRepositories.AppUserExtended;
+using WTP.DAL.Repositories.GenericRepository;
+using WTP.DAL.UnitOfWork;
+using WTP.WebAPI.Helpers;
 
-namespace GamePlatform_WebAPI
+namespace WTP.WebAPI
 {
     public class Startup
     {
@@ -47,19 +40,24 @@ namespace GamePlatform_WebAPI
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddAutoMapper();
 
-            services.AddScoped<IAppUserService, AppUserService>();
-            services.AddScoped<IMaintainable<Country>, CountryService>();
-            services.AddScoped<IMaintainable<Gender>, GenderService>();
-            services.AddScoped<IMaintainable<Language>, LanguageService>();
-            services.AddScoped<IMaintainable<Player>, PlayerService>();
-            services.AddScoped<IMaintainable<Team>, TeamService>();
 
-            services.AddScoped<IAppUserDtoService, AppUserDtoService>();
-            services.AddScoped<IMaintainableDto<CountryDto>, CountryDtoService>();
-            services.AddScoped<IMaintainableDto<GenderDto>, GenderDtoService>();
-            services.AddScoped<IMaintainableDto<LanguageDto>, LanguageDtoService>();
-            services.AddScoped<IMaintainableDto<PlayerDto>, PlayerDtoService>();
-            services.AddScoped<IMaintainableDto<TeamDto>, TeamDtoService>();
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+            services.AddScoped<IAppUserRepository, AppUserRepository>();
+            services.AddScoped<IRepository<AppUser>, RepositoryBase<AppUser>>();
+            services.AddScoped<IRepository<Country>, RepositoryBase<Country>>();
+            services.AddScoped<IRepository<Gender>, RepositoryBase<Gender>>();
+            services.AddScoped<IRepository<Language>, RepositoryBase<Language>>();
+            services.AddScoped<IRepository<Player>, RepositoryBase<Player>>();
+            services.AddScoped<IRepository<Team>, RepositoryBase<Team>>();
+
+            services.AddScoped<IAppUserService, AppUserService>();
+            services.AddScoped<ICountryService, CountryService>();
+            services.AddScoped<IGenderService, GenderService>();
+            services.AddScoped<ILanguageService, LanguageService>();
+            services.AddScoped<IPlayerService, PlayerService>();
+            services.AddScoped<ITeamService, TeamService>();
+
 
             //// In production, the Angular files will be served from this directory
             //services.AddSpaStaticFiles(configuration =>
@@ -80,11 +78,10 @@ namespace GamePlatform_WebAPI
 
             // Conect to Database
             services.AddDbContext<ApplicationDbContext>(options =>
-                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"),
-                    _ => _.MigrationsAssembly("WTP.WebAPI")));
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
             // Specifiying we are going to use Identity Framework
-            services.AddIdentity<AppUser, IdentityRole>(options =>
+            services.AddIdentity<AppUser, IdentityRole<int>>(options =>
             {
                 options.Password.RequireDigit = false;
                 options.Password.RequiredLength = 6;
@@ -97,7 +94,8 @@ namespace GamePlatform_WebAPI
                 options.Lockout.MaxFailedAccessAttempts = 5;
                 options.Lockout.AllowedForNewUsers = true;
 
-            }).AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
+            }).AddRoles<IdentityRole<int>>()
+              .AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
 
 
             // Configure strongly typed settings objects
