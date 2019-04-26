@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
-    <StartupObject>GamePlatform_WebAPI.Program</StartupObject>
+    <StartupObject>WTP.WebAPI.Program</StartupObject>
   </PropertyGroup>
 
   <ItemGroup>
