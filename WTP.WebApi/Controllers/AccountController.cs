@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using WTP.Logging;
 using WTP.BLL.ModelsDto.AppUser;
 using WTP.BLL.Services.Concrete.AppUserService;
 using WTP.WebAPI.Helpers;
@@ -20,16 +21,19 @@ namespace WTP.WebAPI.Controllers
     {
         private readonly IAppUserService _appUserService;
         private readonly AppSettings _appSettings;
+        private readonly ILog _log;
 
-        public AccountController(IAppUserService appUserService, IOptions<AppSettings> appSettings)
+        public AccountController(IAppUserService appUserService, IOptions<AppSettings> appSettings, ILog log)
         {
             _appSettings = appSettings.Value;
+            _log = log;
             _appUserService = appUserService;
         }
 
         [HttpPost("[action]")]
         public async Task<IActionResult> Register([FromBody] RegisterViewModel formdata)
         {
+            _log.Debug($"\nRequest to {this.ToString()}, action = Register");
             // Will hold all the errors related to registration
             List<string> errorList = new List<string>();
 
@@ -44,12 +48,14 @@ namespace WTP.WebAPI.Controllers
 
             if (result.Succeeded)
             {
+                _log.Debug($"\nUser was created. {this.ToString()}, action = Register");
                 // Sending Confirmation Email
 
                 return Ok(result);
             }
             else
             {
+                _log.Debug($"\nUser wasn't created. {this.ToString()}, action = Register");
                 foreach (var error in result.Errors)
                 {
                     errorList.Add(error.Code);
@@ -62,6 +68,7 @@ namespace WTP.WebAPI.Controllers
         [HttpPost("[action]")]
         public async Task<IActionResult> Login([FromBody] LoginViewModel formdata)
         {
+            _log.Debug($"\nRequest to {this.ToString()}, action = Login");
             // Get the User from Database
             var user = await _appUserService.GetByEmailAsync(formdata.Email);
 
@@ -73,6 +80,7 @@ namespace WTP.WebAPI.Controllers
 
             if (user != null && await _appUserService.CheckPasswordAsync(user.Id, formdata.Password))
             {
+                _log.Debug($"\nUser was founded. {this.ToString()}, action = Login");
                 // Confirmation of email
 
                 var tokenHandler = new JwtSecurityTokenHandler();
@@ -97,6 +105,7 @@ namespace WTP.WebAPI.Controllers
 
                 // Generate Token
                 var token = tokenHandler.CreateToken(tokenDescriptor);
+                _log.Debug($"\nToken was created. {this.ToString()}, action = Login");
 
                 return Ok(new
                 {
@@ -106,6 +115,7 @@ namespace WTP.WebAPI.Controllers
                     userRole = roles.FirstOrDefault()
                 });
             }
+            _log.Debug($"\nUser wasn't founded. {this.ToString()}, action = Login");
 
             //return error
             ModelState.AddModelError("", "Username/Password was not Found");

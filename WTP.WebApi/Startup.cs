@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using WTP.Logging;
 using WTP.BLL.Services.Concrete.AppUserService;
 using WTP.BLL.Services.Concrete.CountryService;
 using WTP.BLL.Services.Concrete.GenderService;
@@ -64,6 +65,7 @@ namespace WTP.WebAPI
             //{
             //    configuration.RootPath = "ClientApp/dist";
             //});
+            services.AddSingleton<ILog, SerilogLog>();
 
 
             // Enable CORS
@@ -135,11 +137,6 @@ namespace WTP.WebAPI
                 options.AddPolicy("RequireAdministratorRole", policy =>
                     policy.RequireRole("Admin").RequireAuthenticatedUser());
             });
-        }
-
-        private IServiceCollection ServiceAppUser()
-        {
-            throw new NotImplementedException();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
