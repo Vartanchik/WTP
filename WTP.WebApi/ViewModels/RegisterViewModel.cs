@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace GamePlatform_WebAPI.BusinessLogicLayer.ViewModels
+namespace WTP.WebAPI.ViewModels
 {
     public class RegisterViewModel
     {

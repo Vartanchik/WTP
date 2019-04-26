@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace GamePlatform_WebAPI.BusinessLogicLayer.ViewModels
+namespace WTP.WebAPI.ViewModels
 {
     public class LoginViewModel
     {

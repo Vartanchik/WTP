@@ -1,24 +1,24 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using WTP.BLL.ModelsDto;
-using WTP.BLL.Services.AppUserDtoService;
-using WTP.BLL.TransferModels;
-using WTP.WebAPI.ViewModels;
+using WTP.BLL.ModelsDto.AppUserLanguage;
+using WTP.BLL.ModelsDto.Language;
+using WTP.BLL.Services.Concrete.AppUserService;
 
-namespace GamePlatform_WebAPI.BusinessLogicLayer.Controllers
+namespace WTP.WebAPI.ViewModels.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     public class UserProfileController : ControllerBase
     {
-        private readonly IAppUserDtoService _appUserDtoService;
+        private readonly IAppUserService _appUserService;
         
-        public UserProfileController(IAppUserDtoService appUserDtoService)
+        public UserProfileController(IAppUserService appUserService)
         {
-            _appUserDtoService = appUserDtoService;
+            _appUserService = appUserService;
         }
 
         //GET : /api/UserProfile
@@ -26,9 +26,9 @@ namespace GamePlatform_WebAPI.BusinessLogicLayer.Controllers
         [Authorize(Policy = "RequireLoggedIn")]
         public async Task<IActionResult> GetUserProfile()
         {
-            string userId = User.Claims.First(c => c.Type == "UserID").Value;
+            int userId = Convert.ToInt32(User.Claims.First(c => c.Type == "UserID").Value);
 
-            var user = await _appUserDtoService.GetAsync(userId);
+            var user = await _appUserService.GetAsync(userId);
 
             var langs = new List<LanguageDto>();
             foreach(var item in user.AppUserLanguages)
@@ -67,9 +67,12 @@ namespace GamePlatform_WebAPI.BusinessLogicLayer.Controllers
                 return BadRequest(ModelState);
             }
 
-            string userId = User.Claims.First(c => c.Type == "UserID").Value;
+            // Will hold all the errors related to registration
+            List<string> errorList = new List<string>();
 
-            var user = await _appUserDtoService.GetAsync(userId);
+            int userId = Convert.ToInt32(User.Claims.First(c => c.Type == "UserID").Value);
+
+            var user = await _appUserService.GetAsync(userId);
 
             if (user == null)
             {
@@ -99,14 +102,21 @@ namespace GamePlatform_WebAPI.BusinessLogicLayer.Controllers
             user.AppUserLanguages = languages;
             user.Steam = formdata.Steam;
 
-            var result = await _appUserDtoService.UpdateAsync(user);
+            var result = await _appUserService.UpdateAsync(user);
 
             if (result.Succeeded)
             {
                 return Ok(new JsonResult("Updated"));
             }
+            else
+            {
+                foreach (var error in result.Errors)
+                {
+                    errorList.Add(error.Code);
+                }
+            }
 
-            return BadRequest(new JsonResult("Not updated"));
+            return BadRequest(new JsonResult(errorList));
         }
     }
 }

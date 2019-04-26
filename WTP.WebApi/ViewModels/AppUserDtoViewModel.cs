@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Threading.Tasks;
-using WTP.BLL.ModelsDto;
+using WTP.BLL.ModelsDto.Country;
+using WTP.BLL.ModelsDto.Gender;
+using WTP.BLL.ModelsDto.Language;
+using WTP.BLL.ModelsDto.Player;
+using WTP.BLL.ModelsDto.Team;
 
 namespace WTP.WebAPI.ViewModels
 {

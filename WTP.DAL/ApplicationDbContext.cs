@@ -1,13 +1,11 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using WTP.WebApi.WTP.DAL.DomainModels;
-using System.Linq;
 using WTP.DAL.DomainModels;
 
-namespace WTP.WebApi.WTP.DAL
+namespace WTP.DAL
 {
-    public class ApplicationDbContext : IdentityDbContext<AppUser>
+    public class ApplicationDbContext : IdentityDbContext<AppUser, IdentityRole<int>, int>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
@@ -24,10 +22,10 @@ namespace WTP.WebApi.WTP.DAL
         {
             base.OnModelCreating(builder);
 
-            builder.Entity<IdentityRole>().HasData(
-                    new { Id = "1", Name = "Admin", NormalizedName = "ADMIN" },
-                    new { Id = "2", Name = "User", NormalizedName = "USER" },
-                    new { Id = "3", Name = "Moderator", NormalizedName = "MODERATOR" }
+            builder.Entity<IdentityRole<int>>().HasData(
+                    new { Id = 1, Name = "Admin", NormalizedName = "ADMIN" },
+                    new { Id = 2, Name = "User", NormalizedName = "USER" },
+                    new { Id = 3, Name = "Moderator", NormalizedName = "MODERATOR" }
             );
 
             builder.Entity<AppUserLanguage>()
@@ -40,7 +38,6 @@ namespace WTP.WebApi.WTP.DAL
                 .HasOne(_ => _.Language)
                 .WithMany(_ => _.AppUserLanguages)
                 .HasForeignKey(_ => _.LanguageId);
-
         }
     }
 }

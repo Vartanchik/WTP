@@ -1,14 +1,12 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
-using WTP.DAL.DomainModels;
 
-namespace WTP.WebApi.WTP.DAL.DomainModels
+namespace WTP.DAL.DomainModels
 {
-    public class AppUser : IdentityUser
+    public class AppUser : IdentityUser<int>, IEntity
     {
-        public override string Id { get { return base.Id; } set { base.Id = value; } }
+        public override int Id { get { return base.Id; } set { base.Id = value; } }
         public override string UserName { get { return base.UserName; } set { base.UserName = value; } }
         public override string Email { get { return base.Email; } set { base.Email = value; } }
         public string Photo { get; set; }

@@ -1,4 +1,4 @@
-﻿namespace WTP.WebApi.Helpers
+﻿namespace WTP.WebAPI.Helpers
 {
     public class AppSettings
     {

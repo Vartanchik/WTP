@@ -1,6 +1,6 @@
-﻿namespace WTP.WebApi.WTP.DAL.DomainModels
+﻿namespace WTP.DAL.DomainModels
 {
-    public class Team
+    public class Team : IEntity
     {
         public int Id { get; set; }
         public string Name { get; set; }

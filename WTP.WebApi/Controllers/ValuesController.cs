@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GamePlatform_WebAPI.BusinessLogicLayer.Controllers
+namespace WTP.WebAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
