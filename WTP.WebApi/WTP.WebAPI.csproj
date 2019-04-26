@@ -1,8 +1,9 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
+    <StartupObject>GamePlatform_WebAPI.Program</StartupObject>
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,7 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\WTP.BLL\WTP.BLL.csproj" />
-    <ProjectReference Include="..\WTP.DAL\WTP.DAL.csproj" />
+    <ProjectReference Include="..\WTP.Logging\WTP.Logging.csproj" />
   </ItemGroup>
 
 </Project>
