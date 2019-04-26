@@ -129,12 +129,8 @@ namespace GamePlatform_WebAPI.BusinessLogicLayer.Controllers
                 Log.Debug($"{this.ToString()}, action = ForgotPassword - Model state is valid");
 
                 var user = await _appUserDtoService.GetByEmailAsync(formData.Email);
-                Log.Debug($"{this.ToString()}, action = ForgotPassword - user={user.UserName}");
 
-                var userEmailIsConfirmed = await _appUserDtoService.IsEmailConfirmedAsync(user);
-                Log.Debug($"{this.ToString()}, action = ForgotPassword - userEmailIsConfirmed={userEmailIsConfirmed}");
-
-                if (user == null /*|| !userEmailIsConfirmed*/)
+                if (user == null /*|| !(await _appUserDtoService.IsEmailConfirmedAsync(user))*/)
                 {
                     Log.Debug($"{this.ToString()}, action = ForgotPassword - User wasn't found");
                     // Sending Email about failed procedure 
@@ -181,6 +177,7 @@ namespace GamePlatform_WebAPI.BusinessLogicLayer.Controllers
             {
                 Log.Debug($"{this.ToString()}, action = ResetPasswordGET - userId={userId} or code={code} is null");
 
+                //This redirection must be changed!!!!
                 return RedirectToPage(@"http://localhost:4200/account/forgot-password");
             }
             Log.Debug($"{this.ToString()}, action = ResetPasswordGET - userId={userId} and code={code} are not null");
@@ -190,7 +187,6 @@ namespace GamePlatform_WebAPI.BusinessLogicLayer.Controllers
 
         [HttpPost("[action]")]
         [AllowAnonymous]
-        //[ValidateAntiForgeryToken]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordViewModel formData)
         {
             Log.Debug($"{this.ToString()}, action = ResetPasswordPOST - Came request");
@@ -200,11 +196,13 @@ namespace GamePlatform_WebAPI.BusinessLogicLayer.Controllers
             if (ModelState.IsValid)
             {
                 Log.Debug($"{this.ToString()}, action = ResetPasswordPOST - Model state is valid");
+                Log.Debug($"{this.ToString()}, action = ResetPasswordPOST - Token = {formData.Code}");
 
                 var user = await _appUserDtoService.GetAsync(formData.Id);
                 Log.Debug($"{this.ToString()}, action = ResetPasswordPOST - user={user}");
 
                 var result = await _appUserDtoService.ResetPasswordAsync(user, formData.Code, formData.Password);
+
 
                 if (result.Succeeded)
                 {
@@ -220,6 +218,11 @@ namespace GamePlatform_WebAPI.BusinessLogicLayer.Controllers
                     {
                         errorList.Add(error.Code);
                     }
+                }
+
+                foreach (var err in errorList)
+                {
+                    Log.Debug($"\nerror: {err}");
                 }
                 return BadRequest(new JsonResult(errorList));
             }
