@@ -66,6 +66,13 @@ namespace WTP.BLL.Services.AppUserDtoService
             return appUserDto;
         }
 
+        public async Task<AppUserDto> GetByManAsync(string id)
+        {
+            var appUser = await _appUserService.GetByManAsync(id);
+
+            return _mapper.Map<AppUserDto>(appUser);
+        }
+
         public async Task<AppUserDto> GetByEmailAsync(string email)
         {
             var appUser = await _appUserService.GetByEmailAsync(email);
@@ -128,6 +135,13 @@ namespace WTP.BLL.Services.AppUserDtoService
                 client.Credentials = new NetworkCredential("avg0test0@gmail.com", "TeSt159357");
                 await client.SendMailAsync(emailMessage);
             }
+        }
+
+        public void DeleteEntityState(AppUserDto applicationUserDto)
+        {
+            var appUser = _mapper.Map<AppUser>(applicationUserDto);
+
+            _appUserService.DeleteEntityState(appUser);
         }
     }
 }

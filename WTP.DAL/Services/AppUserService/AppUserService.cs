@@ -32,7 +32,12 @@ namespace WTP.WebApi.WTP.DAL.Services.AppUserServicea
             return await _applicationDbContext.AppUsers.Include("Country").Include("Gender")
                 .Include(_ => _.AppUserLanguages).FirstOrDefaultAsync(_ => _.Id == id);
         }
-        
+
+        public async Task<AppUser> GetByManAsync(string id)
+        {
+           return await _userManager.Users.FirstOrDefaultAsync(_ => _.Id == id);
+        }
+
         public async Task<AppUser> GetByEmailAsync(string email)
         {
             return await _userManager.FindByEmailAsync(email);
@@ -71,14 +76,22 @@ namespace WTP.WebApi.WTP.DAL.Services.AppUserServicea
             return await _userManager.GeneratePasswordResetTokenAsync(applicationUser);
         }
 
-        public async Task<bool> IsEmailConfirmedAsync(AppUser appUser)
+        public async Task<bool> IsEmailConfirmedAsync(AppUser applicationUser)
         {
-            return await _userManager.IsEmailConfirmedAsync(appUser);
+            return await _userManager.IsEmailConfirmedAsync(applicationUser);
         }
 
         public async Task<IdentityResult> ResetPasswordAsync(AppUser applicationUser, string token, string newPassword)
         {
-            return await _userManager.ResetPasswordAsync(applicationUser, token, newPassword);
+            var user = await GetAsync(applicationUser.Id);
+            System.Console.WriteLine($"\n\n!!!!!!!!!!!!!!!!!!!!!!>{user.GetHashCode()}<!!!!!!!!!!!!!!\n\n");
+            return await _userManager.ResetPasswordAsync(user, token, newPassword);
+        }
+
+        public void DeleteEntityState(AppUser applicationUser)
+        {
+            _applicationDbContext.Entry(applicationUser).State = EntityState.Deleted;
+
         }
     }
 }

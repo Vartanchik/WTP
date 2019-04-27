@@ -41,6 +41,7 @@ namespace GamePlatform_WebAPI
             Log.Logger = new LoggerConfiguration()
              .MinimumLevel.Verbose()
              .WriteTo.ColoredConsole()
+             .WriteTo.File("log.txt", rollingInterval: RollingInterval.Day)
              .CreateLogger();
         }
 
@@ -88,8 +89,11 @@ namespace GamePlatform_WebAPI
 
             // Conect to Database
             services.AddDbContext<ApplicationDbContext>(options =>
-                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"),
-                    _ => _.MigrationsAssembly("WTP.WebAPI")));
+            {
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"),
+                   _ => _.MigrationsAssembly("WTP.WebAPI"));
+                options.EnableSensitiveDataLogging();
+            });
 
             // Specifiying we are going to use Identity Framework
             services.AddIdentity<AppUser, IdentityRole>(options =>

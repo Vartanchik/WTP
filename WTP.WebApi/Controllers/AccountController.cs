@@ -8,6 +8,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 using GamePlatform_WebAPI.BusinessLogicLayer.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -146,13 +147,19 @@ namespace GamePlatform_WebAPI.BusinessLogicLayer.Controllers
 
                 else
                 {
-                    Log.Debug($"{this.ToString()}, action = ForgotPassword - User was found");
+                    Log.Debug($"{this.ToString()}, action = ForgotPassword - User was found, user's hashcode: {user.GetHashCode()}");
 
                     var token = await _appUserDtoService.GetPasswordResetTokenAsync(user);
                     Log.Debug($"{this.ToString()}, action = ForgotPassword - Token was generated {token}");
 
+                    token = HttpUtility.UrlEncode(token);
+                    Log.Debug($"{this.ToString()}, action = ForgotPassword - Token Encoded {token}");
+
                     var callbackUrl = Url.Action("ResetPassword", "Account", 
                         new { userId = user.Id, code = token }, protocol: HttpContext.Request.Scheme);
+                    Log.Debug($"{this.ToString()}, action = ForgotPassword - Token in URL {callbackUrl.Substring(callbackUrl.IndexOf("code=") + 5)}");
+
+                    //_appUserDtoService.DeleteEntityState(user);
 
                     await _appUserDtoService.SendEmailAsync(
                         formData.Email,
@@ -196,11 +203,16 @@ namespace GamePlatform_WebAPI.BusinessLogicLayer.Controllers
             if (ModelState.IsValid)
             {
                 Log.Debug($"{this.ToString()}, action = ResetPasswordPOST - Model state is valid");
-                Log.Debug($"{this.ToString()}, action = ResetPasswordPOST - Token = {formData.Code}");
+                Log.Debug($"{this.ToString()}, action = ResetPasswordPOST - Token fromData = {formData.Code}");
 
                 var user = await _appUserDtoService.GetAsync(formData.Id);
-                Log.Debug($"{this.ToString()}, action = ResetPasswordPOST - user={user}");
+                var user2 = await _appUserDtoService.GetByManAsync(formData.Id);
+                Log.Debug($"{this.ToString()}, action = ResetPasswordPOST - User was found, user's hashcode:: {user.GetHashCode()}");
+                Log.Debug($"{this.ToString()}, action = ResetPasswordPOST - User2 was found, user's hashcode:: {user2.GetHashCode()}");
 
+                //var code = HttpUtility.UrlDecode(formData.Code);
+                //Log.Debug($"{this.ToString()}, action = ResetPasswordPOST - Token Decoded = {code}");
+                var str = "CfDJ8DmvOJ/dtDJFhzCmGy38KUC8IRmruqLemjHgDWJR3EoBKQQjUdcv2Q01bV32EYc6QbKUZYolOlGaTmDbpqknJFrH8ctO/fxipefmYptMRUUrzDR4p8+/WzCQMxtj+GjFGd/F3CDPOeL9YqyF/VvS8zAontwzXqaITIPcQWt5nnT0537isHLrEOcIiJ7T942J0zLGKSUHEqw9PEhmHsfk4nBaOOBoWQ5+m5Xoe3xkMcHj";
                 var result = await _appUserDtoService.ResetPasswordAsync(user, formData.Code, formData.Password);
 
 

@@ -9,6 +9,7 @@ namespace WTP.BLL.Services.AppUserDtoService
     {
         Task<IdentityResult> CreateAsync(AppUserDto applicationUserDto, string password);
         Task<AppUserDto> GetAsync(string id);
+        Task<AppUserDto> GetByManAsync(string id);
         Task<AppUserDto> GetByEmailAsync(string email);
         Task<IdentityResult> UpdateAsync(AppUserDto applicationUserDto);
         Task<IList<string>> GetRolesAsync(AppUserDto applicationUserDto);
@@ -17,5 +18,6 @@ namespace WTP.BLL.Services.AppUserDtoService
         Task<bool> IsEmailConfirmedAsync(AppUserDto applicationUserDto);
         Task<IdentityResult> ResetPasswordAsync(AppUserDto applicationUserDto, string token, string newPassword);
         Task SendEmailAsync(string email, string subject, string message);
+        void DeleteEntityState(AppUserDto applicationUserDto);
     }
 }

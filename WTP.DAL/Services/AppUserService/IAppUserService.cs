@@ -9,6 +9,7 @@ namespace WTP.WebApi.WTP.DAL.Services.AppUserService
     {
         Task<IdentityResult> CreateAsync(AppUser applicationUser, string password);
         Task<AppUser> GetAsync(string id);
+        Task<AppUser> GetByManAsync(string id);
         Task<AppUser> GetByEmailAsync(string email);
         Task<IdentityResult> UpdateAsync(AppUser applicationUser);
         Task<IList<string>> GetRolesAsync(AppUser applicationUser);
@@ -16,5 +17,6 @@ namespace WTP.WebApi.WTP.DAL.Services.AppUserService
         Task<string> GetPasswordResetTokenAsync(AppUser applicationUser);
         Task<bool> IsEmailConfirmedAsync(AppUser applicationUser);
         Task<IdentityResult> ResetPasswordAsync(AppUser applicationUser, string token, string newPassword);
+        void DeleteEntityState(AppUser applicationUser);
     }
 }
