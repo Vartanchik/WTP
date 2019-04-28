@@ -13,6 +13,9 @@ namespace WTP.DAL.UnitOfWork
         IRepository<Language> Languages { get; }
         IRepository<Player> Players { get; }
         IRepository<Team> Teams { get; }
+        IRepository<Admin> Admins { get; }
+        IRepository<AdminOperation> AdminOperations { get; }
+        IRepository<History> Histories { get; }
 
         void Commit();
 

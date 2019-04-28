@@ -14,6 +14,9 @@ namespace WTP.DAL.UnitOfWork
         private IRepository<Language> _languages;
         private IRepository<Player> _players;
         private IRepository<Team> _teams;
+        private IRepository<Admin> _admins;
+        private IRepository<AdminOperation> _adminOperations;
+        private IRepository<History> _histories;
 
         public UnitOfWork(ApplicationDbContext context)
         {
@@ -26,6 +29,9 @@ namespace WTP.DAL.UnitOfWork
         public IRepository<Language> Languages => _languages ?? (_languages = new RepositoryBase<Language>(_context));
         public IRepository<Player> Players => _players ?? (_players = new RepositoryBase<Player>(_context));
         public IRepository<Team> Teams => _teams ?? (_teams = new RepositoryBase<Team>(_context));
+        public IRepository<Admin> Admins => _admins ?? (_admins = new RepositoryBase<Admin>(_context));
+        public IRepository<AdminOperation> AdminOperations => _adminOperations ?? (_adminOperations = new RepositoryBase<AdminOperation>(_context));
+        public IRepository<History> Histories => _histories ?? (_histories = new RepositoryBase<History>(_context));
 
         public void Commit()
         {
