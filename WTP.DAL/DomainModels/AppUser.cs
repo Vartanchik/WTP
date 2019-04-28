@@ -19,5 +19,6 @@ namespace WTP.DAL.DomainModels
         public ICollection<AppUserLanguage> AppUserLanguages { get; set; }
         public List<Player> Players { get; set; }
         public List<Team> Teams { get; set; }
+        public List<History> Histories { get; set; }
     }
 }

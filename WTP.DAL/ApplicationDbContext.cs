@@ -17,6 +17,9 @@ namespace WTP.DAL
         public DbSet<Country> Countries { get; set; }
         public DbSet<Player> Players { get; set; }
         public DbSet<Team> Teams { get; set; }
+        public DbSet<Admin> Admins { get; set; }
+        public DbSet<AdminOperation> AdminOperations { get; set; }
+        public DbSet<History> Histories { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -26,6 +29,14 @@ namespace WTP.DAL
                     new { Id = 1, Name = "Admin", NormalizedName = "ADMIN" },
                     new { Id = 2, Name = "User", NormalizedName = "USER" },
                     new { Id = 3, Name = "Moderator", NormalizedName = "MODERATOR" }
+            );
+
+            builder.Entity<AdminOperation>().HasData(
+                    new { Id = 1, OperationName = OperationEnum.Create },
+                    new { Id = 2, OperationName = OperationEnum.Update },
+                    new { Id = 3, OperationName = OperationEnum.Delete },
+                    new { Id = 4, OperationName = OperationEnum.Lock },
+                    new { Id = 5, OperationName = OperationEnum.UnLock }
             );
 
             builder.Entity<AppUserLanguage>()
