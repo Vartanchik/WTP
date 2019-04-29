@@ -80,7 +80,7 @@ namespace WTP.WebAPI
 
             // Conect to Database
             services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"), b => b.MigrationsAssembly("WTP.WebAPI")));
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"), b => b.MigrationsAssembly("WTP.DAL")));
 
             // Specifiying we are going to use Identity Framework
             services.AddIdentity<AppUser, IdentityRole<int>>(options =>
