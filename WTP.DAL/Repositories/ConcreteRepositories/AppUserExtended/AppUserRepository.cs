@@ -64,5 +64,24 @@ namespace WTP.DAL.Repositories.ConcreteRepositories.AppUserExtended
             return await _context.AppUsers.Include("Country").Include("Gender")
                 .Include(_ => _.AppUserLanguages).FirstOrDefaultAsync(_ => _.Id == id);
         }
+
+        public async Task<bool> IsEmailConfirmedAsync(AppUser appUser)
+        {
+            var user = await GetAsync(appUser.Id);
+
+            return await _userManager.IsEmailConfirmedAsync(user);
+        }
+
+        public async Task<string> GeneratePasswordResetTokenAsync(AppUser appUser)
+        {
+            return await _userManager.GeneratePasswordResetTokenAsync(appUser);
+        }
+
+        public async Task<IdentityResult> ResetPasswordAsync(AppUser appUser, string token, string newPassword)
+        {
+            var user = await GetAsync(appUser.Id);
+
+            return await _userManager.ResetPasswordAsync(user, token, newPassword);
+        }
     }
 }

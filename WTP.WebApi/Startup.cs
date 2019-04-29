@@ -67,6 +67,9 @@ namespace WTP.WebAPI
             //});
             services.AddSingleton<ILog, SerilogLog>();
 
+            services.Configure<DataProtectionTokenProviderOptions>(options =>
+            options.TokenLifespan = TimeSpan.FromMinutes(30));
+
 
             // Enable CORS
             services.AddCors(options =>

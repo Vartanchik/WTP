@@ -13,6 +13,8 @@ using WTP.BLL.ModelsDto.AppUser;
 using WTP.BLL.Services.Concrete.AppUserService;
 using WTP.WebAPI.Helpers;
 using WTP.WebAPI.ViewModels;
+using Microsoft.AspNetCore.Authorization;
+using System.Web;
 
 namespace WTP.WebAPI.Controllers
 {
@@ -120,6 +122,126 @@ namespace WTP.WebAPI.Controllers
             //return error
             ModelState.AddModelError("", "Username/Password was not Found");
             return Unauthorized(new { LoginError = "Please Check the Login Credentials - Ivalid Username/Password was entered" });
+        }
+
+        [HttpPost("[action]")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordViewModel formData)
+        {
+            _log.Debug($"{this.ToString()}, action = ForgotPassword HttpPost. Came request");
+
+            List<string> errorList = new List<string>();
+
+            if (ModelState.IsValid)
+            {
+                _log.Debug($"{this.ToString()}, action = ForgotPassword HttpPost. Model state is valid");
+
+                var user = await _appUserService.GetByEmailAsync(formData.Email);
+
+                if (user == null || !(await _appUserService.IsEmailConfirmedAsync(user)))
+                {
+                    _log.Debug($"{this.ToString()}, action = ForgotPassword HttpPost. User wasn't found");
+
+                    await _appUserService.SendEmailAsync(
+                        formData.Email,
+                        "WTP Password Reset",
+                        @"Unfortunately the user with such Email wasn't found. Or Your Email isn't confirmed.<br>
+                    You can, <a href='http://localhost:4200/account/forgot-password'>try again</a>");
+                    _log.Debug($"{this.ToString()}, action = ForgotPassword HttpPost. Email with rejection has been sent");
+
+                    return Ok();
+                }
+
+                else
+                {
+                    _log.Debug($"{this.ToString()}, action = ForgotPassword HttpPost. User was found, user's hashcode: {user.GetHashCode()}");
+
+                    var token = await _appUserService.GeneratePasswordResetTokenAsync(user);
+                    _log.Debug($"{this.ToString()}, action = ForgotPassword HttpPost. Token was generated: {token}");
+
+                    token = HttpUtility.UrlEncode(token);
+                    _log.Debug($"{this.ToString()}, action = ForgotPassword HttpPost. Token was encoded: {token}");
+
+                    var callbackUrl = Url.Action("ResetPassword", "Account",
+                        new { userId = user.Id, code = token }, protocol: HttpContext.Request.Scheme);
+                    _log.Debug($"{this.ToString()}, action = ForgotPassword HttpPost. Token in URL: {callbackUrl.Substring(callbackUrl.IndexOf("code=") + 5)}");
+
+                    await _appUserService.SendEmailAsync(
+                        formData.Email,
+                        "WTP Password Reset",
+                        $"If You want to reset Your password, follow this: <a href='{callbackUrl}'>link</a>");
+                    _log.Debug($"{this.ToString()}, action = ForgotPassword HttpPost. Email with link was sent");
+
+                    return Ok();
+                }
+            }
+            _log.Debug($"{this.ToString()}, action = ForgotPassword HttpPost. Model state is invalid");
+
+            errorList.Add("Invalid value was entered! Please, redisplay form.");
+            return BadRequest(new JsonResult(errorList));
+        }
+
+        [HttpGet("[action]")]
+        [AllowAnonymous]
+        public IActionResult ResetPassword([FromQuery] string userId = null, [FromQuery] string code = null)
+        {
+            _log.Debug($"{this.ToString()}, action = ResetPassword HttpGET. Came request");
+
+            if (userId == null || code == null)
+            {
+                _log.Debug($"{this.ToString()}, action = ResetPassword HttpGET. userId={userId} or code={code} is null");
+
+                return Redirect("http://localhost:4200/account/forgot-password?fell=true");
+            }
+            _log.Debug($"{this.ToString()}, action = ResetPassword HttpGET. userId={userId} and code={code} are not null");
+
+            return Redirect($"http://localhost:4200/account/reset-password?userId={userId}&code={code}");
+        }
+
+        [HttpPost("[action]")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordViewModel formData)
+        {
+            _log.Debug($"{this.ToString()}, action = ResetPassword HttpPost. Came request");
+
+            List<string> errorList = new List<string>();
+
+            if (ModelState.IsValid)
+            {
+                _log.Debug($"{this.ToString()}, action = ResetPassword HttpPost. Model state is valid");
+                _log.Debug($"{this.ToString()}, action = ResetPassword HttpPost. Token: {formData.Code}");
+
+                var user = await _appUserService.GetAsync(formData.Id);
+                _log.Debug($"{this.ToString()}, action = ResetPassword HttpPost. User was found");
+
+                var result = await _appUserService.ResetPasswordAsync(user, formData.Code, formData.Password);
+
+                if (result.Succeeded)
+                {
+                    _log.Debug($"{this.ToString()}, action = ResetPassword HttpPost. ResetPassword is succeed");
+
+                    return Ok(result);
+                }
+                else
+                {
+                    _log.Debug($"{this.ToString()}, action = ResetPassword HttpPost. ResetPassword isn't succeed");
+
+                    foreach (var error in result.Errors)
+                    {
+                        errorList.Add(error.Code);
+                    }
+                }
+
+                foreach (var err in errorList)
+                {
+                    _log.Debug($"{ this.ToString()}, action = ResetPassword HttpPost. Error: {err}");
+                }
+                return BadRequest(new JsonResult(errorList));
+            }
+            _log.Debug($"{this.ToString()}, action = ResetPassword HttpPost. Model state isn't valid");
+
+            errorList.Add("Invalid value was entered! Please, redisplay form.");
+            return BadRequest(new JsonResult(errorList));
         }
     }
 }

@@ -15,5 +15,8 @@ namespace WTP.DAL.Repositories.ConcreteRepositories.AppUserExtended
         Task<IList<string>> GetRolesAsync(AppUser appUser);
         Task<bool> CheckPasswordAsync(int id, string password);
         Task<AppUser> GetAsync(int id);
+        Task<bool> IsEmailConfirmedAsync(AppUser appUser);
+        Task<string> GeneratePasswordResetTokenAsync(AppUser appUser);
+        Task<IdentityResult> ResetPasswordAsync(AppUser appUser, string token, string newPassword);
     }
 }
