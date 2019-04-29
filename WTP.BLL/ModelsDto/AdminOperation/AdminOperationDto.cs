@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using WTP.BLL.ModelsDto.History;
 
-namespace WTP.DAL.DomainModels
+namespace WTP.BLL.ModelsDto.AdminOperation
 {
     public enum OperationEnum
     {
@@ -13,7 +14,7 @@ namespace WTP.DAL.DomainModels
         UnLock = 5
     }
 
-    public class AdminOperation: IEntity
+    public class AdminOperationDto
     {
         public int Id { get; set; }
         public OperationEnum OperationName
@@ -22,6 +23,6 @@ namespace WTP.DAL.DomainModels
             set => Id = (int)value;
         }
 
-        public List<History> Histories { get; set; }
+        public List<HistoryDto> Histories { get; set; }
     }
 }

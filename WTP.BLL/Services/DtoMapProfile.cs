@@ -1,7 +1,10 @@
 ﻿using AutoMapper;
+using WTP.BLL.ModelsDto.Admin;
+using WTP.BLL.ModelsDto.AdminOperation;
 using WTP.BLL.ModelsDto.AppUser;
 using WTP.BLL.ModelsDto.Country;
 using WTP.BLL.ModelsDto.Gender;
+using WTP.BLL.ModelsDto.History;
 using WTP.BLL.ModelsDto.Language;
 using WTP.BLL.ModelsDto.Player;
 using WTP.BLL.ModelsDto.Team;
@@ -25,6 +28,12 @@ namespace WTP.BLL.Services.Concrete
             CreateMap<Team, TeamDto>();
             CreateMap<PlayerDto, Player>();
             CreateMap<Player, PlayerDto>();
+            CreateMap<Admin, AdminDto>();
+            CreateMap<AdminDto,Admin>();
+            CreateMap<AdminOperationDto, AdminOperation>();
+            CreateMap<AdminOperation,AdminOperationDto>();
+            CreateMap<History, HistoryDto>();
+            CreateMap<HistoryDto,History>();
         }
     }
 }
