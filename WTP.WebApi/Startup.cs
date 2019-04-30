@@ -23,6 +23,7 @@ using WTP.DAL.Repositories.ConcreteRepositories.AppUserExtended;
 using WTP.DAL.Repositories.GenericRepository;
 using WTP.DAL.UnitOfWork;
 using WTP.WebAPI.Helpers;
+using WTP.BLL.Services.Concrete.EmailService;
 
 namespace WTP.WebAPI
 {
@@ -65,6 +66,7 @@ namespace WTP.WebAPI
             //{
             //    configuration.RootPath = "ClientApp/dist";
             //});
+            services.AddScoped<IEmailService, EmailService>();
             services.AddSingleton<ILog, SerilogLog>();
 
             services.Configure<DataProtectionTokenProviderOptions>(options =>

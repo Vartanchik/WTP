@@ -15,6 +15,7 @@ using WTP.WebAPI.Helpers;
 using WTP.WebAPI.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using System.Web;
+using WTP.BLL.Services.Concrete.EmailService;
 
 namespace WTP.WebAPI.Controllers
 {
@@ -22,12 +23,14 @@ namespace WTP.WebAPI.Controllers
     public class AccountController : Controller
     {
         private readonly IAppUserService _appUserService;
+        private readonly IEmailService _emailService;
         private readonly AppSettings _appSettings;
         private readonly ILog _log;
 
-        public AccountController(IAppUserService appUserService, IOptions<AppSettings> appSettings, ILog log)
+        public AccountController(IAppUserService appUserService, IEmailService emailService, IOptions<AppSettings> appSettings, ILog log)
         {
             _appSettings = appSettings.Value;
+            _emailService = emailService;
             _log = log;
             _appUserService = appUserService;
         }
@@ -140,14 +143,7 @@ namespace WTP.WebAPI.Controllers
 
                 if (user == null || !(await _appUserService.IsEmailConfirmedAsync(user)))
                 {
-                    _log.Debug($"{this.ToString()}, action = ForgotPassword HttpPost. User wasn't found");
-
-                    await _appUserService.SendEmailAsync(
-                        formData.Email,
-                        "WTP Password Reset",
-                        @"Unfortunately the user with such Email wasn't found. Or Your Email isn't confirmed.<br>
-                    You can, <a href='http://localhost:4200/account/forgot-password'>try again</a>");
-                    _log.Debug($"{this.ToString()}, action = ForgotPassword HttpPost. Email with rejection has been sent");
+                    _log.Debug($"{this.ToString()}, action = ForgotPassword HttpPost. User wasn't found or email wasn't confirmed");
 
                     return Ok();
                 }
@@ -166,7 +162,7 @@ namespace WTP.WebAPI.Controllers
                         new { userId = user.Id, code = token }, protocol: HttpContext.Request.Scheme);
                     _log.Debug($"{this.ToString()}, action = ForgotPassword HttpPost. Token in URL: {callbackUrl.Substring(callbackUrl.IndexOf("code=") + 5)}");
 
-                    await _appUserService.SendEmailAsync(
+                    await _emailService.SendEmailAsync(
                         formData.Email,
                         "WTP Password Reset",
                         $"If You want to reset Your password, follow this: <a href='{callbackUrl}'>link</a>");

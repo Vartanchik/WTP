@@ -1,8 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using System.Collections.Generic;
-using System.Net;
-using System.Net.Mail;
 using System.Threading.Tasks;
 using WTP.BLL.ModelsDto.AppUser;
 using WTP.BLL.ModelsDto.AppUserLanguage;
@@ -113,23 +111,6 @@ namespace WTP.BLL.Services.Concrete.AppUserService
             var appUser = _mapper.Map<AppUser>(appUserDto);
 
             return await _appUserRepository.ResetPasswordAsync(appUser, token, newPassword);
-        }
-
-        public async Task SendEmailAsync(string email, string subject, string message)
-        {
-            var emailMessage = new MailMessage("avg0test0@gmail.com", email);
-            emailMessage.Subject = subject;
-            emailMessage.IsBodyHtml = true;
-            emailMessage.Body = message;
-
-            using (var client = new SmtpClient())
-            {
-                client.Host = "smtp.gmail.com";
-                client.Port = 587;
-                client.EnableSsl = true;
-                client.Credentials = new NetworkCredential("avg0test0@gmail.com", "TeSt159357");
-                await client.SendMailAsync(emailMessage);
-            }
         }
     }
 }
