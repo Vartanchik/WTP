@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using WTP.DAL.DomainModels;
+using WTP.DAL.Repositories.ConcreteRepositories.AppUserExtended;
 using WTP.DAL.Repositories.GenericRepository;
 
 namespace WTP.DAL.Repositories.ConcreteRepositories.AdminExtended

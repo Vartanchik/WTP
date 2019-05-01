@@ -64,5 +64,11 @@ namespace WTP.DAL.Repositories.ConcreteRepositories.AppUserExtended
             return await _context.AppUsers.Include("Country").Include("Gender")
                 .Include(_ => _.AppUserLanguages).FirstOrDefaultAsync(_ => _.Id == id);
         }
+
+        public new async Task<IEnumerable<AppUser>> GetAllAsync()
+        {
+            return await _userManager.Users.ToListAsync();
+            //return await GetAllAsync();
+        }
     }
 }

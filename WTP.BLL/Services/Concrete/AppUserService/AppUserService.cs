@@ -91,5 +91,11 @@ namespace WTP.BLL.Services.Concrete.AppUserService
         {
             return await _appUserRepository.CheckPasswordAsync(id, password);
         }
+
+        public async Task<IEnumerable<AppUserDto>> GetAllAsync()
+        {
+            var allUsers = await _appUserRepository.GetAllAsync();
+            return _mapper.Map<IEnumerable<AppUserDto>>(allUsers);
+        }
     }
 }

@@ -23,6 +23,10 @@ using WTP.DAL.Repositories.ConcreteRepositories.AppUserExtended;
 using WTP.DAL.Repositories.GenericRepository;
 using WTP.DAL.UnitOfWork;
 using WTP.WebAPI.Helpers;
+using WTP.BLL.Services.Concrete.AdminService;
+using WTP.BLL.Services.Concrete.AdminOperationService;
+using WTP.BLL.Services.Concrete.HistoryService;
+using WTP.DAL.Repositories.ConcreteRepositories.AdminExtended;
 
 namespace WTP.WebAPI
 {
@@ -52,12 +56,21 @@ namespace WTP.WebAPI
             services.AddScoped<IRepository<Player>, RepositoryBase<Player>>();
             services.AddScoped<IRepository<Team>, RepositoryBase<Team>>();
 
+            services.AddScoped<IRepository<History>, RepositoryBase<History>>();
+            services.AddScoped<IAdminRepository, AdminRepository>();
+            services.AddScoped<IRepository<Admin>, RepositoryBase<Admin>>();
+            services.AddScoped<IRepository<AdminOperation>, RepositoryBase<AdminOperation>>();
+
             services.AddScoped<IAppUserService, AppUserService>();
             services.AddScoped<ICountryService, CountryService>();
             services.AddScoped<IGenderService, GenderService>();
             services.AddScoped<ILanguageService, LanguageService>();
             services.AddScoped<IPlayerService, PlayerService>();
             services.AddScoped<ITeamService, TeamService>();
+
+            services.AddScoped<IHistoryService, HistoryService>();
+            services.AddScoped<IAdminService, AdminService>();
+            services.AddScoped<IAdminOperationService, AdminOperationService>();
 
 
             //// In production, the Angular files will be served from this directory
