@@ -67,6 +67,13 @@ namespace WTP.WebAPI
             //});
             services.AddSingleton<ILog, SerilogLog>();
 
+            // Add the REDIS 
+            services.AddDistributedRedisCache(options =>
+            {
+                options.Configuration = "127.0.0.1";//defaultDatabase=4";
+                options.InstanceName = "master";
+            });
+
 
             // Enable CORS
             services.AddCors(options =>
