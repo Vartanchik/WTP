@@ -9,6 +9,7 @@ namespace WTP.DAL.Repositories.ConcreteRepositories.AppUserExtended
 {
     public interface IAppUserRepository
     {
+        Task<IdentityResult> CreateAdminAsync(AppUser appUser, string password);
         Task<IdentityResult> CreateAsync(AppUser appUser, string password);
         Task<IdentityResult> UpdateAsync(AppUser appUser);
         Task<AppUser> GetByEmailAsync(string email);

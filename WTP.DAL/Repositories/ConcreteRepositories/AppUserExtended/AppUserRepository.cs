@@ -27,6 +27,15 @@ namespace WTP.DAL.Repositories.ConcreteRepositories.AppUserExtended
             return result;
         }
 
+        public async Task<IdentityResult> CreateAdminAsync(AppUser appUser, string password)
+        {
+            var result = await _userManager.CreateAsync(appUser, password);
+
+            await _userManager.AddToRoleAsync(appUser, "Admin");
+
+            return result;
+        }
+
         public new async Task<IdentityResult> UpdateAsync(AppUser appUser)
         {
             var user = await GetAsync(appUser.Id);

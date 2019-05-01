@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using WTP.BLL.ModelsDto.Admin;
+using WTP.BLL.ModelsDto.AppUser;
 using WTP.BLL.ModelsDto.Language;
 using WTP.BLL.Services.Concrete.AdminService;
 using WTP.BLL.Services.Concrete.AppUserService;
@@ -38,7 +39,44 @@ namespace WTP.WebAPI.Controllers
             _appUserService = appUserService;
         }
 
-        
+
+        //Create Admin account
+        [HttpPost("[action]")]
+        public async Task<IActionResult> Register([FromBody] RegisterViewModel formdata)
+        {
+            _log.Debug($"\nRequest to {this.ToString()}, action = Register");
+            // Will hold all the errors related to registration
+            List<string> errorList = new List<string>();
+
+            var user = new AppUserDto
+            {
+                Email = formdata.Email,
+                UserName = formdata.UserName,
+                SecurityStamp = Guid.NewGuid().ToString()
+            };
+
+            var result = await _appUserService.CreateAdminAsync(user, formdata.Password);
+
+            if (result.Succeeded)
+            {
+                _log.Debug($"\nUser was created. {this.ToString()}, action = Register");
+                // Sending Confirmation Email
+
+                return Ok(result);
+            }
+            else
+            {
+                _log.Debug($"\nUser wasn't created. {this.ToString()}, action = Register");
+                foreach (var error in result.Errors)
+                {
+                    errorList.Add(error.Code);
+                }
+            }
+
+            return BadRequest(new JsonResult(errorList));
+        }
+
+        //GetAllUsers
         [HttpGet]
         [Route("GetUserProfile")]
         //[Authorize(Policy = "RequireLoggedIn")]

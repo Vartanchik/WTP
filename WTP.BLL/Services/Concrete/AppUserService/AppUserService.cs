@@ -32,6 +32,15 @@ namespace WTP.BLL.Services.Concrete.AppUserService
             return result;
         }
 
+        public async Task<IdentityResult> CreateAdminAsync(AppUserDto appUserDto, string password)
+        {
+            var appUser = _mapper.Map<AppUser>(appUserDto);
+
+            var result = await _appUserRepository.CreateAdminAsync(appUser, password);
+
+            return result;
+        }
+
         public async Task<AppUserDto> GetAsync(int id)
         {
             var appUser = await _appUserRepository.GetAsync(id);
