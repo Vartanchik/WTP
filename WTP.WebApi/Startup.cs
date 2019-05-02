@@ -23,6 +23,7 @@ using WTP.DAL.Repositories.ConcreteRepositories.AppUserExtended;
 using WTP.DAL.Repositories.GenericRepository;
 using WTP.DAL.UnitOfWork;
 using WTP.WebAPI.Helpers;
+using WTP.DAL.Repositories.UserCacheRepositories;
 
 namespace WTP.WebAPI
 {
@@ -44,7 +45,7 @@ namespace WTP.WebAPI
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-            services.AddScoped<IAppUserRepository, AppUserRepository>();
+            services.AddScoped<IAppUserRepository, UserCachingRepository>();
             services.AddScoped<IRepository<AppUser>, RepositoryBase<AppUser>>();
             services.AddScoped<IRepository<Country>, RepositoryBase<Country>>();
             services.AddScoped<IRepository<Gender>, RepositoryBase<Gender>>();
@@ -70,8 +71,7 @@ namespace WTP.WebAPI
             // Add the REDIS 
             services.AddDistributedRedisCache(options =>
             {
-                options.Configuration = "127.0.0.1";//defaultDatabase=4";
-                options.InstanceName = "master";
+                options.Configuration = Configuration["Redis:ConnectionString"]; 
             });
 
 

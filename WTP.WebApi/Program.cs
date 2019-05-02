@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Caching.Distributed;
 
 namespace WTP.WebAPI
 {
@@ -13,5 +14,6 @@ namespace WTP.WebAPI
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
                 .UseStartup<Startup>();
+
     }
 }
