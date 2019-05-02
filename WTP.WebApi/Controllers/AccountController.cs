@@ -16,6 +16,7 @@ using WTP.WebAPI.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using System.Web;
 using WTP.BLL.Services.Concrete.EmailService;
+using WTP.WebAPI.Utility.Extensions;
 
 namespace WTP.WebAPI.Controllers
 {
@@ -238,6 +239,73 @@ namespace WTP.WebAPI.Controllers
 
             errorList.Add("Invalid value was entered! Please, redisplay form.");
             return BadRequest(new JsonResult(errorList));
+        }
+
+        //POST : /api/UserProfile
+        [HttpPost("[action]")]
+        [Authorize(Policy = "RequireLoggedIn")]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordViewModel formdata)
+        {
+            #region Validation
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new ResponseViewModel
+                {
+                    StatusCode = 400,
+                    Message = "Syntax error."
+                });
+            }
+
+            if (formdata.CurrentPassword == formdata.NewPassword)
+            {
+                return BadRequest(new ResponseViewModel
+                {
+                    StatusCode = 400,
+                    Message = "You can't change password for the current one."
+                });
+            }
+            #endregion
+
+            #region Get User
+            int userId = this.GetCurrentUserId();
+
+            var appUserDto = await _appUserService.GetAsync(userId);
+
+            if (appUserDto == null)
+            {
+                return NotFound(new ResponseViewModel
+                {
+                    StatusCode = 404,
+                    Message = "User not found."
+                });
+            }
+            #endregion
+
+            #region Change Password
+            var result = await _appUserService.ChangePasswordAsync(new ChangePasswordDto
+            {
+                UserId = userId,
+                CurrentPassword = formdata.CurrentPassword,
+                NewPassword = formdata.NewPassword
+            });
+            #endregion
+
+            #region Result
+            if (result.Succeeded)
+            {
+                return Ok(new ResponseViewModel
+                {
+                    StatusCode = 200,
+                    Message = "Password update successful."
+                });
+            }
+
+            return BadRequest(new ResponseViewModel
+            {
+                StatusCode = 500,
+                Message = result.ToString() //"Server error."
+            });
+            #endregion
         }
     }
 }

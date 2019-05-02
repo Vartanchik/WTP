@@ -112,5 +112,12 @@ namespace WTP.BLL.Services.Concrete.AppUserService
 
             return await _appUserRepository.ResetPasswordAsync(appUser, token, newPassword);
         }
+
+        public async Task<IdentityResult> ChangePasswordAsync(ChangePasswordDto changePasswordDto)
+        {
+            return await _appUserRepository.ChangePasswordAsync(changePasswordDto.UserId,
+                                                                changePasswordDto.CurrentPassword,
+                                                                changePasswordDto.NewPassword);
+        }
     }
 }

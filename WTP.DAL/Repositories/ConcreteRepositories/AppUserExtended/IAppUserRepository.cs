@@ -18,5 +18,6 @@ namespace WTP.DAL.Repositories.ConcreteRepositories.AppUserExtended
         Task<bool> IsEmailConfirmedAsync(AppUser appUser);
         Task<string> GeneratePasswordResetTokenAsync(AppUser appUser);
         Task<IdentityResult> ResetPasswordAsync(AppUser appUser, string token, string newPassword);
+        Task<IdentityResult> ChangePasswordAsync(int appUserId, string currentPassword, string newPassword);
     }
 }

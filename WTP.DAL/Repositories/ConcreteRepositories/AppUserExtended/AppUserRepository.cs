@@ -83,5 +83,14 @@ namespace WTP.DAL.Repositories.ConcreteRepositories.AppUserExtended
 
             return await _userManager.ResetPasswordAsync(user, token, newPassword);
         }
+
+        public async Task<IdentityResult> ChangePasswordAsync(int appUserId, string currentPassword, string newPassword)
+        {
+            var user = await GetAsync(appUserId);
+
+            return await _userManager.ChangePasswordAsync(user: user,
+                                                          currentPassword: currentPassword,
+                                                          newPassword: newPassword);
+        }
     }
 }
