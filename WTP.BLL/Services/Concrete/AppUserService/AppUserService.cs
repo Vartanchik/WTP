@@ -73,6 +73,11 @@ namespace WTP.BLL.Services.Concrete.AppUserService
             return appUserDto;
         }
 
+        public async Task<bool> DeleteAsync(int id)
+        {
+            return await _appUserRepository.DeleteAsync(id);
+        }
+
         public async Task<AppUserDto> GetByEmailAsync(string email)
         {
             var appUser = await _appUserRepository.GetByEmailAsync(email);
@@ -105,6 +110,16 @@ namespace WTP.BLL.Services.Concrete.AppUserService
         {
             var allUsers = await _appUserRepository.GetAllAsync();
             return _mapper.Map<IEnumerable<AppUserDto>>(allUsers);
+        }
+
+        public async Task<bool> LockAsync(int id, int? days)
+        {
+            return await _appUserRepository.LockAsync(id, days);
+        }
+
+        public async Task<bool> UnLockAsync(int id)
+        {
+            return await _appUserRepository.UnLockAsync(id);
         }
     }
 }

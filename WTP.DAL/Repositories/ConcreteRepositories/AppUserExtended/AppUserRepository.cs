@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using WTP.DAL.DomainModels;
@@ -34,6 +35,18 @@ namespace WTP.DAL.Repositories.ConcreteRepositories.AppUserExtended
             await _userManager.AddToRoleAsync(appUser, "Admin");
 
             return result;
+        }
+
+        public new async Task<bool> DeleteAsync(int id)
+        {
+            var user = await GetAsync(id);
+            
+            if (user==null || user.DeletedStatus)
+                return false;
+
+            user.DeletedStatus = true;
+            await _context.SaveChangesAsync();
+            return true;
         }
 
         public new async Task<IdentityResult> UpdateAsync(AppUser appUser)
@@ -78,6 +91,32 @@ namespace WTP.DAL.Repositories.ConcreteRepositories.AppUserExtended
         {
             return await _userManager.Users.ToListAsync();
             //return await GetAllAsync();
+        }
+
+        public async Task<bool> LockAsync(int id, int? days)
+        {
+            var user = await GetAsync(id);
+            if (user == null)
+                return false;
+
+            await _userManager.SetLockoutEnabledAsync(user, true);
+
+            if (days == null)
+                await _userManager.SetLockoutEndDateAsync(user, null);
+            else
+            {
+                if (days < 0)
+                    days = 0;
+                await _userManager.SetLockoutEndDateAsync(user, DateTimeOffset.UtcNow.AddDays(days.Value));
+            }
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+
+        public async Task<bool> UnLockAsync(int id)
+        {
+            return await LockAsync(id, null);
         }
     }
 }

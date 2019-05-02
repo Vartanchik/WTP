@@ -16,6 +16,9 @@ namespace WTP.DAL.DomainModels
         public int? CountryId { get; set; }
         public Country Country { get; set; }
         public string Steam { get; set; }
+
+        public bool DeletedStatus { get; set; }
+
         public ICollection<AppUserLanguage> AppUserLanguages { get; set; }
         public List<Player> Players { get; set; }
         public List<Team> Teams { get; set; }

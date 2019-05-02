@@ -24,5 +24,6 @@ namespace WTP.BLL.ModelsDto.AppUser
         public List<PlayerDto> Players { get; set; }
         public List<TeamDto> Teams { get; set; }
         public string SecurityStamp { get; set; }
+        public bool DeletedStatus { get; set; }
     }
 }
