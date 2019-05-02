@@ -22,7 +22,7 @@ namespace WTP.DAL.Repositories.UserCacheRepositories
             var value = await _Cache.GetStringAsync(id.ToString());
 
             if (value != null)
-                return await Task.FromResult((AppUser)JsonConvert.DeserializeObject(value));
+                return (AppUser)JsonConvert.DeserializeObject(value);
             else
                 return await base.GetAsync(id);
         }
