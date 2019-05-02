@@ -24,7 +24,6 @@ using WTP.WebAPI.ViewModels;
 namespace WTP.WebAPI.Controllers
 {
     [Route("api/[controller]")]
-    //[Authorize(Roles = "Admin")]
     [ApiController]
     public class AdminController : Controller
     {
@@ -44,7 +43,7 @@ namespace WTP.WebAPI.Controllers
         //Create Admin account
         [HttpPost]
         [Route("Admins/CreareProfile")]
-        //[Authorize(Policy = "RequireAdministratorRole")]
+        [Authorize(Policy = "RequireAdministratorRole")]
         public async Task<IActionResult> CreateAdminProfile([FromBody] RegisterViewModel formdata)
         {
             _log.Debug($"\nRequest to {this.ToString()}, action = Register");
@@ -79,21 +78,22 @@ namespace WTP.WebAPI.Controllers
             return BadRequest(new JsonResult(errorList));
         }
 
-        //GetAllUsers
+        //Get List of all Users
         [HttpGet]
         [Route("Users")]
-        //[Authorize(Policy = "RequireAdministratorRole")]
+        [Authorize(Policy = "RequireAdministratorRole")]
         public async Task<IActionResult> GetUsersProfile()
         {
+            List<AppUserDtoViewModel> result = new List<AppUserDtoViewModel>();
             var users = await _appUserService.GetAllAsync();
+
             if (users.Count() == 0)
                 return Ok("List of Users are empty!");
-            List<AppUserDtoViewModel> result = new List<AppUserDtoViewModel>();
-            //int userId = 1;            
-            foreach (var t in users)
+            
+            foreach (var user in users)
             {
-                var user = t;//await _appUserService.GetAsync(userId);
                 var langs = new List<LanguageDto>();
+
                 foreach (var item in user.AppUserLanguages)
                 {
                     langs.Add(new LanguageDto
@@ -117,15 +117,17 @@ namespace WTP.WebAPI.Controllers
                     Teams = user.Teams
                 };
 
-                result.Add(appUserDtoViewModel);
+                //Check if account isn't deleted
+                if(user.DeletedStatus!=true)
+                    result.Add(appUserDtoViewModel);
             }
-            //return Ok(new JsonResult(result));
-            return Ok();
+            return Ok(new JsonResult(result));
+            //return Ok();
         }
 
-        //Update Dta about user
+        //Update user's account
         [HttpPut]
-        //[Authorize(Policy = "RequireAdministratorRole")]
+        [Authorize(Policy = "RequireAdministratorRole")]
         [Route("Users/UpdateUser/{id}")]
         public async Task<IActionResult> UpdateUser([FromBody] AppUserDtoViewModel formdata,int id)
         {
@@ -173,7 +175,7 @@ namespace WTP.WebAPI.Controllers
 
             if (result.Succeeded)
             {
-                return Ok(new JsonResult("User with id "+user.Id+" is updated!"));
+                return Ok(new JsonResult("User with id "+user.Id+" was updated!"));
             }
             else
             {
@@ -186,59 +188,48 @@ namespace WTP.WebAPI.Controllers
             return BadRequest(new JsonResult(errorList));
         }
 
-        //Delete users account by id
+        //Delete user's account by id
         [HttpDelete]
-        //[Authorize(Policy = "RequireAdministratorRole")]
+        [Authorize(Policy = "RequireAdministratorRole")]
         [Route("Users/DeleteUser/{id}")]
         public async Task<IActionResult> DeleteUser(int id)
         {
-            int userId = id;
-
-            //var user = await _appUserService.GetAsync(userId);
-            bool status = await _appUserService.DeleteAsync(userId);
+            bool status = await _appUserService.DeleteAsync(id);
 
             if (status)
-            {
-                return Ok(new JsonResult("User with id " +id+" is deleted!"));
-            }
+                return Ok(new JsonResult("User with id " +id+" was deleted!"));
 
-            return NotFound(new JsonResult("User with id " + id + " wasnt deleted!"));
+            return NotFound(new JsonResult("User with id " + id + " wasn't deleted!"));
             
         }
 
         //Lock users account by id
         [HttpPut]
-        //[Authorize(Policy = "RequireAdministratorRole")]
+        [Authorize(Policy = "RequireAdministratorRole")]
         [Route("Users/LockUser/{id}")]
         public async Task<IActionResult> LockUser([FromBody]LockViewModel formDate,int id)
         {
-            int userId = id;
-            bool status = await _appUserService.LockAsync(userId,formDate.Days);
+            bool status = await _appUserService.LockAsync(id,formDate.Days);
 
             if (status)
-            {
-                return Ok(new JsonResult("User with id " + id + " is lock!"));
-            }
-
-            return NotFound(new JsonResult("User with id " + id + " wasnt lock!"));
+                return Ok(new JsonResult("User with id " + id + " was lock!"));
+        
+            return NotFound(new JsonResult("User with id " + id + " wasn't lock!"));
 
         }
 
-        //UnLock users account by id
+        //UnLock user's account by id
         [HttpPut]
-        //[Authorize(Policy = "RequireAdministratorRole")]
+        [Authorize(Policy = "RequireAdministratorRole")]
         [Route("Users/UnLockUser/{id}")]
         public async Task<IActionResult> UnLockUser(int id)
         {
-            int userId = id;
-            bool status = await _appUserService.UnLockAsync(userId);
+            bool status = await _appUserService.UnLockAsync(id);
 
-            if (status)
-            {
-                return Ok(new JsonResult("User with id " + id + " is unlock!"));
-            }
+            if (status)            
+                return Ok(new JsonResult("User with id " + id + " was unlock!"));
 
-            return NotFound(new JsonResult("User with id " + id + " wasnt unlock!"));
+            return NotFound(new JsonResult("User with id " + id + " wasn't unlock!"));
 
         }
     }
