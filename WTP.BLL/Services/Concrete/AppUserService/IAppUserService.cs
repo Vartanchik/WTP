@@ -16,5 +16,8 @@ namespace WTP.BLL.Services.Concrete.AppUserService
         Task<bool> IsEmailConfirmedAsync(AppUserDto appUserDto);
         Task<string> GeneratePasswordResetTokenAsync(AppUserDto appUserDto);
         Task<IdentityResult> ResetPasswordAsync(AppUserDto appUserDto, string token, string newPassword);
+        Task<string> GenerateEmailConfirmationTokenAsync(AppUserDto appUserDto);
+        Task<AppUserDto> FindByIdAsync(string id);
+        Task<IdentityResult> ConfirmEmailAsync(AppUserDto appUserDto, string token);
     }
 }

@@ -83,5 +83,22 @@ namespace WTP.DAL.Repositories.ConcreteRepositories.AppUserExtended
 
             return await _userManager.ResetPasswordAsync(user, token, newPassword);
         }
+
+        public async Task<string> GenerateEmailConfirmationTokenAsync(AppUser appUser)
+        {
+            return await _userManager.GenerateEmailConfirmationTokenAsync(appUser);
+        }
+
+        public async Task<AppUser> FindByIdAsync(string id)
+        {
+            return await _userManager.FindByIdAsync(id);
+        }
+
+        public async Task<IdentityResult> ConfirmEmailAsync(AppUser appUser, string token)
+        {
+            var user = await GetAsync(appUser.Id);
+
+            return await _userManager.ConfirmEmailAsync(user, token);
+        }
     }
 }
