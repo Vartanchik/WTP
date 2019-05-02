@@ -24,6 +24,7 @@ using WTP.DAL.Repositories.GenericRepository;
 using WTP.DAL.UnitOfWork;
 using WTP.WebAPI.Helpers;
 using WTP.BLL.Services.Concrete.EmailService;
+using Swashbuckle.AspNetCore.Swagger;
 
 namespace WTP.WebAPI
 {
@@ -142,6 +143,21 @@ namespace WTP.WebAPI
                 options.AddPolicy("RequireAdministratorRole", policy =>
                     policy.RequireRole("Admin").RequireAuthenticatedUser());
             });
+
+            #region Swagger Registration
+
+            // Register the Swagger generator, defining 1 or more Swagger documents
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new Info
+                {
+                    Version = "v1",
+                    Title = "WTP API",
+                    Description = ".NET Core API",
+                });
+            });
+
+            #endregion
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -180,6 +196,20 @@ namespace WTP.WebAPI
             //        spa.UseAngularCliServer(npmScript: "start");
             //    }
             //});
+
+            #region Enable Swagger Middleware
+
+            // Enable middleware to serve generated Swagger as a JSON endpoint.
+            app.UseSwagger();
+
+            // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.), 
+            // specifying the Swagger JSON endpoint.
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+            });
+
+            #endregion
         }
     }
 }
