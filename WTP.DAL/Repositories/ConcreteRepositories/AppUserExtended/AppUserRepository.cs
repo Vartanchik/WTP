@@ -89,8 +89,16 @@ namespace WTP.DAL.Repositories.ConcreteRepositories.AppUserExtended
 
         public new async Task<IEnumerable<AppUser>> GetAllAsync()
         {
-            return await _userManager.Users.ToListAsync();
-            //return await GetAllAsync();
+            var users = await _userManager.Users.ToListAsync();
+            List<AppUser> result = new List<AppUser>();
+            foreach (var t in users)
+            {
+                var role = await _userManager.GetRolesAsync(t);
+                if (role.Contains("User"))
+                    result.Add(t);
+            }
+            return result;
+            //return await _userManager.Users.ToListAsync();
         }
 
         public async Task<bool> LockAsync(int id, int? days)

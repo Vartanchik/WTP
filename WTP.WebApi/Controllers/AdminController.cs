@@ -28,25 +28,20 @@ namespace WTP.WebAPI.Controllers
     public class AdminController : Controller
     {
         //private readonly IHistoryService _historyService;
-        private readonly AppSettings _appSettings;
-        private readonly ILog _log;
         private readonly IAppUserService _appUserService;
 
-        public AdminController(IOptions<AppSettings> appSettings, ILog log, IAppUserService appUserService)
+        public AdminController(IAppUserService appUserService)
         {
-            _log = log;
-            _appSettings = appSettings.Value;
             _appUserService = appUserService;
         }
 
 
         //Create Admin account
         [HttpPost]
-        [Route("Admins/CreareProfile")]
+        [Route("profiles")]
         [Authorize(Policy = "RequireAdministratorRole")]
         public async Task<IActionResult> CreateAdminProfile([FromBody] RegisterViewModel formdata)
         {
-            _log.Debug($"\nRequest to {this.ToString()}, action = Register");
             // Will hold all the errors related to registration
             List<string> errorList = new List<string>();
 
@@ -61,14 +56,46 @@ namespace WTP.WebAPI.Controllers
 
             if (result.Succeeded)
             {
-                _log.Debug($"\nUser was created. {this.ToString()}, action = Register");
+                // Sending Confirmation Email
+                return Ok(result);
+            }
+            else
+            {
+                foreach (var error in result.Errors)
+                {
+                    errorList.Add(error.Code);
+                }
+            }
+
+            return BadRequest(new JsonResult(errorList));
+        }
+
+        //Create User account
+        [HttpPost]
+        [Route("users/profiles")]
+        [Authorize(Policy = "RequireAdministratorRole")]
+        public async Task<IActionResult> Register([FromBody] RegisterViewModel formdata)
+        {            
+            // Will hold all the errors related to registration
+            List<string> errorList = new List<string>();
+
+            var user = new AppUserDto
+            {
+                Email = formdata.Email,
+                UserName = formdata.UserName,
+                SecurityStamp = Guid.NewGuid().ToString()
+            };
+
+            var result = await _appUserService.CreateAsync(user, formdata.Password);
+
+            if (result.Succeeded)
+            {
                 // Sending Confirmation Email
 
                 return Ok(result);
             }
             else
             {
-                _log.Debug($"\nUser wasn't created. {this.ToString()}, action = Register");
                 foreach (var error in result.Errors)
                 {
                     errorList.Add(error.Code);
@@ -80,16 +107,17 @@ namespace WTP.WebAPI.Controllers
 
         //Get List of all Users
         [HttpGet]
-        [Route("Users")]
+        [Route("users")]
         [Authorize(Policy = "RequireAdministratorRole")]
-        public async Task<IActionResult> GetUsersProfile()
+        public async Task<UserDataForAdminViewModel[]> GetUsersProfile()
         {
-            List<AppUserDtoViewModel> result = new List<AppUserDtoViewModel>();
+            List<UserDataForAdminViewModel> result = new List<UserDataForAdminViewModel>();
             var users = await _appUserService.GetAllAsync();
 
             if (users.Count() == 0)
-                return Ok("List of Users are empty!");
-            
+                return result.ToArray();
+            //return Ok("List of Users are empty!");
+
             foreach (var user in users)
             {
                 var langs = new List<LanguageDto>();
@@ -102,9 +130,10 @@ namespace WTP.WebAPI.Controllers
                         Name = item.Language.Name
                     });
                 }
-                // Convert userDto to appUserDtoViewModel
-                var appUserDtoViewModel = new AppUserDtoViewModel()
+                // Convert userDto to UserDataForAdminViewModel
+                var appUserDtoViewModel = new UserDataForAdminViewModel()
                 {
+                    Id = user.Id,
                     Email = user.Email,
                     Photo = user.Photo,
                     UserName = user.UserName,
@@ -121,31 +150,30 @@ namespace WTP.WebAPI.Controllers
                 if(user.DeletedStatus!=true)
                     result.Add(appUserDtoViewModel);
             }
-            return Ok(new JsonResult(result));
+            return result.ToArray();
+            //return Ok(new JsonResult(result.ToArray()));
             //return Ok();
         }
 
         //Update user's account
         [HttpPut]
         [Authorize(Policy = "RequireAdministratorRole")]
-        [Route("Users/UpdateUser/{id}")]
-        public async Task<IActionResult> UpdateUser([FromBody] AppUserDtoViewModel formdata,int id)
+        [Route("users/{id}")]
+        public async Task<APIResponse> UpdateUser([FromBody] AppUserDtoViewModel formdata,[FromRoute]int id)
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return new APIResponse(406, "User's profile with id " + id + " wasnt valid.");
             }
 
             // Will hold all the errors related to registration
             List<string> errorList = new List<string>();
 
-            int userId = id;
-
-            var user = await _appUserService.GetAsync(userId);
+            var user = await _appUserService.GetAsync(id);
 
             if (user == null)
             {
-                return NotFound();
+                return new APIResponse(404, "User's profile with id " + id + " wasnt found.");
             }
 
             //Update languages
@@ -155,7 +183,7 @@ namespace WTP.WebAPI.Controllers
                 languages.Add(new AppUserDtoLanguageDto
                 {
                     LanguageId = item.Id,
-                    AppUserId = userId
+                    AppUserId = id
                 });
             }
 
@@ -175,7 +203,7 @@ namespace WTP.WebAPI.Controllers
 
             if (result.Succeeded)
             {
-                return Ok(new JsonResult("User with id "+user.Id+" was updated!"));
+                return new APIResponse(202, "User's profile with id " + id+ " was updated.");
             }
             else
             {
@@ -185,51 +213,51 @@ namespace WTP.WebAPI.Controllers
                 }
             }
 
-            return BadRequest(new JsonResult(errorList));
+            return new APIResponse(406, "User's profile with id " + id + " wasnt updated.");
         }
 
         //Delete user's account by id
         [HttpDelete]
         [Authorize(Policy = "RequireAdministratorRole")]
-        [Route("Users/DeleteUser/{id}")]
-        public async Task<IActionResult> DeleteUser(int id)
+        [Route("users/{id}")]
+        public async Task<APIResponse> DeleteUser([FromRoute]int id)
         {
             bool status = await _appUserService.DeleteAsync(id);
 
             if (status)
-                return Ok(new JsonResult("User with id " +id+" was deleted!"));
+                return new APIResponse(202, "User's profile with id " + id + " was deleted.");
 
-            return NotFound(new JsonResult("User with id " + id + " wasn't deleted!"));
+            return new APIResponse(404, "User's profile with id " + id + " wasnt found.");
             
         }
 
         //Lock users account by id
         [HttpPut]
         [Authorize(Policy = "RequireAdministratorRole")]
-        [Route("Users/LockUser/{id}")]
-        public async Task<IActionResult> LockUser([FromBody]LockViewModel formDate,int id)
+        [Route("users/{id}/block")]
+        public async Task<APIResponse> LockUser([FromBody]LockViewModel formDate,[FromRoute]int id)
         {
             bool status = await _appUserService.LockAsync(id,formDate.Days);
 
             if (status)
-                return Ok(new JsonResult("User with id " + id + " was lock!"));
+                return new APIResponse(202, "User's profile with id " + id + " was locked.");
         
-            return NotFound(new JsonResult("User with id " + id + " wasn't lock!"));
+            return new APIResponse(404, "User's profile with id " + id + " wasnt found.");
 
         }
 
         //UnLock user's account by id
         [HttpPut]
         [Authorize(Policy = "RequireAdministratorRole")]
-        [Route("Users/UnLockUser/{id}")]
-        public async Task<IActionResult> UnLockUser(int id)
+        [Route("users/{id}/unblock")]
+        public async Task<APIResponse> UnLockUser([FromRoute]int id)
         {
             bool status = await _appUserService.UnLockAsync(id);
 
             if (status)            
-                return Ok(new JsonResult("User with id " + id + " was unlock!"));
-
-            return NotFound(new JsonResult("User with id " + id + " wasn't unlock!"));
+                return new APIResponse(202, "User's profile with id " + id + " was unlocked.");
+            
+            return new APIResponse(404, "User's profile with id " + id + " wasnt found.");
 
         }
     }
