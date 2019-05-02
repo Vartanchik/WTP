@@ -40,6 +40,7 @@ namespace WTP.WebAPI.Controllers
         public async Task<IActionResult> Register([FromBody] RegisterViewModel formdata)
         {
             _log.Debug($"\nRequest to {this.ToString()}, action = Register");
+
             // Will hold all the errors related to registration
             List<string> errorList = new List<string>();
 
@@ -55,20 +56,57 @@ namespace WTP.WebAPI.Controllers
             if (result.Succeeded)
             {
                 _log.Debug($"\nUser was created. {this.ToString()}, action = Register");
+
                 // Sending Confirmation Email
+                var userForConfirmEmail = await _appUserService.GetByEmailAsync(formdata.Email);
+
+                var code = await _appUserService.GenerateEmailConfirmationTokenAsync(userForConfirmEmail);
+                _log.Debug($"\nUser was created. {this.ToString()}, action = Register.Token = {code}");
+
+                var callbackUrl = Url.Action(
+                    "ConfirmEmail",
+                    "Account",
+                    new { userId = userForConfirmEmail.Id, code },
+                    protocol: HttpContext.Request.Scheme);
+
+                await _emailService.SendEmailAsync(formdata.Email, "Confirm your account",
+                    $"Подтвердите регистрацию, перейдя по ссылке: <a href='{callbackUrl}'>link</a>");
 
                 return Ok(result);
             }
-            else
+
+            _log.Debug($"\nUser wasn't created. {this.ToString()}, action = Register");
+
+            foreach (var error in result.Errors)
             {
-                _log.Debug($"\nUser wasn't created. {this.ToString()}, action = Register");
-                foreach (var error in result.Errors)
-                {
-                    errorList.Add(error.Code);
-                }
+                errorList.Add(error.Code);
             }
 
             return BadRequest(new JsonResult(errorList));
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> ConfirmEmail(string userId, string code)
+        {
+            if (userId == null || code == null)
+            {
+                return Redirect("http://localhost:4200/home?confirmed=false");
+            }
+
+            var user = await _appUserService.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return Redirect("http://localhost:4200/home?confirmed=false");
+            }
+
+            var result = await _appUserService.ConfirmEmailAsync(user, code);
+            if (result.Succeeded)
+            {
+                return Redirect("http://localhost:4200/home?confirmed=true");
+            }
+
+            return Redirect("http://localhost:4200/home?confirmed=false");
         }
 
         [HttpPost("[action]")]

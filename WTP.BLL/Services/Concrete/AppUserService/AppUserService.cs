@@ -119,5 +119,26 @@ namespace WTP.BLL.Services.Concrete.AppUserService
                                                                 changePasswordDto.CurrentPassword,
                                                                 changePasswordDto.NewPassword);
         }
+
+        public async Task<string> GenerateEmailConfirmationTokenAsync(AppUserDto appUserDto)
+        {
+            var appUser = _mapper.Map<AppUser>(appUserDto);
+
+            return await _appUserRepository.GenerateEmailConfirmationTokenAsync(appUser);
+        }
+
+        public async Task<AppUserDto> FindByIdAsync(string id)
+        {
+            var appUser = await _appUserRepository.FindByIdAsync(id);
+
+            return _mapper.Map<AppUserDto>(appUser);
+        }
+
+        public async Task<IdentityResult> ConfirmEmailAsync(AppUserDto appUserDto, string token)
+        {
+            var appUser = _mapper.Map<AppUser>(appUserDto);
+
+            return await _appUserRepository.ConfirmEmailAsync(appUser, token);
+        }
     }
 }
