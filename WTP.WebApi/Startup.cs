@@ -25,6 +25,7 @@ using WTP.DAL.UnitOfWork;
 using WTP.WebAPI.Helpers;
 using WTP.BLL.Services.Concrete.EmailService;
 using Swashbuckle.AspNetCore.Swagger;
+using WTP.DAL.Repositories.UserCacheRepositories;
 
 namespace WTP.WebAPI
 {
@@ -46,7 +47,7 @@ namespace WTP.WebAPI
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-            services.AddScoped<IAppUserRepository, AppUserRepository>();
+            services.AddScoped<IAppUserRepository, UserCachingRepository>();
             services.AddScoped<IRepository<AppUser>, RepositoryBase<AppUser>>();
             services.AddScoped<IRepository<Country>, RepositoryBase<Country>>();
             services.AddScoped<IRepository<Gender>, RepositoryBase<Gender>>();
@@ -72,6 +73,12 @@ namespace WTP.WebAPI
 
             services.Configure<DataProtectionTokenProviderOptions>(options =>
             options.TokenLifespan = TimeSpan.FromMinutes(30));
+            
+            // Add the REDIS 
+            services.AddDistributedRedisCache(options =>
+            {
+                options.Configuration = Configuration["Redis:ConnectionString"]; 
+            });
 
 
             // Enable CORS
