@@ -49,7 +49,6 @@ namespace WTP.WebAPI
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             services.AddScoped<IAppUserRepository, UserCachingRepository>();
-            services.AddScoped<IAppUserRepository, AppUserRepository>();
             services.AddScoped<IRepository<AppUser>, RepositoryBase<AppUser>>();
             services.AddScoped<IRepository<Country>, RepositoryBase<Country>>();
             services.AddScoped<IRepository<Gender>, RepositoryBase<Gender>>();
