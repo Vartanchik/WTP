@@ -10,5 +10,10 @@ namespace WTP.WebAPI.ViewModels
     {
         [Required]
         public int Id { get; set; }
+        [Required]
+        public bool LockoutEnabled { get; set; }
+        [Required]
+        public DateTimeOffset? LockoutEnd { get; set; }
+
     }
 }

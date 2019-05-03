@@ -18,7 +18,8 @@ namespace WTP.DAL.DomainModels
         public string Steam { get; set; }
 
         public bool DeletedStatus { get; set; }
-
+        public override bool LockoutEnabled { get { return base.LockoutEnabled; } set { base.LockoutEnabled = value; } }
+        public override DateTimeOffset? LockoutEnd { get { return base.LockoutEnd; } set { base.LockoutEnd = value; } }
         public ICollection<AppUserLanguage> AppUserLanguages { get; set; }
         public List<Player> Players { get; set; }
         public List<Team> Teams { get; set; }

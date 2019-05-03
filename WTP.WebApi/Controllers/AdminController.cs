@@ -143,7 +143,9 @@ namespace WTP.WebAPI.Controllers
                     Country = user.Country,
                     Steam = user.Steam,
                     Players = user.Players,
-                    Teams = user.Teams
+                    Teams = user.Teams,
+                    LockoutEnabled = user.LockoutEnabled,
+                    LockoutEnd = user.LockoutEnd
                 };
 
                 //Check if account isn't deleted
