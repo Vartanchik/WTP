@@ -67,8 +67,8 @@ namespace WTP.WebAPI.Controllers
                     new { userId = userForConfirmEmail.Id, code },
                     protocol: HttpContext.Request.Scheme);
 
-                await _emailService.SendEmailAsync(formdata.Email, "Confirm your account",
-                    $"Подтвердите регистрацию, перейдя по ссылке: <a href='{callbackUrl}'>link</a>");
+                await _emailService.SendEmailAsync(formdata.Email, "Just one click and you're on WTP",
+                    $"Thanks for registering to be a part of evolving esports with WTP. After you: <a href='{callbackUrl}'>confirm your email</a> you'll be able to enjoy all the benefits of the WTP platform.");
 
                 return Ok(result);
             }

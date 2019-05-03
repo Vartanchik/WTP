@@ -70,13 +70,13 @@ namespace WTP.WebAPI.Controllers
             // Validate credentials
             if (user != null && await _appUserService.CheckPasswordAsync(user.Id, model.Password))
             {
-                //// If the user has confirmed his email
-                //if (!await _appUserService.IsEmailConfirmedAsync(user.Id))
-                //{
-                //    ModelState.AddModelError(string.Empty, "User Has not Confirmed Email.");
+                // If the user has confirmed his email
+                if (!await _appUserService.IsEmailConfirmedAsync(user))
+                {
+                    ModelState.AddModelError(string.Empty, "User Has not Confirmed Email.");
 
-                //    return Unauthorized(new { LoginError = "We sent you an Confirmation Email. Please Confirm Your Registration With Techhowdy.com To Log in." });
-                //}
+                    return Unauthorized(new { LoginError = "We sent you an Confirmation Email. Please Confirm Your Registration." });
+                }
 
                 // username & password matches: create the refresh token
                 var newRefreshToken = CreateRefreshToken(user.Id);
