@@ -25,12 +25,10 @@ namespace WTP.WebAPI.Controllers
     {
         private readonly IAppUserService _appUserService;
         private readonly IEmailService _emailService;
-        private readonly AppSettings _appSettings;
         private readonly ILog _log;
 
-        public AccountController(IAppUserService appUserService, IEmailService emailService, IOptions<AppSettings> appSettings, ILog log)
+        public AccountController(IAppUserService appUserService, IEmailService emailService, ILog log)
         {
-            _appSettings = appSettings.Value;
             _emailService = emailService;
             _log = log;
             _appUserService = appUserService;
@@ -74,15 +72,16 @@ namespace WTP.WebAPI.Controllers
 
                 return Ok(result);
             }
-
-            _log.Debug($"\nUser wasn't created. {this.ToString()}, action = Register");
-
-            foreach (var error in result.Errors)
+            else
             {
-                errorList.Add(error.Code);
+                _log.Debug($"\nUser wasn't created. {this.ToString()}, action = Register");
+                foreach (var error in result.Errors)
+                {
+                    errorList.Add(error.Code);
+                }
             }
 
-            return BadRequest(new JsonResult(errorList));
+            return Ok(new ErrorResponseModel { Message = errorList });
         }
 
         [HttpGet]
@@ -110,63 +109,6 @@ namespace WTP.WebAPI.Controllers
         }
 
         [HttpPost("[action]")]
-        public async Task<IActionResult> Login([FromBody] LoginViewModel formdata)
-        {
-            _log.Debug($"\nRequest to {this.ToString()}, action = Login");
-            // Get the User from Database
-            var user = await _appUserService.GetByEmailAsync(formdata.Email);
-
-            var roles = await _appUserService.GetRolesAsync(user);
-
-            var key = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_appSettings.Secret));
-
-            double tokenExpiryTime = Convert.ToDouble(_appSettings.ExpireTime);
-
-            if (user != null && await _appUserService.CheckPasswordAsync(user.Id, formdata.Password))
-            {
-                _log.Debug($"\nUser was founded. {this.ToString()}, action = Login");
-                // Confirmation of email
-
-                var tokenHandler = new JwtSecurityTokenHandler();
-
-                var tokenDescriptor = new SecurityTokenDescriptor
-                {
-                    Subject = new ClaimsIdentity(new Claim[]
-                    {
-                        new Claim(JwtRegisteredClaimNames.Sub, formdata.Email),
-                        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                        new Claim(ClaimTypes.Role, roles.FirstOrDefault()),
-                        new Claim("LoggedOn", DateTime.Now.ToString()),
-                        new Claim("UserID", user.Id.ToString())
-                    }),
-
-                    SigningCredentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature),
-                    Issuer = _appSettings.Site,
-                    Audience = _appSettings.Audience,
-                    Expires = DateTime.UtcNow.AddDays(tokenExpiryTime)
-                };
-
-                // Generate Token
-                var token = tokenHandler.CreateToken(tokenDescriptor);
-                _log.Debug($"\nToken was created. {this.ToString()}, action = Login");
-
-                return Ok(new
-                {
-                    token = tokenHandler.WriteToken(token),
-                    expiration = token.ValidTo,
-                    username = user.UserName,
-                    userRole = roles.FirstOrDefault()
-                });
-            }
-            _log.Debug($"\nUser wasn't founded. {this.ToString()}, action = Login");
-
-            //return error
-            ModelState.AddModelError("", "Username/Password was not Found");
-            return Unauthorized(new { LoginError = "Please Check the Login Credentials - Ivalid Username/Password was entered" });
-        }
-
-        [HttpPost("[action]")]
         [AllowAnonymous]
         public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordViewModel formData)
         {
@@ -186,7 +128,6 @@ namespace WTP.WebAPI.Controllers
 
                     return Ok();
                 }
-
                 else
                 {
                     _log.Debug($"{this.ToString()}, action = ForgotPassword HttpPost. User was found, user's hashcode: {user.GetHashCode()}");

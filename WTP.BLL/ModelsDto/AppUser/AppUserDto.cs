@@ -4,6 +4,7 @@ using WTP.BLL.ModelsDto.AppUserLanguage;
 using WTP.BLL.ModelsDto.Country;
 using WTP.BLL.ModelsDto.Gender;
 using WTP.BLL.ModelsDto.Player;
+using WTP.BLL.ModelsDto.RefreshToken;
 using WTP.BLL.ModelsDto.Team;
 
 namespace WTP.BLL.ModelsDto.AppUser
@@ -24,5 +25,6 @@ namespace WTP.BLL.ModelsDto.AppUser
         public List<PlayerDto> Players { get; set; }
         public List<TeamDto> Teams { get; set; }
         public string SecurityStamp { get; set; }
+        public virtual List<RefreshTokenDto> Tokens { get; set; }
     }
 }

@@ -4,6 +4,7 @@ using WTP.BLL.ModelsDto.Country;
 using WTP.BLL.ModelsDto.Gender;
 using WTP.BLL.ModelsDto.Language;
 using WTP.BLL.ModelsDto.Player;
+using WTP.BLL.ModelsDto.RefreshToken;
 using WTP.BLL.ModelsDto.Team;
 using WTP.DAL.DomainModels;
 
@@ -25,6 +26,8 @@ namespace WTP.BLL.Services.Concrete
             CreateMap<Team, TeamDto>();
             CreateMap<PlayerDto, Player>();
             CreateMap<Player, PlayerDto>();
+            CreateMap<RefreshTokenDto, RefreshToken>();
+            CreateMap<RefreshToken, RefreshTokenDto>();
         }
     }
 }

@@ -38,27 +38,32 @@ namespace WTP.BLL.Services.Concrete.AppUserService
 
             var appUserDto = _mapper.Map<AppUserDto>(appUser);
 
-            // Create new List in order to get current language
-            var appUserDtoLanguagesDto = new List<AppUserDtoLanguageDto>();
-
-            foreach (var item in appUserDto.AppUserLanguages)
+            if (appUser != null)
             {
-                appUserDtoLanguagesDto.Add(new AppUserDtoLanguageDto
+                // Create new List in order to get current language
+                var appUserDtoLanguagesDto = new List<AppUserDtoLanguageDto>();
+
+                foreach (var item in appUserDto.AppUserLanguages)
                 {
-                    AppUser = null,
-                    AppUserId = null,
-                    LanguageId = item.LanguageId,
-                    Language = await _languageService.GetAsync(item.LanguageId)
-                });
-            }
+                    appUserDtoLanguagesDto.Add(new AppUserDtoLanguageDto
+                    {
+                        AppUser = null,
+                        AppUserId = null,
+                        LanguageId = item.LanguageId,
+                        Language = await _languageService.GetAsync(item.LanguageId)
+                    });
+                }
 
-            //Set language property 
-            appUserDto.AppUserLanguages = appUserDtoLanguagesDto;
+                //Set language property 
+                appUserDto.AppUserLanguages = appUserDtoLanguagesDto;
 
-            //Set default user photo
-            if (appUserDto.Photo == null)
-            {
-                appUserDto.Photo = "https://cdn4.iconfinder.com/data/icons/48-bubbles/48/30.User-256.png";
+                //Set default user photo
+                if (appUserDto.Photo == null)
+                {
+                    appUserDto.Photo = "https://cdn4.iconfinder.com/data/icons/48-bubbles/48/30.User-256.png";
+                }
+
+                return appUserDto;
             }
 
             return appUserDto;
@@ -68,9 +73,76 @@ namespace WTP.BLL.Services.Concrete.AppUserService
         {
             var appUser = await _appUserRepository.GetByEmailAsync(email);
 
-            return _mapper.Map<AppUserDto>(appUser);
+            var appUserDto = _mapper.Map<AppUserDto>(appUser);
+
+            if (appUser != null)
+            {
+                // Create new List in order to get current language
+                var appUserDtoLanguagesDto = new List<AppUserDtoLanguageDto>();
+
+                foreach (var item in appUserDto.AppUserLanguages)
+                {
+                    appUserDtoLanguagesDto.Add(new AppUserDtoLanguageDto
+                    {
+                        AppUser = null,
+                        AppUserId = null,
+                        LanguageId = item.LanguageId,
+                        Language = await _languageService.GetAsync(item.LanguageId)
+                    });
+                }
+
+                //Set language property 
+                appUserDto.AppUserLanguages = appUserDtoLanguagesDto;
+
+                //Set default user photo
+                if (appUserDto.Photo == null)
+                {
+                    appUserDto.Photo = "https://cdn4.iconfinder.com/data/icons/48-bubbles/48/30.User-256.png";
+                }
+
+                return appUserDto;
+            }
+
+            return appUserDto;
         }
 
+        public async Task<AppUserDto> GetByNameAsync(string name)
+        {
+            var appUser = await _appUserRepository.GetByNameAsync(name);
+
+            var appUserDto = _mapper.Map<AppUserDto>(appUser);
+
+            if (appUser != null)
+            {
+                // Create new List in order to get current language
+                var appUserDtoLanguagesDto = new List<AppUserDtoLanguageDto>();
+
+                foreach (var item in appUserDto.AppUserLanguages)
+                {
+                    appUserDtoLanguagesDto.Add(new AppUserDtoLanguageDto
+                    {
+                        AppUser = null,
+                        AppUserId = null,
+                        LanguageId = item.LanguageId,
+                        Language = await _languageService.GetAsync(item.LanguageId)
+                    });
+                }
+
+                //Set language property 
+                appUserDto.AppUserLanguages = appUserDtoLanguagesDto;
+
+                //Set default user photo
+                if (appUserDto.Photo == null)
+                {
+                    appUserDto.Photo = "https://cdn4.iconfinder.com/data/icons/48-bubbles/48/30.User-256.png";
+                }
+
+                return appUserDto;
+            }
+
+            return appUserDto;
+        }
+                     
         public async Task<IdentityResult> UpdateAsync(AppUserDto appUserDto)
         {
             var appUser = _mapper.Map<AppUser>(appUserDto);

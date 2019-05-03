@@ -7,5 +7,9 @@
         public string Audience { get; set; }
         public string ExpireTime { get; set; }
         public string Secret { get; set; }
+
+        // Token Refresh Properties added 
+        public string RefreshToken { get; set; }
+        public string GrantType { get; set; }
     }
 }

@@ -46,6 +46,10 @@ namespace WTP.DAL.Repositories.ConcreteRepositories.AppUserExtended
         {
             return await _userManager.FindByEmailAsync(email);
         }
+        public async Task<AppUser> GetByNameAsync(string name)
+        {
+            return await _userManager.FindByNameAsync(name);
+        }
 
         public async Task<IList<string>> GetRolesAsync(AppUser appUser)
         {

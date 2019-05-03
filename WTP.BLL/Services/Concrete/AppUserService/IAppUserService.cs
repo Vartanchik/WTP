@@ -10,6 +10,7 @@ namespace WTP.BLL.Services.Concrete.AppUserService
         Task<IdentityResult> CreateAsync(AppUserDto appUserDto, string password);
         Task<AppUserDto> GetAsync(int id);
         Task<AppUserDto> GetByEmailAsync(string email);
+        Task<AppUserDto> GetByNameAsync(string name);
         Task<IdentityResult> UpdateAsync(AppUserDto appUserDto);
         Task<IList<string>> GetRolesAsync(AppUserDto appUserDto);
         Task<bool> CheckPasswordAsync(int id, string password);

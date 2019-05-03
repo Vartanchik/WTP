@@ -26,6 +26,8 @@ using WTP.WebAPI.Helpers;
 using WTP.BLL.Services.Concrete.EmailService;
 using Swashbuckle.AspNetCore.Swagger;
 using WTP.DAL.Repositories.UserCacheRepositories;
+using WTP.DAL.Repositories.ConcreteRepositories.RefreshTokenExtended;
+using WTP.BLL.Services.Concrete.RefreshTokenService;
 
 namespace WTP.WebAPI
 {
@@ -44,16 +46,18 @@ namespace WTP.WebAPI
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddAutoMapper();
 
-
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             services.AddScoped<IAppUserRepository, UserCachingRepository>();
+            services.AddScoped<IAppUserRepository, AppUserRepository>();
             services.AddScoped<IRepository<AppUser>, RepositoryBase<AppUser>>();
             services.AddScoped<IRepository<Country>, RepositoryBase<Country>>();
             services.AddScoped<IRepository<Gender>, RepositoryBase<Gender>>();
             services.AddScoped<IRepository<Language>, RepositoryBase<Language>>();
             services.AddScoped<IRepository<Player>, RepositoryBase<Player>>();
             services.AddScoped<IRepository<Team>, RepositoryBase<Team>>();
+            services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+            services.AddScoped<IRepository<RefreshToken>, RepositoryBase<RefreshToken>>();
 
             services.AddScoped<IAppUserService, AppUserService>();
             services.AddScoped<ICountryService, CountryService>();
@@ -61,6 +65,7 @@ namespace WTP.WebAPI
             services.AddScoped<ILanguageService, LanguageService>();
             services.AddScoped<IPlayerService, PlayerService>();
             services.AddScoped<ITeamService, TeamService>();
+            services.AddScoped<IRefreshTokenService, RefreshTokenService>();
 
 
             //// In production, the Angular files will be served from this directory
@@ -137,7 +142,8 @@ namespace WTP.WebAPI
                     ValidateAudience = true,
                     ValidIssuer = appSettings.Site,
                     ValidAudience = appSettings.Audience,
-                    IssuerSigningKey = new SymmetricSecurityKey(key)
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ClockSkew = TimeSpan.Zero
                 };
             });
 

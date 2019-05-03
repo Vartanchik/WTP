@@ -12,6 +12,7 @@ namespace WTP.DAL.Repositories.ConcreteRepositories.AppUserExtended
         Task<IdentityResult> CreateAsync(AppUser appUser, string password);
         Task<IdentityResult> UpdateAsync(AppUser appUser);
         Task<AppUser> GetByEmailAsync(string email);
+        Task<AppUser> GetByNameAsync(string name);
         Task<IList<string>> GetRolesAsync(AppUser appUser);
         Task<bool> CheckPasswordAsync(int id, string password);
         Task<AppUser> GetAsync(int id);
