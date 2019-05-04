@@ -2,7 +2,9 @@
 using WTP.BLL.ModelsDto.AppUser;
 using WTP.BLL.ModelsDto.Country;
 using WTP.BLL.ModelsDto.Gender;
+using WTP.BLL.ModelsDto.History;
 using WTP.BLL.ModelsDto.Language;
+using WTP.BLL.ModelsDto.Operation;
 using WTP.BLL.ModelsDto.Player;
 using WTP.BLL.ModelsDto.RefreshToken;
 using WTP.BLL.ModelsDto.Team;
@@ -28,6 +30,8 @@ namespace WTP.BLL.Services.Concrete
             CreateMap<Player, PlayerDto>();
             CreateMap<RefreshTokenDto, RefreshToken>();
             CreateMap<RefreshToken, RefreshTokenDto>();
+            CreateMap<Operation, OperationDto>();
+            CreateMap<History, HistoryDto>();
         }
     }
 }

@@ -16,9 +16,13 @@ namespace WTP.DAL.DomainModels
         public int? CountryId { get; set; }
         public Country Country { get; set; }
         public string Steam { get; set; }
+        public override bool LockoutEnabled { get { return base.LockoutEnabled; } set { base.LockoutEnabled = value; } }
+        public override DateTimeOffset? LockoutEnd { get { return base.LockoutEnd; } set { base.LockoutEnd = value; } }
+        public bool DeletedStatus { get; set; }
         public ICollection<AppUserLanguage> AppUserLanguages { get; set; } //Need this in order to implement relation many to many between appUser and languages
         public List<Player> Players { get; set; }
         public List<Team> Teams { get; set; }
         public virtual List<RefreshToken> Tokens { get; set; }
+        public List<History> Histories { get; set; }
     }
 }

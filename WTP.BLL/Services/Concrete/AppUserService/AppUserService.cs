@@ -212,5 +212,45 @@ namespace WTP.BLL.Services.Concrete.AppUserService
 
             return await _appUserRepository.ConfirmEmailAsync(appUser, token);
         }
+
+        public async Task<IdentityResult> CreateAdminAsync(AppUserDto appUserDto, string password)
+        {
+            var appUser = _mapper.Map<AppUser>(appUserDto);
+
+            var result = await _appUserRepository.CreateAdminAsync(appUser, password);
+
+            return result;
+
+        }
+
+        public async Task<IdentityResult> CreateModeratorAsync(AppUserDto appUserDto, string password)
+        {
+            var appUser = _mapper.Map<AppUser>(appUserDto);
+
+            var result = await _appUserRepository.CreateModeratorAsync(appUser, password);
+
+            return result;
+        }
+
+        public async Task<bool> DeleteAsync(int id)
+        {
+            return await _appUserRepository.DeleteAsync(id);
+        }
+
+        public async Task<IList<AppUserDto>> GetAllUsersAsync()
+        {
+            var allUsers = await _appUserRepository.GetAllUsersAsync();
+            return _mapper.Map<IList<AppUserDto>>(allUsers);
+        }
+
+        public async Task<bool> LockAsync(int id, int? days)
+        {
+            return await _appUserRepository.LockAsync(id, days);
+        }
+
+        public async Task<bool> UnLockAsync(int id)
+        {
+            return await _appUserRepository.UnLockAsync(id);
+        }
     }
 }

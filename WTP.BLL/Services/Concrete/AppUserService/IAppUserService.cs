@@ -21,5 +21,11 @@ namespace WTP.BLL.Services.Concrete.AppUserService
         Task<string> GenerateEmailConfirmationTokenAsync(AppUserDto appUserDto);
         Task<AppUserDto> FindByIdAsync(string id);
         Task<IdentityResult> ConfirmEmailAsync(AppUserDto appUserDto, string token);
+        Task<IdentityResult> CreateAdminAsync(AppUserDto appUserDto, string password);
+        Task<IdentityResult> CreateModeratorAsync(AppUserDto appUserDto, string password);
+        Task<bool> DeleteAsync(int id);
+        Task<IList<AppUserDto>> GetAllUsersAsync();
+        Task<bool> LockAsync(int id, int? days);
+        Task<bool> UnLockAsync(int id);
     }
 }

@@ -18,6 +18,8 @@ namespace WTP.DAL
         public DbSet<Player> Players { get; set; }
         public DbSet<Team> Teams { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
+        public DbSet<Operation> Operations { get; set; }
+        public DbSet<History> Histories { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -28,6 +30,15 @@ namespace WTP.DAL
                     new { Id = 2, Name = "User", NormalizedName = "USER" },
                     new { Id = 3, Name = "Moderator", NormalizedName = "MODERATOR" }
             );
+
+            builder.Entity<Operation>().HasData(
+                    new { Id = 1, OperationName = OperationEnum.Create },
+                    new { Id = 2, OperationName = OperationEnum.Update },
+                    new { Id = 3, OperationName = OperationEnum.Delete },
+                    new { Id = 4, OperationName = OperationEnum.Lock },
+                    new { Id = 5, OperationName = OperationEnum.UnLock }
+            );
+
 
             builder.Entity<AppUserLanguage>()
                 .HasKey(_ => new { _.AppUserId, _.LanguageId });

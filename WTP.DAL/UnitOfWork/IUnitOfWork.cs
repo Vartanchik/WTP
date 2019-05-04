@@ -14,6 +14,8 @@ namespace WTP.DAL.UnitOfWork
         IRepository<Player> Players { get; }
         IRepository<Team> Teams { get; }
         IRepository<RefreshToken> Tokens { get; }
+        IRepository<Operation> Operations { get; }
+        IRepository<History> Histories { get; }
 
         void Commit();
 

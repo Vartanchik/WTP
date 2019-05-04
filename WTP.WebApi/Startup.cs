@@ -28,6 +28,8 @@ using Swashbuckle.AspNetCore.Swagger;
 using WTP.DAL.Repositories.UserCacheRepositories;
 using WTP.DAL.Repositories.ConcreteRepositories.RefreshTokenExtended;
 using WTP.BLL.Services.Concrete.RefreshTokenService;
+using WTP.BLL.Services.Concrete.HistoryService;
+using WTP.BLL.Services.Concrete.OperationService;
 
 namespace WTP.WebAPI
 {
@@ -57,6 +59,8 @@ namespace WTP.WebAPI
             services.AddScoped<IRepository<Team>, RepositoryBase<Team>>();
             services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
             services.AddScoped<IRepository<RefreshToken>, RepositoryBase<RefreshToken>>();
+            services.AddScoped<IRepository<History>, RepositoryBase<History>>();
+            services.AddScoped<IRepository<WTP.DAL.DomainModels.Operation>, RepositoryBase<WTP.DAL.DomainModels.Operation>>();
 
             services.AddScoped<IAppUserService, AppUserService>();
             services.AddScoped<ICountryService, CountryService>();
@@ -65,6 +69,8 @@ namespace WTP.WebAPI
             services.AddScoped<IPlayerService, PlayerService>();
             services.AddScoped<ITeamService, TeamService>();
             services.AddScoped<IRefreshTokenService, RefreshTokenService>();
+            services.AddScoped<IHistoryService, HistoryService>();
+            services.AddScoped<IOperationService, OperationService > ();
 
 
             //// In production, the Angular files will be served from this directory
@@ -97,7 +103,7 @@ namespace WTP.WebAPI
 
             // Conect to Database
             services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"), b => b.MigrationsAssembly("WTP.DAL")));
 
             // Specifiying we are going to use Identity Framework
             services.AddIdentity<AppUser, IdentityRole<int>>(options =>

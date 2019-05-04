@@ -15,6 +15,8 @@ namespace WTP.DAL.UnitOfWork
         private IRepository<Player> _players;
         private IRepository<Team> _teams;
         private IRepository<RefreshToken> _tokens;
+        private IRepository<Operation> _operations;
+        private IRepository<History> _histories;
 
         public UnitOfWork(ApplicationDbContext context)
         {
@@ -28,6 +30,8 @@ namespace WTP.DAL.UnitOfWork
         public IRepository<Player> Players => _players ?? (_players = new RepositoryBase<Player>(_context));
         public IRepository<Team> Teams => _teams ?? (_teams = new RepositoryBase<Team>(_context));
         public IRepository<RefreshToken> Tokens => _tokens ?? (_tokens = new RepositoryBase<RefreshToken>(_context));
+        public IRepository<Operation> Operations => _operations ?? (_operations = new RepositoryBase<Operation>(_context));
+        public IRepository<History> Histories => _histories ?? (_histories = new RepositoryBase<History>(_context));
 
         public void Commit()
         {
