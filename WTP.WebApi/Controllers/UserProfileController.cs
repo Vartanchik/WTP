@@ -33,7 +33,7 @@ namespace WTP.WebAPI.ViewModels.Controllers
             {
                 return NotFound(new ResponseViewModel {
                     StatusCode = 404,
-                    Message = "User not found."
+                    Message = "Something going wrong."
                 });
             }
 
@@ -71,10 +71,7 @@ namespace WTP.WebAPI.ViewModels.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(new ResponseViewModel {
-                    StatusCode = 400,
-                    Message = "Syntax error."
-                });
+                return BadRequest(new ResponseViewModel(400, "Invalid value was entered! Please, redisplay form."));
             }
 
             int userId = this.GetCurrentUserId();
@@ -83,10 +80,7 @@ namespace WTP.WebAPI.ViewModels.Controllers
 
             if (user == null)
             {
-                return NotFound(new ResponseViewModel {
-                    StatusCode = 404,
-                    Message = "User not found."
-                });
+                return NotFound(new ResponseViewModel(404, "Something going wrong."));
             }
 
             var languages = new List<AppUserDtoLanguageDto>();
@@ -112,19 +106,9 @@ namespace WTP.WebAPI.ViewModels.Controllers
 
             var result = await _appUserService.UpdateAsync(user);
 
-            if (result.Succeeded)
-            {
-                return Ok(new ResponseViewModel {
-                    StatusCode = 200,
-                    Message = "User profile updated successfully."
-                });
-            }
-
-            return BadRequest(new ResponseViewModel
-            {
-                StatusCode = 500,
-                Message = "Server error."
-            });
+            return result.Succeeded
+                ? Ok(new ResponseViewModel(200, "User profile updated successfully."))
+                : (IActionResult)BadRequest(new ResponseViewModel(500, "User profile updated faild."));
         }
     }
 }

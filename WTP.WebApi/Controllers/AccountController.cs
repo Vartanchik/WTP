@@ -9,6 +9,7 @@ using WTP.BLL.Services.Concrete.AppUserService;
 using WTP.BLL.Services.Concrete.EmailService;
 using WTP.WebAPI.Utility.Extensions;
 using WTP.WebAPI.ViewModels;
+using System.Linq;
 
 namespace WTP.WebAPI.Controllers
 {
@@ -55,14 +56,18 @@ namespace WTP.WebAPI.Controllers
 
                 return Ok(new ResponseViewModel {
                     StatusCode = 200,
-                    Message = "Registration is successful."
+                    Message = "Registration is successful.",
+                    Info = "To complete the registration, check the email and click on the link indicated in the letter."
                 });
             }
 
+            var errorInfo = result.Errors.First(err => err.Code == "DuplicateUserName" || err.Code == "DuplicateEmail");
+
             return BadRequest(new ResponseViewModel
             {
-                StatusCode = 500,
-                Message = "Server error."
+                StatusCode = 400,
+                Message = "Registration is faild.",
+                Info = errorInfo.Description
             });
         }
 
@@ -187,18 +192,12 @@ namespace WTP.WebAPI.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(new ResponseViewModel {
-                    StatusCode = 400,
-                    Message = "Syntax error."
-                });
+                return BadRequest(new ResponseViewModel(400, "Invalid value was entered! Please, redisplay form."));
             }
 
             if (formdata.CurrentPassword == formdata.NewPassword)
             {
-                return BadRequest(new ResponseViewModel {
-                    StatusCode = 400,
-                    Message = "You can't change password for the current one."
-                });
+                return BadRequest(new ResponseViewModel(400, "You can't change password for the current one."));
             }
 
             int userId = this.GetCurrentUserId();
@@ -207,20 +206,14 @@ namespace WTP.WebAPI.Controllers
 
             if (appUserDto == null)
             {
-                return NotFound(new ResponseViewModel {
-                    StatusCode = 404,
-                    Message = "User not found."
-                });
+                return NotFound(new ResponseViewModel(404, "Something going wrong."));
             }
 
             var isPasswordValid = await _appUserService.CheckPasswordAsync(userId, formdata.CurrentPassword);
 
             if (isPasswordValid != true)
             {
-                return BadRequest(new ResponseViewModel {
-                    StatusCode = 400,
-                    Message = "Invalid current password."
-                });
+                return BadRequest(new ResponseViewModel(400, "Invalid current password."));
             }
 
             var result = await _appUserService.ChangePasswordAsync(new ChangePasswordDto
@@ -232,16 +225,10 @@ namespace WTP.WebAPI.Controllers
 
             if (result.Succeeded)
             {
-                return Ok(new ResponseViewModel {
-                    StatusCode = 200,
-                    Message = "Password update successful."
-                });
+                return Ok(new ResponseViewModel(200, "Password update successful."));
             }
 
-            return BadRequest(new ResponseViewModel {
-                StatusCode = 500,
-                Message = "Server error."
-            });
+            return BadRequest(new ResponseViewModel(500, "Change password failed."));
         }
     }
 }
