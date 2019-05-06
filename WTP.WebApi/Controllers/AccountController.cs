@@ -52,7 +52,8 @@ namespace WTP.WebAPI.Controllers
                     protocol: HttpContext.Request.Scheme);
 
                 await _emailService.SendEmailAsync(formdata.Email, "Just one click and you're on WTP",
-                    $"Thanks for registering to be a part of evolving esports with WTP. After you: <a href='{callbackUrl}'>confirm your email</a> you'll be able to enjoy all the benefits of the WTP platform.");
+                    $"Thanks for registering to be a part of evolving esports with WTP. After you: " +
+                    $"<a href='{callbackUrl}'>confirm your email</a> you'll be able to enjoy all the benefits of the WTP platform.");
 
                 return Ok(new ResponseViewModel {
                     StatusCode = 200,
@@ -81,12 +82,14 @@ namespace WTP.WebAPI.Controllers
             }
 
             var user = await _appUserService.FindByIdAsync(userId);
+
             if (user == null)
             {
                 return Redirect("http://localhost:4200/home?confirmed=false");
             }
 
             var result = await _appUserService.ConfirmEmailAsync(user, code);
+
             if (result.Succeeded)
             {
                 return Redirect("http://localhost:4200/home?confirmed=true");
@@ -103,43 +106,32 @@ namespace WTP.WebAPI.Controllers
             {
                 return BadRequest(new ResponseViewModel {
                     StatusCode = 400,
-                    Message = "Syntax error."
+                    Message = "Invalid value was entered! Please, redisplay form."
                 });
             }
 
             var user = await _appUserService.GetByEmailAsync(formData.Email);
 
-            if (user == null)
+            if (user != null || await _appUserService.IsEmailConfirmedAsync(user))
             {
-                return NotFound(new ResponseViewModel {
-                    StatusCode = 404,
-                    Message = "User not found."
-                });
+
+                var token = await _appUserService.GeneratePasswordResetTokenAsync(user);
+
+                token = HttpUtility.UrlEncode(token);
+
+                var callbackUrl = Url.Action("ResetPassword", "Account",
+                    new { userId = user.Id, code = token }, protocol: HttpContext.Request.Scheme);
+
+                await _emailService.SendEmailAsync(
+                    formData.Email,
+                    "WTP Password Reset",
+                    $"If You want to reset Your password, follow this: <a href='{callbackUrl}'>link</a>");
             }
-
-            if (!(await _appUserService.IsEmailConfirmedAsync(user)))
-            {
-                return BadRequest(new ResponseViewModel {
-                    StatusCode = 400,
-                    Message = "Email is not confurmed."
-                });
-            }
-
-            var token = await _appUserService.GeneratePasswordResetTokenAsync(user);
-
-            token = HttpUtility.UrlEncode(token);
-
-            var callbackUrl = Url.Action("ResetPassword", "Account",
-                new { userId = user.Id, code = token }, protocol: HttpContext.Request.Scheme);
-
-            await _emailService.SendEmailAsync(
-                formData.Email,
-                "WTP Password Reset",
-                $"If You want to reset Your password, follow this: <a href='{callbackUrl}'>link</a>");
 
             return Ok(new ResponseViewModel {
                 StatusCode = 200,
-                Message = "Message for password reset has been sent."
+                Message = "Instructions are sent. Please, check Your email.",
+                Info = "If there is no user with such email, or email is not confirmed - the letter won\'t be delivered!"
             });
         }
 
@@ -149,7 +141,7 @@ namespace WTP.WebAPI.Controllers
         {
             if (userId == null || code == null)
             {
-                return Redirect("http://localhost:4200/account/forgot-password?fell=true");
+                return Redirect("http://localhost:4200/account/forgot-password?resetIsFailed=true");
             }
 
             return Redirect($"http://localhost:4200/account/reset-password?userId={userId}&code={code}");
@@ -163,7 +155,7 @@ namespace WTP.WebAPI.Controllers
             {
                 return BadRequest(new ResponseViewModel {
                     StatusCode = 400,
-                    Message = "Syntax error."
+                    Message = "Invalid value was entered! Please, redisplay form."
                 });
             }
 
@@ -175,14 +167,14 @@ namespace WTP.WebAPI.Controllers
             {
                 return Ok(new ResponseViewModel {
                     StatusCode = 200,
-                    Message = "Password successfully reset."
+                    Message = "Password reset is successful!"
                 });
             }
 
             return BadRequest(new ResponseViewModel
             {
                 StatusCode = 500,
-                Message = "Server error."
+                Message = "Password reset is failed!"
             });
         }
 
