@@ -15,7 +15,7 @@ namespace WTP.WebAPI.ViewModels
         [Required]
         [DataType(DataType.Password)]
         [Column(TypeName = "nvarchar(16)")]
-        public string Password { get; set; }
+        public string NewPassword { get; set; }
 
         [Required]
         public string Code { get; set; }

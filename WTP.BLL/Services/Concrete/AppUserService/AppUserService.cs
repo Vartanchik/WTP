@@ -32,9 +32,9 @@ namespace WTP.BLL.Services.Concrete.AppUserService
             return result;
         }
 
-        public async Task<AppUserDto> GetAsync(int id)
+        public async Task<AppUserDto> GetAsync(int userId)
         {
-            var appUser = await _appUserRepository.GetAsync(id);
+            var appUser = await _appUserRepository.GetAsync(userId);
 
             var appUserDto = _mapper.Map<AppUserDto>(appUser);
 
@@ -58,7 +58,7 @@ namespace WTP.BLL.Services.Concrete.AppUserService
                 appUserDto.AppUserLanguages = appUserDtoLanguagesDto;
 
                 //Set default user photo
-                if (appUserDto.Photo == null)
+                if (string.IsNullOrEmpty(appUserDto.Photo))
                 {
                     appUserDto.Photo = "https://cdn4.iconfinder.com/data/icons/48-bubbles/48/30.User-256.png";
                 }
@@ -106,9 +106,9 @@ namespace WTP.BLL.Services.Concrete.AppUserService
             return appUserDto;
         }
 
-        public async Task<AppUserDto> GetByNameAsync(string name)
+        public async Task<AppUserDto> GetByNameAsync(string userName)
         {
-            var appUser = await _appUserRepository.GetByNameAsync(name);
+            var appUser = await _appUserRepository.GetByNameAsync(userName);
 
             var appUserDto = _mapper.Map<AppUserDto>(appUser);
 
@@ -159,9 +159,9 @@ namespace WTP.BLL.Services.Concrete.AppUserService
             return await _appUserRepository.GetRolesAsync(appUser);
         }
 
-        public async Task<bool> CheckPasswordAsync(int id, string password)
+        public async Task<bool> CheckPasswordAsync(int userId, string password)
         {
-            return await _appUserRepository.CheckPasswordAsync(id, password);
+            return await _appUserRepository.CheckPasswordAsync(userId, password);
         }
 
         public async Task<bool> IsEmailConfirmedAsync(AppUserDto appUserDto)
@@ -199,9 +199,9 @@ namespace WTP.BLL.Services.Concrete.AppUserService
             return await _appUserRepository.GenerateEmailConfirmationTokenAsync(appUser);
         }
 
-        public async Task<AppUserDto> FindByIdAsync(string id)
+        public async Task<AppUserDto> FindByIdAsync(string userId)
         {
-            var appUser = await _appUserRepository.FindByIdAsync(id);
+            var appUser = await _appUserRepository.FindByIdAsync(userId);
 
             return _mapper.Map<AppUserDto>(appUser);
         }

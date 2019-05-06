@@ -156,8 +156,6 @@ namespace WTP.WebAPI
                     policy.RequireRole("Admin").RequireAuthenticatedUser());
             });
 
-            #region Swagger Registration
-
             // Register the Swagger generator, defining 1 or more Swagger documents
             services.AddSwaggerGen(c =>
             {
@@ -168,8 +166,6 @@ namespace WTP.WebAPI
                     Description = ".NET Core API",
                 });
             });
-
-            #endregion
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -209,8 +205,6 @@ namespace WTP.WebAPI
             //    }
             //});
 
-            #region Enable Swagger Middleware
-
             // Enable middleware to serve generated Swagger as a JSON endpoint.
             app.UseSwagger();
 
@@ -220,8 +214,6 @@ namespace WTP.WebAPI
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
             });
-
-            #endregion
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿
-namespace WTP.DAL.DomainModels
+﻿namespace WTP.DAL.DomainModels
 {
     public class Country : IEntity
     {
