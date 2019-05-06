@@ -9,5 +9,6 @@ namespace WTP.WebAPI.ViewModels
     {
         public int StatusCode { get; set; }
         public string Message { get; set; }
+        public string Info { get; set; }
     }
 }
