@@ -10,6 +10,7 @@ using WTP.BLL.Services.Concrete.EmailService;
 using WTP.WebAPI.Utility.Extensions;
 using WTP.WebAPI.ViewModels;
 using System.Linq;
+using Microsoft.Extensions.Configuration;
 
 namespace WTP.WebAPI.Controllers
 {
@@ -19,12 +20,14 @@ namespace WTP.WebAPI.Controllers
         private readonly IAppUserService _appUserService;
         private readonly IEmailService _emailService;
         private readonly ILog _log;
+        private readonly IConfiguration _configuration;
 
-        public AccountController(IAppUserService appUserService, IEmailService emailService, ILog log)
+        public AccountController(IAppUserService appUserService, IEmailService emailService, ILog log, IConfiguration configuration)
         {
             _emailService = emailService;
             _log = log;
             _appUserService = appUserService;
+            _configuration = configuration;
         }
 
         [HttpPost("[action]")]
@@ -72,22 +75,22 @@ namespace WTP.WebAPI.Controllers
         {
             if (userId == null || code == null)
             {
-                return Redirect("http://localhost:4200/home?confirmed=false");
+                return Redirect($"{_configuration["Url:BaseUrl"]}/home?confirmed=false");
             }
 
             var user = await _appUserService.FindByIdAsync(userId);
             if (user == null)
             {
-                return Redirect("http://localhost:4200/home?confirmed=false");
+                return Redirect($"{_configuration["Url:BaseUrl"]}/home?confirmed=false");
             }
 
             var result = await _appUserService.ConfirmEmailAsync(user, code);
             if (result.Succeeded)
             {
-                return Redirect("http://localhost:4200/home?confirmed=true");
+                return Redirect($"{_configuration["Url:BaseUrl"]}/home?confirmed=true");
             }
 
-            return Redirect("http://localhost:4200/home?confirmed=false");
+            return Redirect($"{_configuration["Url:BaseUrl"]}/home?confirmed=false");
         }
 
         [HttpPost("[action]")]
@@ -130,8 +133,8 @@ namespace WTP.WebAPI.Controllers
         public IActionResult ResetPassword([FromQuery] string userId = null, [FromQuery] string code = null)
         {
             return userId == null || code == null
-                ? Redirect("http://localhost:4200/account/forgot-password?resetIsFailed=true")
-                : Redirect($"http://localhost:4200/account/reset-password?userId={userId}&code={code}");
+                ? Redirect($"{_configuration["Url:BaseUrl"]}/account/forgot-password?resetIsFailed=true")
+                : Redirect($"{_configuration["Url:BaseUrl"]}/account/reset-password?userId={userId}&code={code}");
         }
 
         [HttpPost("[action]")]

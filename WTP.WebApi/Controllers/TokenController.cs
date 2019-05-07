@@ -129,7 +129,7 @@ namespace WTP.WebAPI.Controllers
                 Refresh_token = refreshToken,
                 Role = roles.FirstOrDefault(),
                 UserName = user.UserName,
-                Photo = user.Photo,
+                Photo = user.Photo
             };
         }
 

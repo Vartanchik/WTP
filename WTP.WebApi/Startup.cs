@@ -95,7 +95,7 @@ namespace WTP.WebAPI
             {
                 options.AddPolicy("EnableCORS", builder =>
                 {
-                    builder.WithOrigins("http://localhost:4200")
+                    builder.WithOrigins($"{Configuration["Url:BaseUrl"]}")
                     .AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod().AllowCredentials().Build();
                 });
             });
