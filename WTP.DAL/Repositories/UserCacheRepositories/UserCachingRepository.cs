@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Caching.Distributed;
 using Newtonsoft.Json;
+using System;
 using System.Threading.Tasks;
 using WTP.DAL.DomainModels;
 using WTP.DAL.Repositories.ConcreteRepositories.AppUserExtended;
@@ -22,36 +23,28 @@ namespace WTP.DAL.Repositories.UserCacheRepositories
             var value = await _Cache.GetStringAsync(id.ToString());
 
             if (value != null)
-                return (AppUser)JsonConvert.DeserializeObject(value);
+            {
+                return JsonConvert.DeserializeObject<AppUser>(value);
+            }
+                
             else
-                return await base.GetAsync(id);
+            {
+                AppUser currentUser = await base.GetAsync(id);
+
+                await _Cache.SetStringAsync(id.ToString(), JsonConvert.SerializeObject(currentUser, Formatting.Indented,
+                new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore }));
+
+                return currentUser;
+            }
         }
 
-        //save
-        //public async Task SetObjectAsync<T>(string key, T value)
-        //{
-        //    await _Cache.SetStringAsync(key, JsonConvert.SerializeObject(value));
-        //}
+        public new async Task<IdentityResult> UpdateAsync(AppUser appUser)
+        {
+            var resultOfUpdate = await base.UpdateAsync(appUser);
 
-        //get
-        //public async Task<T> GetObjectAsync<T>(string key)
-        //{
-        //    var value = await _Cache.GetStringAsync(key);
-        //    return value == null ? default : JsonConvert.DeserializeObject<T>(value);
-        //}
+            await _Cache.RemoveAsync(appUser.Id.ToString());
 
-        //remove object
-        //public async Task RemoveObjectAsync(string key)
-        //{
-        //    await _Cache.RemoveAsync(key);
-        //}
-
-        //verify if an object exists
-        //public async Task<bool> ExistObjectAsync<T>(string key)
-        //{
-        //    var value = await _Cache.GetStringAsync(key);
-        //    return value == null ? false : true;
-        //}
-
+            return resultOfUpdate;
+        }
     }
 }
