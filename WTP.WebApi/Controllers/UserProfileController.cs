@@ -106,7 +106,13 @@ namespace WTP.WebAPI.ViewModels.Controllers
 
             if (result.Succeeded)
             {
-                return Ok(new JsonResult("Updated"));
+                var appUserDtoViewModel = new AppUserDtoViewModel()
+                {
+                    Photo = user.Photo,
+                    UserName = user.UserName
+                };
+
+                return Ok(appUserDtoViewModel);
             }
             else
             {
@@ -116,7 +122,7 @@ namespace WTP.WebAPI.ViewModels.Controllers
                 }
             }
 
-            return BadRequest(new JsonResult(errorList));
+            return Ok(new ErrorResponseModel { Message = errorList });
         }
     }
 }

@@ -23,7 +23,11 @@ using WTP.DAL.Repositories.ConcreteRepositories.AppUserExtended;
 using WTP.DAL.Repositories.GenericRepository;
 using WTP.DAL.UnitOfWork;
 using WTP.WebAPI.Helpers;
+using WTP.BLL.Services.Concrete.EmailService;
+using Swashbuckle.AspNetCore.Swagger;
 using WTP.DAL.Repositories.UserCacheRepositories;
+using WTP.DAL.Repositories.ConcreteRepositories.RefreshTokenExtended;
+using WTP.BLL.Services.Concrete.RefreshTokenService;
 
 namespace WTP.WebAPI
 {
@@ -42,7 +46,6 @@ namespace WTP.WebAPI
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddAutoMapper();
 
-
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             services.AddScoped<IAppUserRepository, UserCachingRepository>();
@@ -52,6 +55,8 @@ namespace WTP.WebAPI
             services.AddScoped<IRepository<Language>, RepositoryBase<Language>>();
             services.AddScoped<IRepository<Player>, RepositoryBase<Player>>();
             services.AddScoped<IRepository<Team>, RepositoryBase<Team>>();
+            services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+            services.AddScoped<IRepository<RefreshToken>, RepositoryBase<RefreshToken>>();
 
             services.AddScoped<IAppUserService, AppUserService>();
             services.AddScoped<ICountryService, CountryService>();
@@ -59,6 +64,7 @@ namespace WTP.WebAPI
             services.AddScoped<ILanguageService, LanguageService>();
             services.AddScoped<IPlayerService, PlayerService>();
             services.AddScoped<ITeamService, TeamService>();
+            services.AddScoped<IRefreshTokenService, RefreshTokenService>();
 
 
             //// In production, the Angular files will be served from this directory
@@ -66,8 +72,12 @@ namespace WTP.WebAPI
             //{
             //    configuration.RootPath = "ClientApp/dist";
             //});
+            services.AddScoped<IEmailService, EmailService>();
             services.AddSingleton<ILog, SerilogLog>();
 
+            services.Configure<DataProtectionTokenProviderOptions>(options =>
+            options.TokenLifespan = TimeSpan.FromMinutes(30));
+            
             // Add the REDIS 
             services.AddDistributedRedisCache(options =>
             {
@@ -131,7 +141,8 @@ namespace WTP.WebAPI
                     ValidateAudience = true,
                     ValidIssuer = appSettings.Site,
                     ValidAudience = appSettings.Audience,
-                    IssuerSigningKey = new SymmetricSecurityKey(key)
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ClockSkew = TimeSpan.Zero
                 };
             });
 
@@ -144,6 +155,21 @@ namespace WTP.WebAPI
                 options.AddPolicy("RequireAdministratorRole", policy =>
                     policy.RequireRole("Admin").RequireAuthenticatedUser());
             });
+
+            #region Swagger Registration
+
+            // Register the Swagger generator, defining 1 or more Swagger documents
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new Info
+                {
+                    Version = "v1",
+                    Title = "WTP API",
+                    Description = ".NET Core API",
+                });
+            });
+
+            #endregion
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -182,6 +208,20 @@ namespace WTP.WebAPI
             //        spa.UseAngularCliServer(npmScript: "start");
             //    }
             //});
+
+            #region Enable Swagger Middleware
+
+            // Enable middleware to serve generated Swagger as a JSON endpoint.
+            app.UseSwagger();
+
+            // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.), 
+            // specifying the Swagger JSON endpoint.
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+            });
+
+            #endregion
         }
     }
 }

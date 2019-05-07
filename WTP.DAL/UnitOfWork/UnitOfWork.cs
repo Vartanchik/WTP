@@ -14,6 +14,7 @@ namespace WTP.DAL.UnitOfWork
         private IRepository<Language> _languages;
         private IRepository<Player> _players;
         private IRepository<Team> _teams;
+        private IRepository<RefreshToken> _tokens;
 
         public UnitOfWork(ApplicationDbContext context)
         {
@@ -26,6 +27,7 @@ namespace WTP.DAL.UnitOfWork
         public IRepository<Language> Languages => _languages ?? (_languages = new RepositoryBase<Language>(_context));
         public IRepository<Player> Players => _players ?? (_players = new RepositoryBase<Player>(_context));
         public IRepository<Team> Teams => _teams ?? (_teams = new RepositoryBase<Team>(_context));
+        public IRepository<RefreshToken> Tokens => _tokens ?? (_tokens = new RepositoryBase<RefreshToken>(_context));
 
         public void Commit()
         {

@@ -10,7 +10,7 @@ using WTP.DAL;
 namespace WTP.DAL.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20190429160144_InitialCreate")]
+    [Migration("20190502234522_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -284,6 +284,28 @@ namespace WTP.DAL.Migrations
                     b.ToTable("Players");
                 });
 
+            modelBuilder.Entity("WTP.DAL.DomainModels.RefreshToken", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime>("CreatedDate");
+
+                    b.Property<DateTime>("ExpiryTime");
+
+                    b.Property<int>("UserId");
+
+                    b.Property<string>("Value")
+                        .IsRequired();
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("RefreshTokens");
+                });
+
             modelBuilder.Entity("WTP.DAL.DomainModels.Team", b =>
                 {
                     b.Property<int>("Id")
@@ -375,6 +397,14 @@ namespace WTP.DAL.Migrations
                     b.HasOne("WTP.DAL.DomainModels.AppUser")
                         .WithMany("Players")
                         .HasForeignKey("AppUserId");
+                });
+
+            modelBuilder.Entity("WTP.DAL.DomainModels.RefreshToken", b =>
+                {
+                    b.HasOne("WTP.DAL.DomainModels.AppUser", "AppUser")
+                        .WithMany("Tokens")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("WTP.DAL.DomainModels.Team", b =>

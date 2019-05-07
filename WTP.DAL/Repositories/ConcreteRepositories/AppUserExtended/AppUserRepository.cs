@@ -46,6 +46,10 @@ namespace WTP.DAL.Repositories.ConcreteRepositories.AppUserExtended
         {
             return await _userManager.FindByEmailAsync(email);
         }
+        public async Task<AppUser> GetByNameAsync(string name)
+        {
+            return await _userManager.FindByNameAsync(name);
+        }
 
         public async Task<IList<string>> GetRolesAsync(AppUser appUser)
         {
@@ -63,6 +67,51 @@ namespace WTP.DAL.Repositories.ConcreteRepositories.AppUserExtended
         {
             return await _context.AppUsers.Include("Country").Include("Gender")
                 .Include(_ => _.AppUserLanguages).FirstOrDefaultAsync(_ => _.Id == id);
+        }
+
+        public async Task<bool> IsEmailConfirmedAsync(AppUser appUser)
+        {
+            var user = await GetAsync(appUser.Id);
+
+            return await _userManager.IsEmailConfirmedAsync(user);
+        }
+
+        public async Task<string> GeneratePasswordResetTokenAsync(AppUser appUser)
+        {
+            return await _userManager.GeneratePasswordResetTokenAsync(appUser);
+        }
+
+        public async Task<IdentityResult> ResetPasswordAsync(AppUser appUser, string token, string newPassword)
+        {
+            var user = await GetAsync(appUser.Id);
+
+            return await _userManager.ResetPasswordAsync(user, token, newPassword);
+        }
+
+        public async Task<IdentityResult> ChangePasswordAsync(int appUserId, string currentPassword, string newPassword)
+        {
+            var user = await GetAsync(appUserId);
+
+            return await _userManager.ChangePasswordAsync(user: user,
+                                                          currentPassword: currentPassword,
+                                                          newPassword: newPassword);
+        }
+
+        public async Task<string> GenerateEmailConfirmationTokenAsync(AppUser appUser)
+        {
+            return await _userManager.GenerateEmailConfirmationTokenAsync(appUser);
+        }
+
+        public async Task<AppUser> FindByIdAsync(string id)
+        {
+            return await _userManager.FindByIdAsync(id);
+        }
+
+        public async Task<IdentityResult> ConfirmEmailAsync(AppUser appUser, string token)
+        {
+            var user = await GetAsync(appUser.Id);
+
+            return await _userManager.ConfirmEmailAsync(user, token);
         }
     }
 }

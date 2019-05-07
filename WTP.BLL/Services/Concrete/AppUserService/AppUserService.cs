@@ -38,27 +38,32 @@ namespace WTP.BLL.Services.Concrete.AppUserService
 
             var appUserDto = _mapper.Map<AppUserDto>(appUser);
 
-            // Create new List in order to get current language
-            var appUserDtoLanguagesDto = new List<AppUserDtoLanguageDto>();
-
-            foreach (var item in appUserDto.AppUserLanguages)
+            if (appUser != null)
             {
-                appUserDtoLanguagesDto.Add(new AppUserDtoLanguageDto
+                // Create new List in order to get current language
+                var appUserDtoLanguagesDto = new List<AppUserDtoLanguageDto>();
+
+                foreach (var item in appUserDto.AppUserLanguages)
                 {
-                    AppUser = null,
-                    AppUserId = null,
-                    LanguageId = item.LanguageId,
-                    Language = await _languageService.GetAsync(item.LanguageId)
-                });
-            }
+                    appUserDtoLanguagesDto.Add(new AppUserDtoLanguageDto
+                    {
+                        AppUser = null,
+                        AppUserId = null,
+                        LanguageId = item.LanguageId,
+                        Language = await _languageService.GetAsync(item.LanguageId)
+                    });
+                }
 
-            //Set language property 
-            appUserDto.AppUserLanguages = appUserDtoLanguagesDto;
+                //Set language property 
+                appUserDto.AppUserLanguages = appUserDtoLanguagesDto;
 
-            //Set default user photo
-            if (appUserDto.Photo == null)
-            {
-                appUserDto.Photo = "https://cdn4.iconfinder.com/data/icons/48-bubbles/48/30.User-256.png";
+                //Set default user photo
+                if (appUserDto.Photo == null)
+                {
+                    appUserDto.Photo = "https://cdn4.iconfinder.com/data/icons/48-bubbles/48/30.User-256.png";
+                }
+
+                return appUserDto;
             }
 
             return appUserDto;
@@ -68,9 +73,76 @@ namespace WTP.BLL.Services.Concrete.AppUserService
         {
             var appUser = await _appUserRepository.GetByEmailAsync(email);
 
-            return _mapper.Map<AppUserDto>(appUser);
+            var appUserDto = _mapper.Map<AppUserDto>(appUser);
+
+            if (appUser != null)
+            {
+                // Create new List in order to get current language
+                var appUserDtoLanguagesDto = new List<AppUserDtoLanguageDto>();
+
+                foreach (var item in appUserDto.AppUserLanguages)
+                {
+                    appUserDtoLanguagesDto.Add(new AppUserDtoLanguageDto
+                    {
+                        AppUser = null,
+                        AppUserId = null,
+                        LanguageId = item.LanguageId,
+                        Language = await _languageService.GetAsync(item.LanguageId)
+                    });
+                }
+
+                //Set language property 
+                appUserDto.AppUserLanguages = appUserDtoLanguagesDto;
+
+                //Set default user photo
+                if (appUserDto.Photo == null)
+                {
+                    appUserDto.Photo = "https://cdn4.iconfinder.com/data/icons/48-bubbles/48/30.User-256.png";
+                }
+
+                return appUserDto;
+            }
+
+            return appUserDto;
         }
 
+        public async Task<AppUserDto> GetByNameAsync(string name)
+        {
+            var appUser = await _appUserRepository.GetByNameAsync(name);
+
+            var appUserDto = _mapper.Map<AppUserDto>(appUser);
+
+            if (appUser != null)
+            {
+                // Create new List in order to get current language
+                var appUserDtoLanguagesDto = new List<AppUserDtoLanguageDto>();
+
+                foreach (var item in appUserDto.AppUserLanguages)
+                {
+                    appUserDtoLanguagesDto.Add(new AppUserDtoLanguageDto
+                    {
+                        AppUser = null,
+                        AppUserId = null,
+                        LanguageId = item.LanguageId,
+                        Language = await _languageService.GetAsync(item.LanguageId)
+                    });
+                }
+
+                //Set language property 
+                appUserDto.AppUserLanguages = appUserDtoLanguagesDto;
+
+                //Set default user photo
+                if (appUserDto.Photo == null)
+                {
+                    appUserDto.Photo = "https://cdn4.iconfinder.com/data/icons/48-bubbles/48/30.User-256.png";
+                }
+
+                return appUserDto;
+            }
+
+            return appUserDto;
+        }
+                     
         public async Task<IdentityResult> UpdateAsync(AppUserDto appUserDto)
         {
             var appUser = _mapper.Map<AppUser>(appUserDto);
@@ -90,6 +162,55 @@ namespace WTP.BLL.Services.Concrete.AppUserService
         public async Task<bool> CheckPasswordAsync(int id, string password)
         {
             return await _appUserRepository.CheckPasswordAsync(id, password);
+        }
+
+        public async Task<bool> IsEmailConfirmedAsync(AppUserDto appUserDto)
+        {
+            var appUser = _mapper.Map<AppUser>(appUserDto);
+
+            return await _appUserRepository.IsEmailConfirmedAsync(appUser);
+        }
+
+        public async Task<string> GeneratePasswordResetTokenAsync(AppUserDto appUserDto)
+        {
+            var appUser = _mapper.Map<AppUser>(appUserDto);
+
+            return await _appUserRepository.GeneratePasswordResetTokenAsync(appUser);
+        }
+
+        public async Task<IdentityResult> ResetPasswordAsync(AppUserDto appUserDto, string token, string newPassword)
+        {
+            var appUser = _mapper.Map<AppUser>(appUserDto);
+
+            return await _appUserRepository.ResetPasswordAsync(appUser, token, newPassword);
+        }
+
+        public async Task<IdentityResult> ChangePasswordAsync(ChangePasswordDto changePasswordDto)
+        {
+            return await _appUserRepository.ChangePasswordAsync(changePasswordDto.UserId,
+                                                                changePasswordDto.CurrentPassword,
+                                                                changePasswordDto.NewPassword);
+        }
+
+        public async Task<string> GenerateEmailConfirmationTokenAsync(AppUserDto appUserDto)
+        {
+            var appUser = _mapper.Map<AppUser>(appUserDto);
+
+            return await _appUserRepository.GenerateEmailConfirmationTokenAsync(appUser);
+        }
+
+        public async Task<AppUserDto> FindByIdAsync(string id)
+        {
+            var appUser = await _appUserRepository.FindByIdAsync(id);
+
+            return _mapper.Map<AppUserDto>(appUser);
+        }
+
+        public async Task<IdentityResult> ConfirmEmailAsync(AppUserDto appUserDto, string token)
+        {
+            var appUser = _mapper.Map<AppUser>(appUserDto);
+
+            return await _appUserRepository.ConfirmEmailAsync(appUser, token);
         }
     }
 }
