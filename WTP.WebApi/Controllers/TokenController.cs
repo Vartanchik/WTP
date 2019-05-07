@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
@@ -62,30 +61,30 @@ namespace WTP.WebAPI.Controllers
         {
             var user = await _appUserService.GetByEmailAsync(model.Email);
 
-            if (user == null && !await _appUserService.CheckPasswordAsync(user.Id, model.Password))
+            if (user != null && await _appUserService.CheckPasswordAsync(user.Id, model.Password))
             {
-                return BadRequest(new ResponseViewModel(400, "Login failed.", "Incorrect username or password, Authentication failed."));
+                if (!await _appUserService.IsEmailConfirmedAsync(user))
+                {
+                    return Unauthorized(new ResponseViewModel(401, "Login failed.", "We sent you an confirmation email. Please confirm your registration."));
+                }
+
+                var newRefreshToken = CreateRefreshToken(user.Id);
+
+                var oldRefreshTokens = await _refreshTokenService.GetRangeAsync(user.Id);
+
+                if (oldRefreshTokens != null)
+                {
+                    await _refreshTokenService.DeleteRangeAsync(user.Id);
+                }
+
+                await _refreshTokenService.CreateAsync(newRefreshToken);
+
+                var accessToken = await CreateAccessToken(user, newRefreshToken.Value);
+
+                return Ok(new { accessToken, message = "Login successful." });
             }
 
-            if (!await _appUserService.IsEmailConfirmedAsync(user))
-            {
-                return Unauthorized(new ResponseViewModel(401, "Login failed.", "We sent you an confirmation email. Please confirm your registration."));
-            }
-
-            var newRefreshToken = CreateRefreshToken(user.Id);
-
-            var oldRefreshTokens = await _refreshTokenService.GetRangeAsync(user.Id);
-
-            if (oldRefreshTokens != null)
-            {
-                await _refreshTokenService.DeleteRangeAsync(user.Id);
-            }
-
-            await _refreshTokenService.CreateAsync(newRefreshToken);
-
-            var accessToken = await CreateAccessToken(user, newRefreshToken.Value);
-
-            return Ok(new { accessToken, message = "Login successful." });
+            return BadRequest(new ResponseViewModel(400, "Authentication failed.", "Incorrect email or password."));
         }
 
         // Create access Token

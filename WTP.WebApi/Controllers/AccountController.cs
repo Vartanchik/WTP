@@ -33,6 +33,11 @@ namespace WTP.WebAPI.Controllers
         [HttpPost("[action]")]
         public async Task<IActionResult> Register([FromBody] RegisterViewModel formdata)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new ResponseViewModel(400, "Invalid value was entered! Please, redisplay form."));
+            }
+
             var user = new AppUserDto
             {
                 Email = formdata.Email,
@@ -102,14 +107,13 @@ namespace WTP.WebAPI.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(new ResponseViewModel(400, "Invalid value was entered! Please, redisplay form."));
+                return BadRequest(new ResponseViewModel(400, "Error", "Invalid value was entered! Please, redisplay form."));
             }
 
             var user = await _appUserService.GetByEmailAsync(formData.Email);
 
-            if (user != null || await _appUserService.IsEmailConfirmedAsync(user))
+            if (user != null && await _appUserService.IsEmailConfirmedAsync(user))
             {
-
                 var token = await _appUserService.GeneratePasswordResetTokenAsync(user);
 
                 token = HttpUtility.UrlEncode(token);
@@ -123,12 +127,10 @@ namespace WTP.WebAPI.Controllers
                     $"If You want to reset Your password, follow this: <a href='{callbackUrl}'>link</a>");
             }
 
-            return Ok(new ResponseViewModel
-            {
-                StatusCode = 200,
-                Message = "Instructions are sent. Please, check Your email.",
-                Info = "If there is no user with such email, or email is not confirmed - the letter won\'t be delivered!"
-            });
+            return Ok(new ResponseViewModel(200,
+                "Instructions are sent. Please, check Your email.",
+                "If there is no user with such email, or email is not confirmed - the letter won\'t be delivered!"
+                ));
         }
 
         [HttpGet("[action]")]

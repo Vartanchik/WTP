@@ -25,7 +25,7 @@ namespace WTP.WebAPI.ViewModels
         public GenderDto Gender { get; set; }
 
         [Required]
-        public DateTime? DateOfBirth { get; set; }
+        public string DateOfBirth { get; set; }
 
         [Required]
         public CountryDto Country { get; set; }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -31,10 +32,7 @@ namespace WTP.WebAPI.ViewModels.Controllers
 
             if (user == null)
             {
-                return NotFound(new ResponseViewModel {
-                    StatusCode = 404,
-                    Message = "Something going wrong."
-                });
+                return NotFound(new ResponseViewModel(404, "Something going wrong."));
             }
 
             var languages = new List<LanguageDto>();
@@ -53,7 +51,7 @@ namespace WTP.WebAPI.ViewModels.Controllers
                 Email = user.Email,
                 Photo = user.Photo,
                 Gender = user.Gender,
-                DateOfBirth = user.DateOfBirth,
+                DateOfBirth = user.DateOfBirth.ToString(),
                 Country = user.Country,
                 Steam = user.Steam,
                 Languages = languages,
@@ -99,7 +97,7 @@ namespace WTP.WebAPI.ViewModels.Controllers
             }
             user.UserName = formdata.UserName;
             user.GenderId = formdata.Gender.Id;
-            user.DateOfBirth = formdata.DateOfBirth;
+            user.DateOfBirth = Convert.ToDateTime(formdata.DateOfBirth);
             user.CountryId = formdata.Country.Id;
             user.AppUserLanguages = userLanguage;
             user.Steam = formdata.Steam;
