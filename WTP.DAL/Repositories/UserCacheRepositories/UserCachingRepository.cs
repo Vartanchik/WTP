@@ -20,7 +20,7 @@ namespace WTP.DAL.Repositories.UserCacheRepositories
 
         public override async Task<AppUser> GetAsync(int id)
         {
-            var value = await _Cache.GetStringAsync(id.ToString());
+            string value = await _Cache.GetStringAsync(id.ToString());
 
             if (value != null)
             {
@@ -31,8 +31,14 @@ namespace WTP.DAL.Repositories.UserCacheRepositories
             {
                 AppUser currentUser = await base.GetAsync(id);
 
-                await _Cache.SetStringAsync(id.ToString(), JsonConvert.SerializeObject(currentUser, Formatting.Indented,
-                new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore }));
+                string CurrentUserStringObject = JsonConvert.SerializeObject(currentUser, Formatting.Indented,
+                new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore });
+
+                await _Cache.SetStringAsync(id.ToString(), CurrentUserStringObject,
+                new DistributedCacheEntryOptions
+                {
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(60)
+                });
 
                 return currentUser;
             }
@@ -42,7 +48,7 @@ namespace WTP.DAL.Repositories.UserCacheRepositories
         {
             var resultOfUpdate = await base.UpdateAsync(appUser);
 
-            await _Cache.RemoveAsync(appUser.Id.ToString());
+            await _Cache.RemoveAsync((appUser.Id).ToString());
 
             return resultOfUpdate;
         }
