@@ -63,12 +63,7 @@ namespace WTP.WebAPI.Controllers
 
             var errorInfo = result.Errors.First(err => err.Code == "DuplicateUserName" || err.Code == "DuplicateEmail");
 
-            return BadRequest(new ResponseViewModel
-            {
-                StatusCode = 400,
-                Message = "Registration is faild.",
-                Info = errorInfo.Description
-            });
+            return BadRequest(new ResponseViewModel(400, "Registration is faild.", errorInfo.Description));
         }
 
         [HttpGet]
@@ -101,45 +96,32 @@ namespace WTP.WebAPI.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(new ResponseViewModel {
-                    StatusCode = 400,
-                    Message = "Syntax error."
-                });
+                return BadRequest(new ResponseViewModel(400, "Invalid value was entered! Please, redisplay form."));
             }
 
             var user = await _appUserService.GetByEmailAsync(formData.Email);
 
-            if (user == null)
+            if (user != null || await _appUserService.IsEmailConfirmedAsync(user))
             {
-                return NotFound(new ResponseViewModel {
-                    StatusCode = 404,
-                    Message = "User not found."
-                });
+
+                var token = await _appUserService.GeneratePasswordResetTokenAsync(user);
+
+                token = HttpUtility.UrlEncode(token);
+
+                var callbackUrl = Url.Action("ResetPassword", "Account",
+                    new { userId = user.Id, code = token }, protocol: HttpContext.Request.Scheme);
+
+                await _emailService.SendEmailAsync(
+                    formData.Email,
+                    "WTP Password Reset",
+                    $"If You want to reset Your password, follow this: <a href='{callbackUrl}'>link</a>");
             }
 
-            if (!(await _appUserService.IsEmailConfirmedAsync(user)))
+            return Ok(new ResponseViewModel
             {
-                return BadRequest(new ResponseViewModel {
-                    StatusCode = 400,
-                    Message = "Email is not confurmed."
-                });
-            }
-
-            var token = await _appUserService.GeneratePasswordResetTokenAsync(user);
-
-            token = HttpUtility.UrlEncode(token);
-
-            var callbackUrl = Url.Action("ResetPassword", "Account",
-                new { userId = user.Id, code = token }, protocol: HttpContext.Request.Scheme);
-
-            await _emailService.SendEmailAsync(
-                formData.Email,
-                "WTP Password Reset",
-                $"If You want to reset Your password, follow this: <a href='{callbackUrl}'>link</a>");
-
-            return Ok(new ResponseViewModel {
                 StatusCode = 200,
-                Message = "Message for password reset has been sent."
+                Message = "Instructions are sent. Please, check Your email.",
+                Info = "If there is no user with such email, or email is not confirmed - the letter won\'t be delivered!"
             });
         }
 
@@ -147,12 +129,9 @@ namespace WTP.WebAPI.Controllers
         [AllowAnonymous]
         public IActionResult ResetPassword([FromQuery] string userId = null, [FromQuery] string code = null)
         {
-            if (userId == null || code == null)
-            {
-                return Redirect("http://localhost:4200/account/forgot-password?fell=true");
-            }
-
-            return Redirect($"http://localhost:4200/account/reset-password?userId={userId}&code={code}");
+            return userId == null || code == null
+                ? Redirect("http://localhost:4200/account/forgot-password?resetIsFailed=true")
+                : Redirect($"http://localhost:4200/account/reset-password?userId={userId}&code={code}");
         }
 
         [HttpPost("[action]")]
@@ -161,29 +140,16 @@ namespace WTP.WebAPI.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(new ResponseViewModel {
-                    StatusCode = 400,
-                    Message = "Syntax error."
-                });
+                return BadRequest(new ResponseViewModel(400, "Invalid value was entered! Please, redisplay form."));
             }
 
             var user = await _appUserService.GetAsync(formData.Id);
 
             var result = await _appUserService.ResetPasswordAsync(user, formData.Code, formData.NewPassword);
 
-            if (result.Succeeded)
-            {
-                return Ok(new ResponseViewModel {
-                    StatusCode = 200,
-                    Message = "Password successfully reset."
-                });
-            }
-
-            return BadRequest(new ResponseViewModel
-            {
-                StatusCode = 500,
-                Message = "Server error."
-            });
+            return result.Succeeded
+                ? Ok(new ResponseViewModel(200, "Password reset is successful!"))
+                : (IActionResult)BadRequest(new ResponseViewModel(500, "Password reset is failed!"));
         }
 
         [HttpPost("[action]")]
@@ -193,11 +159,6 @@ namespace WTP.WebAPI.Controllers
             if (!ModelState.IsValid)
             {
                 return BadRequest(new ResponseViewModel(400, "Invalid value was entered! Please, redisplay form."));
-            }
-
-            if (formdata.CurrentPassword == formdata.NewPassword)
-            {
-                return BadRequest(new ResponseViewModel(400, "You can't change password for the current one."));
             }
 
             int userId = this.GetCurrentUserId();
@@ -223,12 +184,9 @@ namespace WTP.WebAPI.Controllers
                 NewPassword = formdata.NewPassword
             });
 
-            if (result.Succeeded)
-            {
-                return Ok(new ResponseViewModel(200, "Password update successful."));
-            }
-
-            return BadRequest(new ResponseViewModel(500, "Change password failed."));
+            return result.Succeeded 
+                ? Ok(new ResponseViewModel(200, "Password update successful."))
+                : (IActionResult)BadRequest(new ResponseViewModel(500, "Change password failed."));
         }
     }
 }

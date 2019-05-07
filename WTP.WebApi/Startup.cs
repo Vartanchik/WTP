@@ -28,6 +28,7 @@ using Swashbuckle.AspNetCore.Swagger;
 using WTP.DAL.Repositories.UserCacheRepositories;
 using WTP.DAL.Repositories.ConcreteRepositories.RefreshTokenExtended;
 using WTP.BLL.Services.Concrete.RefreshTokenService;
+using FluentValidation.AspNetCore;
 
 namespace WTP.WebAPI
 {
@@ -43,7 +44,11 @@ namespace WTP.WebAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddMvc()
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
+                .AddFluentValidation(fvc =>
+                    fvc.RegisterValidatorsFromAssemblyContaining<Startup>());
+
             services.AddAutoMapper();
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -78,7 +83,7 @@ namespace WTP.WebAPI
             services.Configure<DataProtectionTokenProviderOptions>(options =>
             options.TokenLifespan = TimeSpan.FromMinutes(30));
             
-            // Add the REDIS 
+            // Add the REDIS
             services.AddDistributedRedisCache(options =>
             {
                 options.Configuration = Configuration["Redis:ConnectionString"]; 

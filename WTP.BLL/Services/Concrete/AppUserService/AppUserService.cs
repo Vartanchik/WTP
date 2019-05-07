@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using WTP.BLL.ModelsDto.AppUser;
@@ -15,12 +16,14 @@ namespace WTP.BLL.Services.Concrete.AppUserService
         private readonly IMapper _mapper;
         private readonly IAppUserRepository _appUserRepository;
         private ILanguageService _languageService;
+        private IConfiguration _configuration;
 
-        public AppUserService(IMapper mapper, IAppUserRepository appUserRepository, ILanguageService languageService)
+        public AppUserService(IMapper mapper, IAppUserRepository appUserRepository, ILanguageService languageService, IConfiguration configuration)
         {
             _mapper = mapper;
             _appUserRepository = appUserRepository;
             _languageService = languageService;
+            _configuration = configuration;
         }
 
         public async Task<IdentityResult> CreateAsync(AppUserDto appUserDto, string password)
@@ -60,7 +63,7 @@ namespace WTP.BLL.Services.Concrete.AppUserService
                 //Set default user photo
                 if (string.IsNullOrEmpty(appUserDto.Photo))
                 {
-                    appUserDto.Photo = "https://cdn4.iconfinder.com/data/icons/48-bubbles/48/30.User-256.png";
+                    appUserDto.Photo = _configuration["Photo:DefaultPhoto"];
                 }
 
                 return appUserDto;
@@ -145,6 +148,10 @@ namespace WTP.BLL.Services.Concrete.AppUserService
                      
         public async Task<IdentityResult> UpdateAsync(AppUserDto appUserDto)
         {
+            appUserDto.Photo = appUserDto.Photo == _configuration["Photo:DefaultPhoto"]
+                ? null
+                : appUserDto.Photo;
+
             var appUser = _mapper.Map<AppUser>(appUserDto);
 
             var result = await _appUserRepository.UpdateAsync(appUser);

@@ -83,10 +83,10 @@ namespace WTP.WebAPI.ViewModels.Controllers
                 return NotFound(new ResponseViewModel(404, "Something going wrong."));
             }
 
-            var languages = new List<AppUserDtoLanguageDto>();
+            var userLanguage = new List<AppUserDtoLanguageDto>();
             foreach (var item in formdata.Languages)
             {
-                languages.Add(new AppUserDtoLanguageDto
+                userLanguage.Add(new AppUserDtoLanguageDto
                 {
                     LanguageId = item.Id,
                     AppUserId = userId
@@ -101,7 +101,7 @@ namespace WTP.WebAPI.ViewModels.Controllers
             user.GenderId = formdata.Gender.Id;
             user.DateOfBirth = formdata.DateOfBirth;
             user.CountryId = formdata.Country.Id;
-            user.AppUserLanguages = languages;
+            user.AppUserLanguages = userLanguage;
             user.Steam = formdata.Steam;
 
             var result = await _appUserService.UpdateAsync(user);

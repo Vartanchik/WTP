@@ -42,7 +42,7 @@ namespace WTP.WebAPI.Controllers
             // If we receive an invalid payload
             if (model == null)
             {
-                return new StatusCodeResult(500);
+                return BadRequest(new ResponseViewModel(500, "Login failed.", "Something going wrong."));
             }
 
             switch (model.GrantType)
@@ -53,7 +53,7 @@ namespace WTP.WebAPI.Controllers
                     return await UpdateAccessToken(model);
                 default:
                     // not supported - return a HTTP 401 (Unauthorized)
-                    return new UnauthorizedResult();
+                    return Unauthorized(new ResponseViewModel(401, "Login failed.", "Something going wrong."));
             }
         }
 
@@ -64,23 +64,16 @@ namespace WTP.WebAPI.Controllers
 
             if (user == null && !await _appUserService.CheckPasswordAsync(user.Id, model.Password))
             {
-                return BadRequest(new ResponseViewModel {
-                    StatusCode = 400,
-                    Message = "Incorrect username or password, Authentication failed"
-                });
+                return BadRequest(new ResponseViewModel(400, "Login failed.", "Incorrect username or password, Authentication failed."));
             }
 
             if (!await _appUserService.IsEmailConfirmedAsync(user))
             {
-                ModelState.AddModelError(string.Empty, "User Has not Confirmed Email.");
-
-                return Unauthorized(new { LoginError = "We sent you an Confirmation Email. Please Confirm Your Registration." });
+                return Unauthorized(new ResponseViewModel(401, "Login failed.", "We sent you an confirmation email. Please confirm your registration."));
             }
 
-            // username & password matches: create the refresh token
             var newRefreshToken = CreateRefreshToken(user.Id);
 
-            // first we delete any existing old refreshtokens
             var oldRefreshTokens = await _refreshTokenService.GetRangeAsync(user.Id);
 
             if (oldRefreshTokens != null)
@@ -88,13 +81,11 @@ namespace WTP.WebAPI.Controllers
                 await _refreshTokenService.DeleteRangeAsync(user.Id);
             }
 
-            // Add new refresh token to Database
             await _refreshTokenService.CreateAsync(newRefreshToken);
 
-            // Create & Return the access token which contains JWT and Refresh Token
             var accessToken = await CreateAccessToken(user, newRefreshToken.Value);
 
-            return Ok(new { accessToken });
+            return Ok(new { accessToken, message = "Login successful." });
         }
 
         // Create access Token
@@ -138,7 +129,7 @@ namespace WTP.WebAPI.Controllers
                 Refresh_token = refreshToken,
                 Role = roles.FirstOrDefault(),
                 UserName = user.UserName,
-                Photo = user.Photo
+                Photo = user.Photo,
             };
         }
 
