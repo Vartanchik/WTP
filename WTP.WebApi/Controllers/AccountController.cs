@@ -55,7 +55,8 @@ namespace WTP.WebAPI.Controllers
                     protocol: HttpContext.Request.Scheme);
 
                 await _emailService.SendEmailAsync(formdata.Email, "Just one click and you're on WTP",
-                    $"Thanks for registering to be a part of evolving esports with WTP. After you: <a href='{callbackUrl}'>confirm your email</a> you'll be able to enjoy all the benefits of the WTP platform.");
+                    $"Thanks for registering to be a part of evolving esports with WTP. After you: " +
+                    $"<a href='{callbackUrl}'>confirm your email</a> you'll be able to enjoy all the benefits of the WTP platform.");
 
                 return Ok(new ResponseViewModel {
                     StatusCode = 200,
@@ -79,12 +80,14 @@ namespace WTP.WebAPI.Controllers
             }
 
             var user = await _appUserService.FindByIdAsync(userId);
+
             if (user == null)
             {
                 return Redirect($"{_configuration["Url:BaseUrl"]}/home?confirmed=false");
             }
 
             var result = await _appUserService.ConfirmEmailAsync(user, code);
+
             if (result.Succeeded)
             {
                 return Redirect($"{_configuration["Url:BaseUrl"]}/home?confirmed=true");
