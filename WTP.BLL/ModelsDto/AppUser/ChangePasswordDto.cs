@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace WTP.BLL.ModelsDto.AppUser
+﻿namespace WTP.BLL.ModelsDto.AppUser
 {
     public class ChangePasswordDto
     {

@@ -5,7 +5,6 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -43,7 +42,7 @@ namespace WTP.WebAPI.Controllers
             // If we receive an invalid payload
             if (model == null)
             {
-                return new StatusCodeResult(500);
+                return BadRequest(new ResponseViewModel(500, "Login failed.", "Something going wrong."));
             }
 
             switch (model.GrantType)
@@ -54,53 +53,39 @@ namespace WTP.WebAPI.Controllers
                     return await UpdateAccessToken(model);
                 default:
                     // not supported - return a HTTP 401 (Unauthorized)
-                    return new UnauthorizedResult();
+                    return Unauthorized(new ResponseViewModel(401, "Login failed.", "Something going wrong."));
             }
         }
 
         // Method to Create New JWT and Refresh Token
         private async Task<IActionResult> Login(AccessRequestModel model)
         {
-            // Will hold all the errors related to registration
-            List<string> errorList = new List<string>();
-
-            // check if there's an user with the given username
             var user = await _appUserService.GetByEmailAsync(model.Email);
 
-            // Validate credentials
-            if (user != null && await _appUserService.CheckPasswordAsync(user.Id, model.Password))
+            if (user == null && !await _appUserService.CheckPasswordAsync(user.Id, model.Password))
             {
-                // If the user has confirmed his email
-                if (!await _appUserService.IsEmailConfirmedAsync(user))
-                {
-                    ModelState.AddModelError(string.Empty, "User Has not Confirmed Email.");
-
-                    return Unauthorized(new { LoginError = "We sent you an Confirmation Email. Please Confirm Your Registration." });
-                }
-
-                // username & password matches: create the refresh token
-                var newRefreshToken = CreateRefreshToken(user.Id);
-
-                // first we delete any existing old refreshtokens
-                var oldRefreshTokens = await _refreshTokenService.GetRangeAsync(user.Id);
-
-                if (oldRefreshTokens != null)
-                {
-                    await _refreshTokenService.DeleteRangeAsync(user.Id);
-                }
-
-                // Add new refresh token to Database
-                await _refreshTokenService.CreateAsync(newRefreshToken);
-
-                // Create & Return the access token which contains JWT and Refresh Token
-                var accessToken = await CreateAccessToken(user, newRefreshToken.Value);
-
-                return Ok(new { accessToken });
+                return BadRequest(new ResponseViewModel(400, "Login failed.", "Incorrect username or password, Authentication failed."));
             }
 
-            errorList.Add("Incorrect username or password, Authentication failed");
+            if (!await _appUserService.IsEmailConfirmedAsync(user))
+            {
+                return Unauthorized(new ResponseViewModel(401, "Login failed.", "We sent you an confirmation email. Please confirm your registration."));
+            }
 
-            return Ok(new ErrorResponseModel { Message = errorList });
+            var newRefreshToken = CreateRefreshToken(user.Id);
+
+            var oldRefreshTokens = await _refreshTokenService.GetRangeAsync(user.Id);
+
+            if (oldRefreshTokens != null)
+            {
+                await _refreshTokenService.DeleteRangeAsync(user.Id);
+            }
+
+            await _refreshTokenService.CreateAsync(newRefreshToken);
+
+            var accessToken = await CreateAccessToken(user, newRefreshToken.Value);
+
+            return Ok(new { accessToken, message = "Login successful." });
         }
 
         // Create access Token

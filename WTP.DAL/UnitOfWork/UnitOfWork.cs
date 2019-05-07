@@ -15,6 +15,7 @@ namespace WTP.DAL.UnitOfWork
         private IRepository<Player> _players;
         private IRepository<Team> _teams;
         private IRepository<RefreshToken> _tokens;
+        private bool _disposed = false;
 
         public UnitOfWork(ApplicationDbContext context)
         {
@@ -39,19 +40,16 @@ namespace WTP.DAL.UnitOfWork
             await _context.SaveChangesAsync();
         }
 
-
-        private bool disposed = false;
-
         protected virtual void Dispose(bool disposing)
         {
-            if (!this.disposed)
+            if (!_disposed)
             {
                 if (disposing)
                 {
                     _context.Dispose();
                 }
             }
-            this.disposed = true;
+            _disposed = true;
         }
 
         public void Dispose()

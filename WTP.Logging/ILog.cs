@@ -1,5 +1,4 @@
-﻿
-namespace WTP.Logging
+﻿namespace WTP.Logging
 {
     public interface ILog
     {

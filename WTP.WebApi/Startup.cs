@@ -28,6 +28,7 @@ using Swashbuckle.AspNetCore.Swagger;
 using WTP.DAL.Repositories.UserCacheRepositories;
 using WTP.DAL.Repositories.ConcreteRepositories.RefreshTokenExtended;
 using WTP.BLL.Services.Concrete.RefreshTokenService;
+using FluentValidation.AspNetCore;
 
 namespace WTP.WebAPI
 {
@@ -43,7 +44,11 @@ namespace WTP.WebAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddMvc()
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
+                .AddFluentValidation(fvc =>
+                    fvc.RegisterValidatorsFromAssemblyContaining<Startup>());
+
             services.AddAutoMapper();
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -78,7 +83,7 @@ namespace WTP.WebAPI
             services.Configure<DataProtectionTokenProviderOptions>(options =>
             options.TokenLifespan = TimeSpan.FromMinutes(30));
             
-            // Add the REDIS 
+            // Add the REDIS
             services.AddDistributedRedisCache(options =>
             {
                 options.Configuration = Configuration["Redis:ConnectionString"]; 
@@ -90,7 +95,7 @@ namespace WTP.WebAPI
             {
                 options.AddPolicy("EnableCORS", builder =>
                 {
-                    builder.WithOrigins("http://localhost:4200")
+                    builder.WithOrigins($"{Configuration["Url:BaseUrl"]}")
                     .AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod().AllowCredentials().Build();
                 });
             });
@@ -156,8 +161,6 @@ namespace WTP.WebAPI
                     policy.RequireRole("Admin").RequireAuthenticatedUser());
             });
 
-            #region Swagger Registration
-
             // Register the Swagger generator, defining 1 or more Swagger documents
             services.AddSwaggerGen(c =>
             {
@@ -168,8 +171,6 @@ namespace WTP.WebAPI
                     Description = ".NET Core API",
                 });
             });
-
-            #endregion
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -209,8 +210,6 @@ namespace WTP.WebAPI
             //    }
             //});
 
-            #region Enable Swagger Middleware
-
             // Enable middleware to serve generated Swagger as a JSON endpoint.
             app.UseSwagger();
 
@@ -220,8 +219,6 @@ namespace WTP.WebAPI
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
             });
-
-            #endregion
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using WTP.BLL.ModelsDto.AppUser;
@@ -15,12 +16,14 @@ namespace WTP.BLL.Services.Concrete.AppUserService
         private readonly IMapper _mapper;
         private readonly IAppUserRepository _appUserRepository;
         private ILanguageService _languageService;
+        private IConfiguration _configuration;
 
-        public AppUserService(IMapper mapper, IAppUserRepository appUserRepository, ILanguageService languageService)
+        public AppUserService(IMapper mapper, IAppUserRepository appUserRepository, ILanguageService languageService, IConfiguration configuration)
         {
             _mapper = mapper;
             _appUserRepository = appUserRepository;
             _languageService = languageService;
+            _configuration = configuration;
         }
 
         public async Task<IdentityResult> CreateAsync(AppUserDto appUserDto, string password)
@@ -32,9 +35,9 @@ namespace WTP.BLL.Services.Concrete.AppUserService
             return result;
         }
 
-        public async Task<AppUserDto> GetAsync(int id)
+        public async Task<AppUserDto> GetAsync(int userId)
         {
-            var appUser = await _appUserRepository.GetAsync(id);
+            var appUser = await _appUserRepository.GetAsync(userId);
 
             var appUserDto = _mapper.Map<AppUserDto>(appUser);
 
@@ -58,9 +61,9 @@ namespace WTP.BLL.Services.Concrete.AppUserService
                 appUserDto.AppUserLanguages = appUserDtoLanguagesDto;
 
                 //Set default user photo
-                if (appUserDto.Photo == null)
+                if (string.IsNullOrEmpty(appUserDto.Photo))
                 {
-                    appUserDto.Photo = "https://cdn4.iconfinder.com/data/icons/48-bubbles/48/30.User-256.png";
+                    appUserDto.Photo = _configuration["Photo:DefaultPhoto"];
                 }
 
                 return appUserDto;
@@ -106,9 +109,9 @@ namespace WTP.BLL.Services.Concrete.AppUserService
             return appUserDto;
         }
 
-        public async Task<AppUserDto> GetByNameAsync(string name)
+        public async Task<AppUserDto> GetByNameAsync(string userName)
         {
-            var appUser = await _appUserRepository.GetByNameAsync(name);
+            var appUser = await _appUserRepository.GetByNameAsync(userName);
 
             var appUserDto = _mapper.Map<AppUserDto>(appUser);
 
@@ -145,6 +148,10 @@ namespace WTP.BLL.Services.Concrete.AppUserService
                      
         public async Task<IdentityResult> UpdateAsync(AppUserDto appUserDto)
         {
+            appUserDto.Photo = appUserDto.Photo == _configuration["Photo:DefaultPhoto"]
+                ? null
+                : appUserDto.Photo;
+
             var appUser = _mapper.Map<AppUser>(appUserDto);
 
             var result = await _appUserRepository.UpdateAsync(appUser);
@@ -159,9 +166,9 @@ namespace WTP.BLL.Services.Concrete.AppUserService
             return await _appUserRepository.GetRolesAsync(appUser);
         }
 
-        public async Task<bool> CheckPasswordAsync(int id, string password)
+        public async Task<bool> CheckPasswordAsync(int userId, string password)
         {
-            return await _appUserRepository.CheckPasswordAsync(id, password);
+            return await _appUserRepository.CheckPasswordAsync(userId, password);
         }
 
         public async Task<bool> IsEmailConfirmedAsync(AppUserDto appUserDto)
@@ -199,9 +206,9 @@ namespace WTP.BLL.Services.Concrete.AppUserService
             return await _appUserRepository.GenerateEmailConfirmationTokenAsync(appUser);
         }
 
-        public async Task<AppUserDto> FindByIdAsync(string id)
+        public async Task<AppUserDto> FindByIdAsync(string userId)
         {
-            var appUser = await _appUserRepository.FindByIdAsync(id);
+            var appUser = await _appUserRepository.FindByIdAsync(userId);
 
             return _mapper.Map<AppUserDto>(appUser);
         }
