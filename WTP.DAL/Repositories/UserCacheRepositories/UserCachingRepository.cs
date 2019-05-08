@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Caching.Distributed;
 using Newtonsoft.Json;
+using System;
 using System.Threading.Tasks;
 using WTP.DAL.DomainModels;
 using WTP.DAL.Repositories.ConcreteRepositories.AppUserExtended;
@@ -11,47 +12,75 @@ namespace WTP.DAL.Repositories.UserCacheRepositories
     public class UserCachingRepository : AppUserRepository, IRepository<AppUser>, IAppUserRepository
     {
         private readonly IDistributedCache _Cache;
+        private readonly IAppUserRepository _baseRepositoryAccessor;
 
-        public UserCachingRepository(IDistributedCache distributedCache, ApplicationDbContext context, UserManager<AppUser> userManager) :base (context, userManager)
+        public UserCachingRepository(IDistributedCache distributedCache, ApplicationDbContext context, UserManager<AppUser> userManager, Func<string, IAppUserRepository> baseRepositoryAccessor)
+        :base (context, userManager)
         {
             _Cache = distributedCache;
+            _baseRepositoryAccessor = baseRepositoryAccessor("BASE");
+        }
+
+        private async void RemoveUserFromCacheAsync(int id)
+        {
+            await _Cache.RemoveAsync(id.ToString());
         }
 
         public override async Task<AppUser> GetAsync(int id)
         {
-            var value = await _Cache.GetStringAsync(id.ToString());
+            string value = await _Cache.GetStringAsync(id.ToString());
 
             if (value != null)
-                return (AppUser)JsonConvert.DeserializeObject(value);
+            {
+                return JsonConvert.DeserializeObject<AppUser>(value);
+            }
+                
             else
-                return await base.GetAsync(id);
+            {
+                AppUser currentUser = await _baseRepositoryAccessor.GetAsync(id);
+
+                if (currentUser.EmailConfirmed)
+                {
+                    string CurrentUserStringObject = JsonConvert.SerializeObject(currentUser, Formatting.Indented,
+                    new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore });
+
+                    await _Cache.SetStringAsync(id.ToString(), CurrentUserStringObject,
+                    new DistributedCacheEntryOptions
+                    {
+                        AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(600)
+                    });
+                }
+
+                return currentUser;
+            }
         }
 
-        //save
-        //public async Task SetObjectAsync<T>(string key, T value)
-        //{
-        //    await _Cache.SetStringAsync(key, JsonConvert.SerializeObject(value));
-        //}
+        public new async Task<IdentityResult> UpdateAsync(AppUser appUser)
+        {
+            var resultOfBaseUpdate = await _baseRepositoryAccessor.UpdateAsync(appUser);
 
-        //get
-        //public async Task<T> GetObjectAsync<T>(string key)
-        //{
-        //    var value = await _Cache.GetStringAsync(key);
-        //    return value == null ? default : JsonConvert.DeserializeObject<T>(value);
-        //}
+            RemoveUserFromCacheAsync(appUser.Id);
 
-        //remove object
-        //public async Task RemoveObjectAsync(string key)
-        //{
-        //    await _Cache.RemoveAsync(key);
-        //}
+            return resultOfBaseUpdate;
+        }
 
-        //verify if an object exists
-        //public async Task<bool> ExistObjectAsync<T>(string key)
-        //{
-        //    var value = await _Cache.GetStringAsync(key);
-        //    return value == null ? false : true;
-        //}
+        public new async Task<IdentityResult> ResetPasswordAsync(AppUser appUser, string token, string newPassword)
+        {
+            var resultOfBaseResetPasswordAsync = await _baseRepositoryAccessor.ResetPasswordAsync(appUser, token, newPassword);
 
+            RemoveUserFromCacheAsync(appUser.Id);
+
+            return resultOfBaseResetPasswordAsync;
+        }
+
+        public new async Task<IdentityResult> ChangePasswordAsync(int userId, string currentPassword, string newPassword)
+        {
+            var ResultOfBaseChangePasswordAsync = await _baseRepositoryAccessor.ChangePasswordAsync(userId, currentPassword, newPassword);
+
+            RemoveUserFromCacheAsync(userId);
+
+            return ResultOfBaseChangePasswordAsync;
+
+        }
     }
 }

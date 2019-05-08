@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using WTP.DAL.DomainModels;
@@ -91,11 +92,11 @@ namespace WTP.DAL.Repositories.ConcreteRepositories.AppUserExtended
 
         public async Task<IdentityResult> ChangePasswordAsync(int userId, string currentPassword, string newPassword)
         {
-            var user = await GetAsync(userId);
+            AppUser user = await GetAsync(userId);
 
             return await _userManager.ChangePasswordAsync(user: user,
-                                                          currentPassword: currentPassword,
-                                                          newPassword: newPassword);
+                            currentPassword: currentPassword,
+                            newPassword: newPassword);
         }
 
         public async Task<string> GenerateEmailConfirmationTokenAsync(AppUser appUser)
