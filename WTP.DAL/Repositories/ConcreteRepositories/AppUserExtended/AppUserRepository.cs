@@ -34,6 +34,7 @@ namespace WTP.DAL.Repositories.ConcreteRepositories.AppUserExtended
 
             user.AppUserLanguages = appUser.AppUserLanguages;
             user.Photo = appUser.Photo;
+            user.Email = appUser.Email;
             user.UserName = appUser.UserName;
             user.GenderId = appUser.GenderId;
             user.DateOfBirth = appUser.DateOfBirth;

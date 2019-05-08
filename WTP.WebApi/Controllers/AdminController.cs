@@ -9,6 +9,7 @@ using WTP.BLL.ModelsDto.AppUser;
 using WTP.BLL.ModelsDto.AppUserLanguage;
 using WTP.BLL.ModelsDto.Language;
 using WTP.BLL.Services.Concrete.AppUserService;
+using WTP.BLL.Services.Concrete.HistoryService;
 using WTP.WebAPI.ViewModels;
 
 namespace WTP.WebAPI.Controllers
@@ -17,12 +18,13 @@ namespace WTP.WebAPI.Controllers
     [ApiController]
     public class AdminController : ControllerBase
     {
-        //private readonly IHistoryService _historyService;
+        private readonly IHistoryService _historyService;
         private readonly IAppUserService _appUserService;
 
-        public AdminController(IAppUserService appUserService)
+        public AdminController(IAppUserService appUserService, IHistoryService historyService)
         {
             _appUserService = appUserService;
+            _historyService = historyService;
         }
 
         //Create Admin account
@@ -142,6 +144,7 @@ namespace WTP.WebAPI.Controllers
                 return result.ToArray();
             //return Ok("List of Users are empty!");
 
+            var history = await _historyService.GetAllAsync();
             foreach (var user in users)
             {
                 var langs = new List<LanguageDto>();
@@ -186,7 +189,7 @@ namespace WTP.WebAPI.Controllers
         [HttpPut]
         //[Authorize(Policy = "RequireAdministratorRole")]
         [Route("users/{id}")]
-        public async Task<IActionResult> UpdateUser([FromBody] AppUserDtoViewModel formdata, [FromRoute]int id)
+        public async Task<IActionResult> UpdateUser([FromBody] UpdateUserForAdminViewModel formdata, [FromRoute]int id)
         {
             if (!ModelState.IsValid)
             {
@@ -212,43 +215,18 @@ namespace WTP.WebAPI.Controllers
                 });
             }
 
-            //Update languages
-            var languages = new List<AppUserDtoLanguageDto>();
-            foreach (var item in formdata.Languages)
-            {
-                languages.Add(new AppUserDtoLanguageDto
-                {
-                    LanguageId = item.Id,
-                    AppUserId = id
-                });
-            }
-
-            // If the user was found
-            if (formdata.Photo != null)
-            {
-                user.Photo = formdata.Photo;
-            }
+           
             user.UserName = formdata.UserName;
-            user.GenderId = formdata.Gender.Id;
-            user.DateOfBirth = formdata.DateOfBirth;
-            user.CountryId = formdata.Country.Id;
-            user.AppUserLanguages = languages;
-            user.Steam = formdata.Steam;
+            user.Email = formdata.Email;
 
             var result = await _appUserService.UpdateAsync(user);
 
             if (result.Succeeded)
             {
-                var appUserDtoViewModel = new AppUserDtoViewModel()
-                {
-                    Photo = user.Photo,
-                    UserName = user.UserName
-                };
-
                 return Ok(new ResponseViewModel
                 {
                     StatusCode = 202,
-                    Message = "User's profile with id " + id + " wasnt found."
+                    Message = "User's profile with id " + id + " was updated."
                 });
             }
             else
@@ -268,9 +246,9 @@ namespace WTP.WebAPI.Controllers
         [Route("users/{id}")]
         public async Task<IActionResult> DeleteUser([FromRoute]int id)
         {
-            bool status = await _appUserService.DeleteAsync(id);
+            bool success = await _appUserService.DeleteAsync(id);
 
-            if (status)
+            if (success)
                 return Ok(new ResponseViewModel
                 {
                     StatusCode = 202,
@@ -291,9 +269,9 @@ namespace WTP.WebAPI.Controllers
         [Route("users/{id}/block")]
         public async Task<IActionResult> LockUser([FromBody]LockViewModel formDate, [FromRoute]int id)
         {
-            bool status = await _appUserService.LockAsync(id, formDate.Days);
+            bool success = await _appUserService.LockAsync(id, formDate.Days);
 
-            if (status)
+            if (success)
                 return Ok(new ResponseViewModel
                 {
                     StatusCode = 202,
@@ -314,20 +292,49 @@ namespace WTP.WebAPI.Controllers
         [Route("users/{id}/unblock")]
         public async Task<IActionResult> UnLockUser([FromRoute]int id)
         {
-            bool status = await _appUserService.UnLockAsync(id);
+            bool success = await _appUserService.UnLockAsync(id);
 
-            if (status)
+            if (success)
                 return Ok(new ResponseViewModel
                 {
                     StatusCode = 202,
                     Message = "User's profile with id " + id + " was unlocked."
                 });
-
+            
             return NotFound(new ResponseViewModel
             {
                 StatusCode = 404,
                 Message = "User's profile with id " + id + " wasn't found."
             });
+
+            //return StatusCode(Microsoft.AspNetCore.Http.StatusCodes.Status406NotAcceptable);
+        }
+
+        [HttpGet]
+        //[Authorize(Policy = "RequireAdministratorRole")]
+        [Route("users/pagination")]
+        public async Task<PageResult<AppUserDto>> Pagination(int? page, int pagesize = 10)
+        {
+            var users = await _appUserService.GetAllUsersAsync();
+            var countDetails = users.Count();
+            if (countDetails == 0)
+                return null;
+
+            List<AppUserDto> resultList = new List<AppUserDto>();
+            foreach (var user in users)
+            {
+                if (user.DeletedStatus != true)
+                    resultList.Add(user);
+            }
+
+            var result = new PageResult<AppUserDto>
+            {
+                Count = countDetails,
+                PageIndex = page ?? 1,
+                PageSize = 10,
+                Items = resultList.Skip((page - 1 ?? 0) * pagesize).Take(pagesize).ToList()
+            };
+            return result;
         }
 
     }
