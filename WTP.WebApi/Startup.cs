@@ -29,6 +29,7 @@ using WTP.DAL.Repositories.UserCacheRepositories;
 using WTP.DAL.Repositories.ConcreteRepositories.RefreshTokenExtended;
 using WTP.BLL.Services.Concrete.RefreshTokenService;
 using FluentValidation.AspNetCore;
+using System.Collections.Generic;
 
 namespace WTP.WebAPI
 {
@@ -52,8 +53,23 @@ namespace WTP.WebAPI
             services.AddAutoMapper();
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<UserCachingRepository>();
+            services.AddScoped<AppUserRepository>();
 
-            services.AddScoped<IAppUserRepository, UserCachingRepository>();
+            //injection depends on situation 
+            services.AddScoped<Func<string, IAppUserRepository>>(ServiceProvider => _key => 
+            {
+                switch (_key)
+                {
+                    case "CACHE":
+                        return ServiceProvider.GetService<UserCachingRepository>();
+                    case "BASE":
+                        return ServiceProvider.GetService<AppUserRepository>();
+                    default:
+                        throw new KeyNotFoundException();
+                }
+            });
+
             services.AddScoped<IRepository<AppUser>, RepositoryBase<AppUser>>();
             services.AddScoped<IRepository<Country>, RepositoryBase<Country>>();
             services.AddScoped<IRepository<Gender>, RepositoryBase<Gender>>();

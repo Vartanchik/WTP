@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using WTP.BLL.ModelsDto.AppUser;
@@ -18,10 +19,10 @@ namespace WTP.BLL.Services.Concrete.AppUserService
         private ILanguageService _languageService;
         private IConfiguration _configuration;
 
-        public AppUserService(IMapper mapper, IAppUserRepository appUserRepository, ILanguageService languageService, IConfiguration configuration)
+        public AppUserService(IMapper mapper, Func<string, IAppUserRepository> appUserRepository, ILanguageService languageService, IConfiguration configuration)
         {
             _mapper = mapper;
-            _appUserRepository = appUserRepository;
+            _appUserRepository = appUserRepository("CACHE");
             _languageService = languageService;
             _configuration = configuration;
         }
