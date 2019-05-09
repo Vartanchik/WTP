@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using WTP.BLL.ModelsDto.AppUserLanguage;
 using WTP.BLL.ModelsDto.Language;
 using WTP.BLL.Services.Concrete.AppUserService;
@@ -15,10 +19,14 @@ namespace WTP.WebAPI.ViewModels.Controllers
     public class UserProfileController : ControllerBase
     {
         private readonly IAppUserService _appUserService;
+
+        private readonly IConfiguration _configuration;
         
-        public UserProfileController(IAppUserService appUserService)
+        public UserProfileController(IAppUserService appUserService, IConfiguration configuration)
         {
             _appUserService = appUserService;
+
+            _configuration = configuration;
         }
 
         //GET : /api/UserProfile
@@ -65,12 +73,16 @@ namespace WTP.WebAPI.ViewModels.Controllers
         //PUT : /api/UserProfile
         [HttpPut]
         [Authorize(Policy = "RequireLoggedIn")]
-        public async Task<IActionResult> UpdateUserProfile([FromBody] AppUserDtoViewModel formdata)
+        public async Task<IActionResult> UpdateUserProfile([FromForm]AppUserDtoViewModel formdata)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(new ResponseViewModel(400, "Invalid value was entered! Please, redisplay form."));
             }
+
+            var imageStorage = new BlobStorageMultipartStreamProvider(_configuration);
+
+            await imageStorage.UploadFileAsync(formdata.Image.OpenReadStream(), formdata.Photo);
 
             int userId = this.GetCurrentUserId();
 
