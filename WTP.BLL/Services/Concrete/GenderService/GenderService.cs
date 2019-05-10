@@ -9,7 +9,7 @@ namespace WTP.BLL.Services.Concrete.GenderService
 {
     public class GenderService : IGenderService
     {
-        private IUnitOfWork _uow;
+        private readonly IUnitOfWork _uow;
         private readonly IMapper _mapper;
 
         public GenderService(IUnitOfWork uow, IMapper mapper)

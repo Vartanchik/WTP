@@ -67,8 +67,11 @@ namespace WTP.DAL.Repositories.ConcreteRepositories.AppUserExtended
 
         public override async Task<AppUser> GetAsync(int userId)
         {
-            return await _context.AppUsers.Include("Country").Include("Gender")
-                .Include(_ => _.AppUserLanguages).FirstOrDefaultAsync(_ => _.Id == userId);
+            var user = await _context.AppUsers.Include("Country").Include("Gender")
+                .Include(user => user.AppUserLanguages).ThenInclude(a => a.Language)
+                .FirstOrDefaultAsync(user => user.Id == userId);
+
+            return user;
         }
 
         public async Task<bool> IsEmailConfirmedAsync(AppUser appUser)

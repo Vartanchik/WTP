@@ -8,7 +8,7 @@ namespace WTP.WebAPI.Utility.Extensions
     {
         public static int GetCurrentUserId(this ControllerBase controller)
         {
-            int id = Convert.ToInt32(controller.User.Claims.First(c => c.Type == "UserID").Value);
+            var id = Convert.ToInt32(controller.User.Claims.Where(c => c.Type == "UserID").First().Value);
 
             return id;
         }
