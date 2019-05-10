@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Identity;
 
 namespace WTP.DAL.DomainModels
 {
@@ -12,11 +12,11 @@ namespace WTP.DAL.DomainModels
         public string Photo { get; set; }
         public int? GenderId { get; set; }
         public Gender Gender { get; set; }
-        public DateTime? DateOfBirth { get; set; }
+        public DateTime DateOfBirth { get; set; }
         public int? CountryId { get; set; }
         public Country Country { get; set; }
         public string Steam { get; set; }
-        public ICollection<AppUserLanguage> AppUserLanguages { get; set; } //Need this in order to implement relation many to many between appUser and languages
+        public ICollection<AppUserLanguage> AppUserLanguages { get; set; }
         public List<Player> Players { get; set; }
         public List<Team> Teams { get; set; }
         public virtual List<RefreshToken> Tokens { get; set; }

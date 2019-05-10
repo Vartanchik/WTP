@@ -9,7 +9,7 @@ namespace WTP.BLL.Services.Concrete.RefreshTokenService
 {
     public class RefreshTokenService : IRefreshTokenService
     {
-        private IRefreshTokenRepository _refreshToken;
+        private readonly IRefreshTokenRepository _refreshToken;
         private readonly IMapper _mapper;
 
         public RefreshTokenService(IRefreshTokenRepository refreshToken, IMapper mapper)

@@ -4,7 +4,6 @@ using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using WTP.BLL.ModelsDto.AppUser;
-using WTP.BLL.ModelsDto.AppUserLanguage;
 using WTP.BLL.Services.Concrete.LanguageService;
 using WTP.DAL.DomainModels;
 using WTP.DAL.Repositories.ConcreteRepositories.AppUserExtended;
@@ -15,15 +14,11 @@ namespace WTP.BLL.Services.Concrete.AppUserService
     {
         private readonly IMapper _mapper;
         private readonly IAppUserRepository _appUserRepository;
-        private ILanguageService _languageService;
-        private IConfiguration _configuration;
 
         public AppUserService(IMapper mapper, IAppUserRepository appUserRepository, ILanguageService languageService, IConfiguration configuration)
         {
             _mapper = mapper;
             _appUserRepository = appUserRepository;
-            _languageService = languageService;
-            _configuration = configuration;
         }
 
         public async Task<IdentityResult> CreateAsync(AppUserDto appUserDto, string password)
@@ -41,34 +36,6 @@ namespace WTP.BLL.Services.Concrete.AppUserService
 
             var appUserDto = _mapper.Map<AppUserDto>(appUser);
 
-            if (appUser != null)
-            {
-                // Create new List in order to get current language
-                var appUserDtoLanguagesDto = new List<AppUserDtoLanguageDto>();
-
-                foreach (var item in appUserDto.AppUserLanguages)
-                {
-                    appUserDtoLanguagesDto.Add(new AppUserDtoLanguageDto
-                    {
-                        AppUser = null,
-                        AppUserId = null,
-                        LanguageId = item.LanguageId,
-                        Language = await _languageService.GetAsync(item.LanguageId)
-                    });
-                }
-
-                //Set language property 
-                appUserDto.AppUserLanguages = appUserDtoLanguagesDto;
-
-                //Set default user photo
-                if (string.IsNullOrEmpty(appUserDto.Photo))
-                {
-                    appUserDto.Photo = _configuration["Photo:DefaultPhoto"];
-                }
-
-                return appUserDto;
-            }
-
             return appUserDto;
         }
 
@@ -77,34 +44,6 @@ namespace WTP.BLL.Services.Concrete.AppUserService
             var appUser = await _appUserRepository.GetByEmailAsync(email);
 
             var appUserDto = _mapper.Map<AppUserDto>(appUser);
-
-            if (appUser != null)
-            {
-                // Create new List in order to get current language
-                var appUserDtoLanguagesDto = new List<AppUserDtoLanguageDto>();
-
-                foreach (var item in appUserDto.AppUserLanguages)
-                {
-                    appUserDtoLanguagesDto.Add(new AppUserDtoLanguageDto
-                    {
-                        AppUser = null,
-                        AppUserId = null,
-                        LanguageId = item.LanguageId,
-                        Language = await _languageService.GetAsync(item.LanguageId)
-                    });
-                }
-
-                //Set language property 
-                appUserDto.AppUserLanguages = appUserDtoLanguagesDto;
-
-                //Set default user photo
-                if (appUserDto.Photo == null)
-                {
-                    appUserDto.Photo = "https://cdn4.iconfinder.com/data/icons/48-bubbles/48/30.User-256.png";
-                }
-
-                return appUserDto;
-            }
 
             return appUserDto;
         }
@@ -115,48 +54,19 @@ namespace WTP.BLL.Services.Concrete.AppUserService
 
             var appUserDto = _mapper.Map<AppUserDto>(appUser);
 
-            if (appUser != null)
-            {
-                // Create new List in order to get current language
-                var appUserDtoLanguagesDto = new List<AppUserDtoLanguageDto>();
-
-                foreach (var item in appUserDto.AppUserLanguages)
-                {
-                    appUserDtoLanguagesDto.Add(new AppUserDtoLanguageDto
-                    {
-                        AppUser = null,
-                        AppUserId = null,
-                        LanguageId = item.LanguageId,
-                        Language = await _languageService.GetAsync(item.LanguageId)
-                    });
-                }
-
-                //Set language property 
-                appUserDto.AppUserLanguages = appUserDtoLanguagesDto;
-
-                //Set default user photo
-                if (appUserDto.Photo == null)
-                {
-                    appUserDto.Photo = "https://cdn4.iconfinder.com/data/icons/48-bubbles/48/30.User-256.png";
-                }
-
-                return appUserDto;
-            }
-
             return appUserDto;
         }
                      
         public async Task<IdentityResult> UpdateAsync(AppUserDto appUserDto)
         {
-            appUserDto.Photo = appUserDto.Photo == _configuration["Photo:DefaultPhoto"]
-                ? null
-                : appUserDto.Photo;
+            if (await GetAsync(appUserDto.Id) != null)
+            {
+                var appUser = _mapper.Map<AppUser>(appUserDto);
 
-            var appUser = _mapper.Map<AppUser>(appUserDto);
+                return await _appUserRepository.UpdateAsync(appUser);
+            }
 
-            var result = await _appUserRepository.UpdateAsync(appUser);
-
-            return result;
+            return IdentityResult.Failed();
         }
 
         public async Task<IList<string>> GetRolesAsync(AppUserDto appUserDto)
@@ -194,6 +104,16 @@ namespace WTP.BLL.Services.Concrete.AppUserService
 
         public async Task<IdentityResult> ChangePasswordAsync(ChangePasswordDto changePasswordDto)
         {
+            if (await GetAsync(changePasswordDto.UserId) == null)
+            {
+                return IdentityResult.Failed(new IdentityError { Description = "Something going wrong." });
+            }
+
+            if (!await CheckPasswordAsync(changePasswordDto.UserId, changePasswordDto.CurrentPassword))
+            {
+                return IdentityResult.Failed(new IdentityError { Description = "Invalid current password." });
+            }
+
             return await _appUserRepository.ChangePasswordAsync(changePasswordDto.UserId,
                                                                 changePasswordDto.CurrentPassword,
                                                                 changePasswordDto.NewPassword);

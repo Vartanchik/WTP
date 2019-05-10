@@ -48,7 +48,8 @@ namespace WTP.DAL.Repositories.GenericRepository
 
         public virtual async Task<IEnumerable<TEntity>> GetAllAsync()
         {
-            return _dbset;
+            //return _dbset;
+            return await _dbset.ToListAsync();
         }
     }
 }

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Text;
 using AutoMapper;
+using Swashbuckle.AspNetCore.Swagger;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -11,24 +13,24 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using WTP.Logging;
+using WTP.BLL.Services.Concrete;
 using WTP.BLL.Services.Concrete.AppUserService;
 using WTP.BLL.Services.Concrete.CountryService;
 using WTP.BLL.Services.Concrete.GenderService;
 using WTP.BLL.Services.Concrete.LanguageService;
 using WTP.BLL.Services.Concrete.PlayerService;
 using WTP.BLL.Services.Concrete.TeamService;
+using WTP.BLL.Services.Concrete.RefreshTokenService;
+using WTP.BLL.Services.Concrete.EmailService;
 using WTP.DAL;
 using WTP.DAL.DomainModels;
 using WTP.DAL.Repositories.ConcreteRepositories.AppUserExtended;
 using WTP.DAL.Repositories.GenericRepository;
 using WTP.DAL.UnitOfWork;
-using WTP.WebAPI.Helpers;
-using WTP.BLL.Services.Concrete.EmailService;
-using Swashbuckle.AspNetCore.Swagger;
 using WTP.DAL.Repositories.UserCacheRepositories;
 using WTP.DAL.Repositories.ConcreteRepositories.RefreshTokenExtended;
-using WTP.BLL.Services.Concrete.RefreshTokenService;
-using FluentValidation.AspNetCore;
+using WTP.WebAPI.Helpers;
+using WTP.WebAPI.Services;
 
 namespace WTP.WebAPI
 {
@@ -71,6 +73,11 @@ namespace WTP.WebAPI
             services.AddScoped<ITeamService, TeamService>();
             services.AddScoped<IRefreshTokenService, RefreshTokenService>();
 
+            services.AddScoped(provider => new MapperConfiguration(config =>
+            {
+                config.AddProfile(new DtoMapProfile(provider.GetService<IConfiguration>()));
+                config.AddProfile(new DtoViewModelMapProfile());
+            }).CreateMapper());
 
             //// In production, the Angular files will be served from this directory
             //services.AddSpaStaticFiles(configuration =>

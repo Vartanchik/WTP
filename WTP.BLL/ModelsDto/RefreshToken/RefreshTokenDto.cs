@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using WTP.BLL.ModelsDto.AppUser;
 
 namespace WTP.BLL.ModelsDto.RefreshToken

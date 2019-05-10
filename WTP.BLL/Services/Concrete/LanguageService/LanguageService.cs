@@ -9,7 +9,7 @@ namespace WTP.BLL.Services.Concrete.LanguageService
 {
     public class LanguageService : ILanguageService
     {
-        private IUnitOfWork _uow;
+        private readonly IUnitOfWork _uow;
         private readonly IMapper _mapper;
 
         public LanguageService(IUnitOfWork uow, IMapper mapper)

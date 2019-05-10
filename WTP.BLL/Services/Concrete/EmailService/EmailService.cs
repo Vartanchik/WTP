@@ -16,10 +16,12 @@ namespace WTP.BLL.Services.Concrete.EmailService
 
         public async Task SendEmailAsync(string email, string subject, string message)
         {
-            var emailMessage = new MailMessage(_configuration["Email:Email"], email);
-            emailMessage.Subject = subject;
-            emailMessage.IsBodyHtml = true;
-            emailMessage.Body = message;
+            var emailMessage = new MailMessage(_configuration["Email:Email"], email)
+            {
+                Subject = subject,
+                IsBodyHtml = true,
+                Body = message
+            };
 
             using (var client = new SmtpClient())
             {
