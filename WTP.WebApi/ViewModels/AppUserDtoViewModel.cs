@@ -14,7 +14,7 @@ namespace WTP.WebAPI.ViewModels
 {
     public class AppUserDtoViewModel
     {
-        //[Required]
+        [Required]
         [Column(TypeName = "nvarchar(30)")]
         public string UserName { get; set; }
 
@@ -23,24 +23,22 @@ namespace WTP.WebAPI.ViewModels
 
         public string Photo { get; set; }
 
-        //[Required]
+        [Required]
         public GenderDto Gender { get; set; }
 
-        //[Required]
+        [Required]
         public string DateOfBirth { get; set; }
 
-        //[Required]
+        [Required]
         public CountryDto Country { get; set; }
 
         public string Steam { get; set; }
 
-        //[Required]
+        [Required]
         public List<LanguageDto> Languages { get; set; }
 
         public List<PlayerDto> Players { get; set; }
 
         public List<TeamDto> Teams { get; set; }
-
-        public IFormFile Image { get; set; } 
     }
 }

@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using WTP.BLL.ModelsDto.AppUserLanguage;
 using WTP.BLL.ModelsDto.Language;
 using WTP.BLL.Services.Concrete.AppUserService;
+using WTP.BLL.Services.Concrete.AzureBlobStorageService;
 using WTP.WebAPI.Utility.Extensions;
 
 namespace WTP.WebAPI.ViewModels.Controllers
@@ -21,12 +22,16 @@ namespace WTP.WebAPI.ViewModels.Controllers
         private readonly IAppUserService _appUserService;
 
         private readonly IConfiguration _configuration;
-        
-        public UserProfileController(IAppUserService appUserService, IConfiguration configuration)
+
+        private readonly IAzureBlobStorageService _azureBlobStorageService;
+
+        public UserProfileController(IAppUserService appUserService, IConfiguration configuration, IAzureBlobStorageService azureBlobStorageService)
         {
             _appUserService = appUserService;
 
             _configuration = configuration;
+
+            _azureBlobStorageService = azureBlobStorageService;
         }
 
         //GET : /api/UserProfile
@@ -44,7 +49,7 @@ namespace WTP.WebAPI.ViewModels.Controllers
             }
 
             var languages = new List<LanguageDto>();
-            foreach(var item in user.AppUserLanguages)
+            foreach (var item in user.AppUserLanguages)
             {
                 languages.Add(new LanguageDto
                 {
@@ -57,7 +62,7 @@ namespace WTP.WebAPI.ViewModels.Controllers
             {
                 UserName = user.UserName,
                 Email = user.Email,
-                Photo = user.Photo,
+                Photo = await _azureBlobStorageService.DownloadFileAsync(user.Photo),
                 Gender = user.Gender,
                 DateOfBirth = user.DateOfBirth.ToString(),
                 Country = user.Country,
@@ -73,16 +78,12 @@ namespace WTP.WebAPI.ViewModels.Controllers
         //PUT : /api/UserProfile
         [HttpPut]
         [Authorize(Policy = "RequireLoggedIn")]
-        public async Task<IActionResult> UpdateUserProfile([FromForm]AppUserDtoViewModel formdata)
+        public async Task<IActionResult> UpdateUserProfile([FromBody]AppUserDtoViewModel formdata)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(new ResponseViewModel(400, "Invalid value was entered! Please, redisplay form."));
             }
-
-            var imageStorage = new BlobStorageMultipartStreamProvider(_configuration);
-
-            await imageStorage.UploadFileAsync(formdata.Image.OpenReadStream(), formdata.Photo);
 
             int userId = this.GetCurrentUserId();
 
@@ -105,7 +106,7 @@ namespace WTP.WebAPI.ViewModels.Controllers
 
             if (formdata.Photo != null)
             {
-                user.Photo = formdata.Photo;
+                user.Photo = await _azureBlobStorageService.UploadFileAsync(formdata.Photo);
             }
             user.UserName = formdata.UserName;
             user.GenderId = formdata.Gender.Id;

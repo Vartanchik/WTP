@@ -30,6 +30,7 @@ using WTP.DAL.Repositories.ConcreteRepositories.RefreshTokenExtended;
 using WTP.BLL.Services.Concrete.RefreshTokenService;
 using FluentValidation.AspNetCore;
 using System.Collections.Generic;
+using WTP.BLL.Services.Concrete.AzureBlobStorageService;
 
 namespace WTP.WebAPI
 {
@@ -95,6 +96,7 @@ namespace WTP.WebAPI
             //});
             services.AddScoped<IEmailService, EmailService>();
             services.AddSingleton<ILog, SerilogLog>();
+            services.AddScoped<IAzureBlobStorageService, AzureBlobStorageService>();
 
             services.Configure<DataProtectionTokenProviderOptions>(options =>
             options.TokenLifespan = TimeSpan.FromMinutes(30));
