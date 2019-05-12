@@ -1,9 +1,12 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using WTP.BLL.ModelsDto.AppUser;
 using WTP.BLL.ModelsDto.AppUserLanguage;
+using WTP.BLL.ModelsDto.History;
+using WTP.BLL.Services.Concrete.HistoryService;
 using WTP.BLL.Services.Concrete.LanguageService;
 using WTP.DAL.DomainModels;
 using WTP.DAL.Repositories.ConcreteRepositories.AppUserExtended;
@@ -15,12 +18,14 @@ namespace WTP.BLL.Services.Concrete.AppUserService
         private readonly IMapper _mapper;
         private readonly IAppUserRepository _appUserRepository;
         private ILanguageService _languageService;
+        private readonly IHistoryService _historyService;
 
-        public AppUserService(IMapper mapper, IAppUserRepository appUserRepository, ILanguageService languageService)
+        public AppUserService(IMapper mapper, IAppUserRepository appUserRepository, ILanguageService languageService, IHistoryService historyService)
         {
             _mapper = mapper;
             _appUserRepository = appUserRepository;
             _languageService = languageService;
+            _historyService = historyService;
         }
 
         public async Task<IdentityResult> CreateAsync(AppUserDto appUserDto, string password)
@@ -28,6 +33,21 @@ namespace WTP.BLL.Services.Concrete.AppUserService
             var appUser = _mapper.Map<AppUser>(appUserDto);
 
             var result = await _appUserRepository.CreateAsync(appUser, password);
+
+            HistoryDto history = new HistoryDto
+            {
+                DateOfOperation = DateTime.Now,
+                Description = "Create new user account",
+                PreviousUserEmail = null,
+                PreviousUserName = null,
+                NewUserEmail = appUserDto.Email,
+                NewUserName = appUserDto.UserName,
+                AppUserId = appUserDto.Id,
+                OperationId = (int)OperationEnum.Create,
+                AdminId = 1//Convert.ToInt32(User.Claims.First(c => c.Type == "UserID").Value)
+            };
+            
+            await _historyService.CreateAsync(history);
 
             return result;
         }
@@ -145,9 +165,25 @@ namespace WTP.BLL.Services.Concrete.AppUserService
                      
         public async Task<IdentityResult> UpdateAsync(AppUserDto appUserDto)
         {
-            var appUser = _mapper.Map<AppUser>(appUserDto);
+            var user = await _appUserRepository.GetAsync(appUserDto.Id);
+            HistoryDto history = new HistoryDto
+            {
+                DateOfOperation = DateTime.Now,
+                Description = "Update user's account",
+                PreviousUserEmail = user.Email,
+                PreviousUserName = user.UserName,
+                NewUserEmail = appUserDto.Email,
+                NewUserName = appUserDto.UserName,
+                AppUserId = appUserDto.Id,
+                OperationId = (int)OperationEnum.Update,
+                AdminId = 1//Convert.ToInt32(User.Claims.First(c => c.Type == "UserID").Value)
+            };
 
+            var appUser = _mapper.Map<AppUser>(appUserDto);
             var result = await _appUserRepository.UpdateAsync(appUser);
+            
+            
+            await _historyService.CreateAsync(history);
 
             return result;
         }
@@ -234,6 +270,22 @@ namespace WTP.BLL.Services.Concrete.AppUserService
 
         public async Task<bool> DeleteAsync(int id)
         {
+            var user = await _appUserRepository.GetAsync(id);
+            HistoryDto history = new HistoryDto
+            {
+                DateOfOperation = DateTime.Now,
+                Description = "Delete user's account",
+                PreviousUserEmail = user.Email,
+                PreviousUserName = user.UserName,
+                NewUserEmail = user.Email,
+                NewUserName = user.UserName,
+                AppUserId = user.Id,
+                OperationId = (int)OperationEnum.Delete,
+                AdminId = 1//Convert.ToInt32(User.Claims.First(c => c.Type == "UserID").Value)
+            };
+
+            await _historyService.CreateAsync(history);
+
             return await _appUserRepository.DeleteAsync(id);
         }
 
@@ -245,11 +297,44 @@ namespace WTP.BLL.Services.Concrete.AppUserService
 
         public async Task<bool> LockAsync(int id, int? days)
         {
+            var user = await _appUserRepository.GetAsync(id);
+
+            HistoryDto history = new HistoryDto
+            {
+                DateOfOperation = DateTime.Now,
+                Description = "Lock user's account",
+                PreviousUserEmail = user.Email,
+                PreviousUserName = user.UserName,
+                NewUserEmail = user.Email,
+                NewUserName = user.UserName,
+                AppUserId = user.Id,
+                OperationId = (int)OperationEnum.Lock,
+                AdminId = 1//Convert.ToInt32(User.Claims.First(c => c.Type == "UserID").Value)
+            };
+
+            await _historyService.CreateAsync(history);
+
             return await _appUserRepository.LockAsync(id, days);
         }
 
         public async Task<bool> UnLockAsync(int id)
         {
+            var user = await _appUserRepository.GetAsync(id);
+
+            HistoryDto history = new HistoryDto
+            {
+                DateOfOperation = DateTime.Now,
+                Description = "UnLock user's account",
+                PreviousUserEmail = user.Email,
+                PreviousUserName = user.UserName,
+                NewUserEmail = user.Email,
+                NewUserName = user.UserName,
+                AppUserId = user.Id,
+                OperationId = (int)OperationEnum.UnLock,
+                AdminId = 1//Convert.ToInt32(User.Claims.First(c => c.Type == "UserID").Value)
+            };
+
+            await _historyService.CreateAsync(history);
             return await _appUserRepository.UnLockAsync(id);
         }
     }

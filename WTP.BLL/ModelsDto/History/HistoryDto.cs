@@ -12,7 +12,7 @@ namespace WTP.BLL.ModelsDto.History
         public DateTime DateOfOperation { get; set; }
         public string Description { get; set; }
 
-        public string PreviousEmail { get; set; }
+        public string PreviousUserEmail { get; set; }
         public string PreviousUserName { get; set; }
         public string NewUserEmail { get; set; }
         public string NewUserName { get; set; }

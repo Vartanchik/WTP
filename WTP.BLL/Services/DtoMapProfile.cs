@@ -31,7 +31,9 @@ namespace WTP.BLL.Services.Concrete
             CreateMap<RefreshTokenDto, RefreshToken>();
             CreateMap<RefreshToken, RefreshTokenDto>();
             CreateMap<Operation, OperationDto>();
+            CreateMap<OperationDto, Operation>();
             CreateMap<History, HistoryDto>();
+            CreateMap<HistoryDto,History>();
         }
     }
 }

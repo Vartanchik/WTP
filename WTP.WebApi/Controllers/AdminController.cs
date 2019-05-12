@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using WTP.BLL.ModelsDto.AppUser;
 using WTP.BLL.ModelsDto.AppUserLanguage;
+using WTP.BLL.ModelsDto.History;
 using WTP.BLL.ModelsDto.Language;
 using WTP.BLL.Services.Concrete.AppUserService;
 using WTP.BLL.Services.Concrete.HistoryService;
@@ -301,7 +302,7 @@ namespace WTP.WebAPI.Controllers
         public async Task<IActionResult> UnLockUser([FromRoute]int id)
         {
             bool success = await _appUserService.UnLockAsync(id);
-
+            
             if (success)
                 return Ok(new ResponseViewModel
                 {
@@ -349,13 +350,13 @@ namespace WTP.WebAPI.Controllers
         [HttpGet]
         //[Authorize(Policy = "RequireAdministratorRole")]
         [Route("users/newpagination")]
-        public async Task<IActionResult> Index(string name, int page = 1,
+        public async Task<IActionResult> UserIndex(string name, int page = 1,
             SortState sortOrder = SortState.NameAsc, bool enableDeleted = true, bool enableLocked=true)
         {
             int pageSize = 3;
 
             //Filtration
-            List<AppUserDto> users = new List<AppUserDto>(await _appUserService.GetAllUsersAsync());//db.Users.Include(x => x.Company);
+            List<AppUserDto> users = new List<AppUserDto>(await _appUserService.GetAllUsersAsync());
             //users = null;
             if (users == null)
                 return NoContent();
@@ -406,6 +407,83 @@ namespace WTP.WebAPI.Controllers
                 SortViewModel = new UserSortViewModel(sortOrder),
                 //FilterViewModel = new UserFilterViewModel(users/*(List<AppUserDto>)await _appUserService.GetAllUsersAsync()*/, name),
                 Users = items
+            };
+            return Ok(viewModel);
+        }
+
+        [HttpGet]
+        //[Authorize(Policy = "RequireAdministratorRole")]
+        [Route("history")]
+        public async Task<IActionResult> HistoryIndex(string name, int page = 1,
+            HistorySortState sortOrder = HistorySortState.DateDesc)
+        {
+            int pageSize = 3;
+
+            //Filtration
+            List<HistoryDto> histories = new List<HistoryDto>(await _historyService.GetAllAsync());
+            //users = null;
+            if (histories == null)
+                return NoContent();
+            //return null;
+
+            if (!String.IsNullOrEmpty(name))
+            {
+                histories = histories.Where(p => p.NewUserName.Contains(name)).ToList();
+            }
+
+            // Sorting
+            switch (sortOrder)
+            {
+                case HistorySortState.NameDesc:
+                    histories = histories.OrderByDescending(s => s.NewUserName).ToList();
+                    break;
+                case HistorySortState.EmailAsc:
+                    histories = histories.OrderBy(s => s.NewUserEmail).ToList();
+                    break;
+                case HistorySortState.EmailDesc:
+                    histories = histories.OrderByDescending(s => s.NewUserEmail).ToList();
+                    break;
+                case HistorySortState.IdAsc:
+                    histories = histories.OrderBy(s => s.Id).ToList();
+                    break;
+                case HistorySortState.IdDesc:
+                    histories = histories.OrderByDescending(s => s.Id).ToList();
+                    break;
+                case HistorySortState.UserIdAsc:
+                    histories = histories.OrderBy(s => s.AppUserId).ToList();
+                    break;
+                case HistorySortState.UserIdDesc:
+                    histories = histories.OrderByDescending(s => s.AppUserId).ToList();
+                    break;
+                case HistorySortState.AdminIdAsc:
+                    histories = histories.OrderBy(s => s.AdminId).ToList();
+                    break;
+                case HistorySortState.AdminIdDesc:
+                    histories = histories.OrderByDescending(s => s.AdminId).ToList();
+                    break;
+                case HistorySortState.DateAsc:
+                    histories = histories.OrderBy(s => s.DateOfOperation).ToList();
+                    break;
+                case HistorySortState.NameAsc:
+                    histories = histories.OrderBy(s => s.NewUserName).ToList();
+                    break;  
+                default:
+                    histories = histories.OrderByDescending(s => s.DateOfOperation).ToList();
+                    break;
+            }
+
+
+            // Pagination
+            var count = histories.Count();
+            var items = histories.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+
+            // representation model
+            HistoryIndexViewModel viewModel = new HistoryIndexViewModel
+            {
+                PageViewModel = new UserPageViewModel(count, page, pageSize),
+                SortViewModel = new HistorySortViewModel(sortOrder),
+                //FilterViewModel = new UserFilterViewModel(users/*(List<AppUserDto>)await _appUserService.GetAllUsersAsync()*/, name),
+                Histories = items
             };
             return Ok(viewModel);
         }

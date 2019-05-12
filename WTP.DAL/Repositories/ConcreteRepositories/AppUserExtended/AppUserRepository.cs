@@ -24,7 +24,7 @@ namespace WTP.DAL.Repositories.ConcreteRepositories.AppUserExtended
             var result = await _userManager.CreateAsync(appUser, password);
 
             await _userManager.AddToRoleAsync(appUser, "User");
-
+            
             return result;
         }
 

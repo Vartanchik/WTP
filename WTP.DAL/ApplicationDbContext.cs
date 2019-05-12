@@ -50,6 +50,17 @@ namespace WTP.DAL
                 .HasOne(_ => _.Language)
                 .WithMany(_ => _.AppUserLanguages)
                 .HasForeignKey(_ => _.LanguageId);
+
+            builder.Entity<History>()
+                .HasOne(p => p.AppUser)
+                .WithMany(b => b.Histories)
+                .HasForeignKey(p => p.AppUserId)
+                .HasForeignKey(p => p.AdminId);
+
+            builder.Entity<History>()
+                .HasOne(p => p.Operation)
+                .WithMany(b => b.Histories)
+                .HasForeignKey(p => p.OperationId);
         }
     }
 }
