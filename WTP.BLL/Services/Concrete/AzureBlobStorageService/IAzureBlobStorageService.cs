@@ -1,14 +1,13 @@
-﻿using System.IO;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
 namespace WTP.BLL.Services.Concrete.AzureBlobStorageService
 {
     public interface IAzureBlobStorageService
     {
-        Task<string> UploadFileAsync(string base64StringWithHeaders);
+        Task<string> UploadFileAsync(IFormFile file, string userPhoto);
 
-        Task<string> DownloadFileAsync(string userPhoto);
-
-        Task DeleteFileAsync(string userPhoto);
+        Task<FileStreamResult> DownloadFileAsync(string userPhoto);
     }
 }

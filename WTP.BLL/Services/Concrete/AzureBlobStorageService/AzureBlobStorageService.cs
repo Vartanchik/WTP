@@ -1,10 +1,13 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Auth;
 using Microsoft.WindowsAzure.Storage.Blob;
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using WTP.Logging;
 
 namespace WTP.BLL.Services.Concrete.AzureBlobStorageService
 {
@@ -12,11 +15,15 @@ namespace WTP.BLL.Services.Concrete.AzureBlobStorageService
     {
         private readonly IConfiguration _configuration;
 
+        private readonly ILog _log;
+
         private readonly CloudBlobContainer _cloudBlobContainer;
 
-        public AzureBlobStorageService(IConfiguration configuration)
+        public AzureBlobStorageService(IConfiguration configuration, ILog log)
         {
             _configuration = configuration;
+
+            _log = log;
 
             var accountName = _configuration["AppSettings:AccountName"];
 
@@ -33,45 +40,40 @@ namespace WTP.BLL.Services.Concrete.AzureBlobStorageService
             _cloudBlobContainer = cloudBlobClient.GetContainerReference(containerName);
         }
 
-        public async Task<string> UploadFileAsync(string base64StringWithHeaders, string userPhoto)
+        public async Task<string> UploadFileAsync(IFormFile file, string userPhoto)
         {
-            if(userPhoto == null)
+            CloudBlockBlob cloudBlockBlob;
+
+            if (userPhoto == null)
             {
                 userPhoto = "image" + Guid.NewGuid().ToString();
             }
 
-            var cloudBlockBlob = _cloudBlobContainer.GetBlockBlobReference(userPhoto);
+            cloudBlockBlob = _cloudBlobContainer.GetBlockBlobReference(userPhoto);
 
-            // Remove headers from base64 string
-            var base64String = base64StringWithHeaders.Substring(base64StringWithHeaders.IndexOf(',') + 1);
-
-            var bytes = Convert.FromBase64String(base64String);
-
-            using (var memoryStream = new MemoryStream(bytes))
+            if (await cloudBlockBlob.ExistsAsync())
             {
-                await cloudBlockBlob.UploadFromStreamAsync(memoryStream);
+                await cloudBlockBlob.DeleteAsync();
             }
+
+            cloudBlockBlob.Properties.ContentType = file.ContentType;
+
+            await cloudBlockBlob.UploadFromStreamAsync(file.OpenReadStream());
 
             return userPhoto;
         }
 
-        public async Task<string> DownloadFileAsync(string userPhoto)
+        public async Task<FileStreamResult> DownloadFileAsync(string userPhoto)
         {
             var cloudBlockBlob = _cloudBlobContainer.GetBlockBlobReference(userPhoto);
 
-            using (var memoryStream = new MemoryStream())
-            {
-                await cloudBlockBlob.DownloadToStreamAsync(memoryStream);
+            var memoryStream = new MemoryStream();
 
-                return Convert.ToBase64String(memoryStream.ToArray());
-            }
-        }
+            await cloudBlockBlob.DownloadToStreamAsync(memoryStream);
 
-        public async Task DeleteFileAsync(string userPhoto)
-        {
-            var cloudBlockBlob = _cloudBlobContainer.GetBlockBlobReference(userPhoto);
+            memoryStream.Seek(0, SeekOrigin.Begin);
 
-            await cloudBlockBlob.DeleteAsync();
+            return new FileStreamResult(memoryStream, cloudBlockBlob.Properties.ContentType);
         }
     }
 }

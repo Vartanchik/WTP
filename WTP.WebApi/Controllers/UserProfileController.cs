@@ -5,6 +5,7 @@ using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using WTP.BLL.ModelsDto.AppUserLanguage;
@@ -62,7 +63,7 @@ namespace WTP.WebAPI.ViewModels.Controllers
             {
                 UserName = user.UserName,
                 Email = user.Email,
-                Photo = await _azureBlobStorageService.DownloadFileAsync(user.Photo),
+                Photo = user.Photo,
                 Gender = user.Gender,
                 DateOfBirth = user.DateOfBirth.ToString(),
                 Country = user.Country,
@@ -106,7 +107,7 @@ namespace WTP.WebAPI.ViewModels.Controllers
 
             if (formdata.Photo != null)
             {
-                user.Photo = await _azureBlobStorageService.UploadFileAsync(formdata.Photo);
+                user.Photo = formdata.Photo;
             }
             user.UserName = formdata.UserName;
             user.GenderId = formdata.Gender.Id;
@@ -120,6 +121,40 @@ namespace WTP.WebAPI.ViewModels.Controllers
             return result.Succeeded
                 ? Ok(new ResponseViewModel(200, "User profile updated successfully."))
                 : (IActionResult)BadRequest(new ResponseViewModel(500, "User profile updated faild."));
+        }
+
+        [HttpPost("[action]")]
+        [Authorize(Policy = "RequireLoggedIn")]
+        public async Task<IActionResult> UploadFile([FromForm]FileFormDataModel formData)
+        {
+            int userId = this.GetCurrentUserId();
+
+            var user = await _appUserService.GetAsync(userId);
+
+            var userPhoto = await _azureBlobStorageService.UploadFileAsync(formData.File, user.Photo);
+
+            if (user.Photo == null)
+            {
+                user.Photo = userPhoto;
+
+                var result = await _appUserService.UpdateAsync(user);
+
+                if (!result.Succeeded)
+                {
+                    return BadRequest(new ResponseViewModel(400, "Photo updated failed."));
+                }
+            }
+
+            var photoUrl = _configuration["Url:FileStorageUrl"] + userPhoto;
+
+            return Ok(new ResponseViewModel(200, "User photo was updated.", photoUrl));
+        }
+
+        [HttpGet("[action]")]
+        [Authorize(Policy = "RequireLoggedIn")]
+        public async Task<IActionResult> Files([FromQuery]string file)
+        {
+            return await _azureBlobStorageService.DownloadFileAsync(file);
         }
     }
 }
