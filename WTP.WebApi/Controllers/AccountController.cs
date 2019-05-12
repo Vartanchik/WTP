@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Web;
 using System.Threading.Tasks;
+using System.Linq;
+using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using WTP.Logging;
@@ -9,8 +11,7 @@ using WTP.BLL.Services.Concrete.AppUserService;
 using WTP.BLL.Services.Concrete.EmailService;
 using WTP.WebAPI.Utility.Extensions;
 using WTP.WebAPI.ViewModels;
-using System.Linq;
-using Microsoft.Extensions.Configuration;
+using AutoMapper;
 
 namespace WTP.WebAPI.Controllers
 {
@@ -31,7 +32,7 @@ namespace WTP.WebAPI.Controllers
         }
 
         [HttpPost("[action]")]
-        public async Task<IActionResult> Register([FromBody] RegisterViewModel formdata)
+        public async Task<IActionResult> Register([FromBody] RegisterViewModel formData)
         {
             if (!ModelState.IsValid)
             {
@@ -40,28 +41,16 @@ namespace WTP.WebAPI.Controllers
 
             var user = new AppUserDto
             {
-                Email = formdata.Email,
-                UserName = formdata.UserName,
+                Email = formData.Email,
+                UserName = formData.UserName,
                 SecurityStamp = Guid.NewGuid().ToString()
             };
 
-            var result = await _appUserService.CreateAsync(user, formdata.Password);
+            var result = await _appUserService.CreateAsync(user, formData.Password);
 
             if (result.Succeeded)
             {
-                var userForConfirmEmail = await _appUserService.GetByEmailAsync(formdata.Email);
-
-                var code = await _appUserService.GenerateEmailConfirmationTokenAsync(userForConfirmEmail);
-
-                var callbackUrl = Url.Action(
-                    "ConfirmEmail",
-                    "Account",
-                    new { userId = userForConfirmEmail.Id, code },
-                    protocol: HttpContext.Request.Scheme);
-
-                await _emailService.SendEmailAsync(formdata.Email, "Just one click and you're on WTP",
-                    $"Thanks for registering to be a part of evolving esports with WTP. After you: " +
-                    $"<a href='{callbackUrl}'>confirm your email</a> you'll be able to enjoy all the benefits of the WTP platform.");
+                await SendEmailConfirmation(formData.Email);
 
                 return Ok(new ResponseViewModel {
                     StatusCode = 200,
@@ -77,9 +66,9 @@ namespace WTP.WebAPI.Controllers
 
         [HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> ConfirmEmail(string userId, string code)
+        public async Task<IActionResult> ConfirmEmail(string userId, string token)
         {
-            if (userId == null || code == null)
+            if (userId == null || token == null)
             {
                 return Redirect($"{_configuration["Url:BaseUrl"]}/home?confirmed=false");
             }
@@ -91,14 +80,11 @@ namespace WTP.WebAPI.Controllers
                 return Redirect($"{_configuration["Url:BaseUrl"]}/home?confirmed=false");
             }
 
-            var result = await _appUserService.ConfirmEmailAsync(user, code);
+            var result = await _appUserService.ConfirmEmailAsync(user, token);
 
-            if (result.Succeeded)
-            {
-                return Redirect($"{_configuration["Url:BaseUrl"]}/home?confirmed=true");
-            }
-
-            return Redirect($"{_configuration["Url:BaseUrl"]}/home?confirmed=false");
+            return result.Succeeded
+                ? Redirect($"{_configuration["Url:BaseUrl"]}/home?confirmed=true")
+                : Redirect($"{_configuration["Url:BaseUrl"]}/home?confirmed=false");
         }
 
         [HttpPost("[action]")]
@@ -114,17 +100,7 @@ namespace WTP.WebAPI.Controllers
 
             if (user != null && await _appUserService.IsEmailConfirmedAsync(user))
             {
-                var token = await _appUserService.GeneratePasswordResetTokenAsync(user);
-
-                token = HttpUtility.UrlEncode(token);
-
-                var callbackUrl = Url.Action("ResetPassword", "Account",
-                    new { userId = user.Id, code = token }, protocol: HttpContext.Request.Scheme);
-
-                await _emailService.SendEmailAsync(
-                    formData.Email,
-                    "WTP Password Reset",
-                    $"If You want to reset Your password, follow this: <a href='{callbackUrl}'>link</a>");
+                await SendResetPassword(user);
             }
 
             return Ok(new ResponseViewModel(200,
@@ -171,30 +147,44 @@ namespace WTP.WebAPI.Controllers
 
             int userId = this.GetCurrentUserId();
 
-            var appUserDto = await _appUserService.GetAsync(userId);
-
-            if (appUserDto == null)
-            {
-                return NotFound(new ResponseViewModel(404, "Something going wrong."));
-            }
-
-            var isPasswordValid = await _appUserService.CheckPasswordAsync(userId, formdata.CurrentPassword);
-
-            if (isPasswordValid != true)
-            {
-                return BadRequest(new ResponseViewModel(400, "Invalid current password."));
-            }
-
-            var result = await _appUserService.ChangePasswordAsync(new ChangePasswordDto
-            {
-                UserId = userId,
-                CurrentPassword = formdata.CurrentPassword,
-                NewPassword = formdata.NewPassword
-            });
+            var result = await _appUserService.ChangePasswordAsync(new ChangePasswordDto(userId,
+                                                                                         formdata.CurrentPassword,
+                                                                                         formdata.NewPassword));
 
             return result.Succeeded 
                 ? Ok(new ResponseViewModel(200, "Password update successful."))
-                : (IActionResult)BadRequest(new ResponseViewModel(500, "Change password failed."));
+                : (IActionResult)BadRequest(new ResponseViewModel(500, "Change password failed.", result.Errors.First().Description));
+        }
+
+        private async Task SendEmailConfirmation(string email)
+        {
+            var userForConfirmEmail = await _appUserService.GetByEmailAsync(email);
+
+            var token = await _appUserService.GenerateEmailConfirmationTokenAsync(userForConfirmEmail);
+
+            var callbackUrl = Url.Action(
+                "ConfirmEmail",
+                "Account",
+                new { userId = userForConfirmEmail.Id, token }, protocol: HttpContext.Request.Scheme);
+
+            await _emailService.SendEmailAsync(email, "Just one click and you're on WTP",
+                $"Thanks for registering to be a part of evolving esports with WTP. After you: " +
+                $"<a href='{callbackUrl}'>confirm your email</a> you'll be able to enjoy all the benefits of the WTP platform.");
+        }
+
+        private async Task SendResetPassword(AppUserDto user)
+        {
+            var token = await _appUserService.GeneratePasswordResetTokenAsync(user);
+
+            token = HttpUtility.UrlEncode(token);
+
+            var callbackUrl = Url.Action("ResetPassword", "Account",
+                new { userId = user.Id, code = token }, protocol: HttpContext.Request.Scheme);
+
+            await _emailService.SendEmailAsync(
+                user.Email,
+                "WTP Password Reset",
+                $"If You want to reset Your password, follow this: <a href='{callbackUrl}'>link</a>");
         }
     }
 }

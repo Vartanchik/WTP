@@ -9,7 +9,7 @@ namespace WTP.BLL.Services.Concrete.CountryService
 {
     public class CountryService : ICountryService
     {
-        private IUnitOfWork _uow;
+        private readonly IUnitOfWork _uow;
         private readonly IMapper _mapper;
 
         public CountryService(IUnitOfWork uow, IMapper mapper)

@@ -1,9 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Internal;
-using System;
-using System.Collections.Generic;
+
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using WTP.BLL.ModelsDto.AppUser;
 using WTP.BLL.ModelsDto.Country;
 using WTP.BLL.ModelsDto.Gender;
 using WTP.BLL.ModelsDto.Language;
@@ -14,6 +13,9 @@ namespace WTP.WebAPI.ViewModels
 {
     public class AppUserDtoViewModel
     {
+        [Required]
+        public int Id { get; set; } 
+
         [Required]
         [Column(TypeName = "nvarchar(30)")]
         public string UserName { get; set; }
