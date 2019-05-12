@@ -131,6 +131,15 @@ namespace WTP.WebAPI.Controllers
             return BadRequest(new JsonResult(errorList));
         }
 
+            //[HttpGet]
+            //[Route("history")]
+            ////[Authorize(Policy = "RequireAdministratorRole")]
+            //public async Task<IActionResult> GetHistory()
+            //{
+            //    var history = await _historyService.GetAllAsync();
+            //    return Ok(history);
+            //}
+
         //Get List of all Users
         [HttpGet]
         [Route("users")]
@@ -144,7 +153,6 @@ namespace WTP.WebAPI.Controllers
                 return result.ToArray();
             //return Ok("List of Users are empty!");
 
-            var history = await _historyService.GetAllAsync();
             foreach (var user in users)
             {
                 var langs = new List<LanguageDto>();
@@ -237,7 +245,7 @@ namespace WTP.WebAPI.Controllers
                 }
             }
 
-            return Ok(new ErrorResponseModel { Message = errorList });
+            return BadRequest(new ErrorResponseModel { Message = errorList });
         }
 
         //Delete user's account by id
@@ -335,6 +343,71 @@ namespace WTP.WebAPI.Controllers
                 Items = resultList.Skip((page - 1 ?? 0) * pagesize).Take(pagesize).ToList()
             };
             return result;
+        }
+
+
+        [HttpGet]
+        //[Authorize(Policy = "RequireAdministratorRole")]
+        [Route("users/newpagination")]
+        public async Task<IActionResult> Index(string name, int page = 1,
+            SortState sortOrder = SortState.NameAsc, bool enableDeleted = true, bool enableLocked=true)
+        {
+            int pageSize = 3;
+
+            //Filtration
+            List<AppUserDto> users = new List<AppUserDto>(await _appUserService.GetAllUsersAsync());//db.Users.Include(x => x.Company);
+            //users = null;
+            if (users == null)
+                return NoContent();
+                //return null;
+           
+            if (!String.IsNullOrEmpty(name))
+            {
+                users = users.Where(p => p.UserName.Contains(name)).ToList();
+            }
+
+            // Sorting
+            switch (sortOrder)
+            {
+                case SortState.NameDesc:
+                    users = users.OrderByDescending(s => s.UserName).ToList();
+                    break;
+                case SortState.EmailAsc:
+                    users = users.OrderBy(s => s.Email).ToList();
+                    break;
+                case SortState.EmailDesc:
+                    users = users.OrderByDescending(s => s.Email).ToList();
+                    break;
+                case SortState.IdAsc:
+                    users = users.OrderBy(s => s.Id).ToList();
+                    break;
+                case SortState.IdDesc:
+                    users = users.OrderByDescending(s => s.Id).ToList();
+                    break;
+                default:
+                    users = users.OrderBy(s => s.UserName).ToList();
+                    break;
+            }
+
+            if (!enableDeleted)
+                users = users.Where(s => s.DeletedStatus == false).ToList();
+
+            if (!enableLocked)
+                users = users.Where(s => s.LockoutEnd == null).ToList();
+
+            // Pagination
+            var count = users.Count();
+            var items = users.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+
+            // representation model
+            UserIndexViewModel viewModel = new UserIndexViewModel
+            {
+                PageViewModel = new UserPageViewModel(count, page, pageSize),
+                SortViewModel = new UserSortViewModel(sortOrder),
+                //FilterViewModel = new UserFilterViewModel(users/*(List<AppUserDto>)await _appUserService.GetAllUsersAsync()*/, name),
+                Users = items
+            };
+            return Ok(viewModel);
         }
 
     }
