@@ -7,7 +7,6 @@
     <ApplicationInsightsResourceId>/subscriptions/15c0eec1-f352-4665-b6f9-f3402a9ee5d3/resourcegroups/wtp-dev/providers/microsoft.insights/components/wtp-dev</ApplicationInsightsResourceId>
     <ApplicationInsightsAnnotationResourceId>/subscriptions/15c0eec1-f352-4665-b6f9-f3402a9ee5d3/resourcegroups/wtp-dev/providers/microsoft.insights/components/wtp-dev</ApplicationInsightsAnnotationResourceId>
     <UserSecretsId>fc37cc6b-9b5f-4a4f-a9f7-07ae86bb801a</UserSecretsId>
-    <LangVersion>preview</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>

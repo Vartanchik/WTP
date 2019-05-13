@@ -7,6 +7,7 @@ using Microsoft.WindowsAzure.Storage.Blob;
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using WTP.BLL.Services.Concrete.AppUserService;
 using WTP.Logging;
 
 namespace WTP.BLL.Services.Concrete.AzureBlobStorageService
@@ -19,11 +20,15 @@ namespace WTP.BLL.Services.Concrete.AzureBlobStorageService
 
         private readonly CloudBlobContainer _cloudBlobContainer;
 
-        public AzureBlobStorageService(IConfiguration configuration, ILog log)
+        private readonly IAppUserService _appUserService;
+
+        public AzureBlobStorageService(IConfiguration configuration, ILog log, IAppUserService appUserService)
         {
             _configuration = configuration;
 
             _log = log;
+
+            _appUserService = appUserService;
 
             var accountName = _configuration["AppSettings:AccountName"];
 
@@ -40,16 +45,25 @@ namespace WTP.BLL.Services.Concrete.AzureBlobStorageService
             _cloudBlobContainer = cloudBlobClient.GetContainerReference(containerName);
         }
 
-        public async Task<string> UploadFileAsync(IFormFile file, string userPhoto)
+        public async Task<string> UploadFileAsync(IFormFile file, int userId)
         {
-            CloudBlockBlob cloudBlockBlob;
+            var user = await _appUserService.GetAsync(userId);
 
-            if (userPhoto == null)
+            if (user.Photo == null || user.Photo == _configuration["Photo:DefaultPhoto"])
             {
-                userPhoto = "image" + Guid.NewGuid().ToString();
+                user.Photo = _configuration["Url:ImageStorageUrl"] + userId.ToString();
+
+                var result = await _appUserService.UpdateAsync(user);
+
+                if (!result.Succeeded)
+                {
+                    return null;
+                }
             }
 
-            cloudBlockBlob = _cloudBlobContainer.GetBlockBlobReference(userPhoto);
+            CloudBlockBlob cloudBlockBlob;
+
+            cloudBlockBlob = _cloudBlobContainer.GetBlockBlobReference(user.Photo);
 
             if (await cloudBlockBlob.ExistsAsync())
             {
@@ -60,12 +74,12 @@ namespace WTP.BLL.Services.Concrete.AzureBlobStorageService
 
             await cloudBlockBlob.UploadFromStreamAsync(file.OpenReadStream());
 
-            return userPhoto;
+            return user.Photo;
         }
 
         public async Task<FileStreamResult> DownloadFileAsync(string userPhoto)
         {
-            var cloudBlockBlob = _cloudBlobContainer.GetBlockBlobReference(userPhoto);
+            var cloudBlockBlob = _cloudBlobContainer.GetBlockBlobReference(_configuration["Url:ImageStorageUrl"] + userPhoto);
 
             var memoryStream = new MemoryStream();
 
