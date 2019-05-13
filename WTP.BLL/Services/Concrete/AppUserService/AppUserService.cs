@@ -34,20 +34,20 @@ namespace WTP.BLL.Services.Concrete.AppUserService
 
             var result = await _appUserRepository.CreateAsync(appUser, password);
 
-            HistoryDto history = new HistoryDto
-            {
-                DateOfOperation = DateTime.Now,
-                Description = "Create new user account",
-                PreviousUserEmail = null,
-                PreviousUserName = null,
-                NewUserEmail = appUserDto.Email,
-                NewUserName = appUserDto.UserName,
-                AppUserId = appUserDto.Id,
-                OperationId = (int)OperationEnum.Create,
-                AdminId = 1//Convert.ToInt32(User.Claims.First(c => c.Type == "UserID").Value)
-            };
+            //HistoryDto history = new HistoryDto
+            //{
+            //    DateOfOperation = DateTime.Now,
+            //    Description = "Create new user account",
+            //    PreviousUserEmail = null,
+            //    PreviousUserName = null,
+            //    NewUserEmail = appUserDto.Email,
+            //    NewUserName = appUserDto.UserName,
+            //    AppUserId = 0,//appUserDto.Id,
+            //    OperationId = (int)OperationEnum.Create,
+            //    AdminId = 1//Convert.ToInt32(User.Claims.First(c => c.Type == "UserID").Value)
+            //};
             
-            await _historyService.CreateAsync(history);
+            //await _historyService.CreateAsync(history);
 
             return result;
         }
