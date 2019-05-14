@@ -79,7 +79,7 @@ namespace WTP.BLL.Services.Concrete.AzureBlobStorageService
 
         public async Task<FileStreamResult> DownloadFileAsync(string userPhoto)
         {
-            var cloudBlockBlob = _cloudBlobContainer.GetBlockBlobReference(_configuration["Url:ImageStorageUrl"] + userPhoto);
+            var cloudBlockBlob = _cloudBlobContainer.GetBlockBlobReference(userPhoto);
 
             var memoryStream = new MemoryStream();
 

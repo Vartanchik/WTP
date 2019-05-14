@@ -50,7 +50,7 @@ namespace WTP.WebAPI.Controllers
 
             if (result.Succeeded)
             {
-                await SendEmailConfirmation(formData.Email);
+                await SendEmailConfirmationAsync(formData.Email);
 
                 return Ok(new ResponseViewModel {
                     StatusCode = 200,
@@ -100,7 +100,7 @@ namespace WTP.WebAPI.Controllers
 
             if (user != null && await _appUserService.IsEmailConfirmedAsync(user))
             {
-                await SendResetPassword(user);
+                await SendResetPasswordEmailAsync(user);
             }
 
             return Ok(new ResponseViewModel(200,
@@ -156,7 +156,7 @@ namespace WTP.WebAPI.Controllers
                 : (IActionResult)BadRequest(new ResponseViewModel(500, "Change password failed.", result.Errors.First().Description));
         }
 
-        private async Task SendEmailConfirmation(string email)
+        private async Task SendEmailConfirmationAsync(string email)
         {
             var userForConfirmEmail = await _appUserService.GetByEmailAsync(email);
 
@@ -172,7 +172,7 @@ namespace WTP.WebAPI.Controllers
                 $"<a href='{callbackUrl}'>confirm your email</a> you'll be able to enjoy all the benefits of the WTP platform.");
         }
 
-        private async Task SendResetPassword(AppUserDto user)
+        private async Task SendResetPasswordEmailAsync(AppUserDto user)
         {
             var token = await _appUserService.GeneratePasswordResetTokenAsync(user);
 

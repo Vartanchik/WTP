@@ -9,6 +9,7 @@ using WTP.BLL.Services.Concrete.AppUserService;
 using WTP.BLL.ModelsDto.AppUser;
 using WTP.WebAPI.Utility.Extensions;
 using AutoMapper;
+using Microsoft.AspNetCore.Http.Extensions;
 
 namespace WTP.WebAPI.ViewModels.Controllers
 {
@@ -84,9 +85,11 @@ namespace WTP.WebAPI.ViewModels.Controllers
 
         [HttpGet("[action]/{imageId:minlength(1)}")]
         //[Authorize(Policy = "RequireLoggedIn")]
-        public async Task<IActionResult> Image(string imageId)
+        public async Task<IActionResult> Image()
         {
-            return await _azureBlobStorageService.DownloadFileAsync(imageId);
+            var requestUrl = UriHelper.GetDisplayUrl(Request);
+
+            return await _azureBlobStorageService.DownloadFileAsync(requestUrl);
         }
     }
 }
