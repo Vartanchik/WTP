@@ -186,5 +186,12 @@ namespace WTP.DAL.Repositories.ConcreteRepositories.AppUserExtended
         {
             return await LockAsync(id, null);
         }
+
+        public async Task<int> GetNewId(AppUser appUser)
+        {
+            await _context.AppUsers.AddAsync(appUser);
+            int id = appUser.Id;
+            return id;
+        }
     }
 }

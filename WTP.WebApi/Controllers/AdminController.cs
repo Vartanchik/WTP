@@ -68,6 +68,9 @@ namespace WTP.WebAPI.Controllers
         //[Authorize(Policy = "RequireAdministratorRole")]
         public async Task<IActionResult> CreateUserProfile([FromBody] RegisterViewModel formdata)
         {
+            //int userId = Convert.ToInt32(User.Claims.First(c => c.Type == "UserID").Value);
+            int adminId = 1;
+
             // Will hold all the errors related to registration
             List<string> errorList = new List<string>();
 
@@ -78,7 +81,7 @@ namespace WTP.WebAPI.Controllers
                 SecurityStamp = Guid.NewGuid().ToString()
             };
 
-            var result = await _appUserService.CreateAsync(user, formdata.Password);
+            var result = await _appUserService.CreateAsync(user, formdata.Password,adminId);
 
             if (result.Succeeded)
             {
@@ -132,16 +135,8 @@ namespace WTP.WebAPI.Controllers
             return BadRequest(new JsonResult(errorList));
         }
 
-            //[HttpGet]
-            //[Route("history")]
-            ////[Authorize(Policy = "RequireAdministratorRole")]
-            //public async Task<IActionResult> GetHistory()
-            //{
-            //    var history = await _historyService.GetAllAsync();
-            //    return Ok(history);
-            //}
 
-        //Get List of all Users
+        ////Get List of all Users
         [HttpGet]
         [Route("users")]
         //[Authorize(Policy = "RequireAdministratorRole")]
@@ -200,6 +195,9 @@ namespace WTP.WebAPI.Controllers
         [Route("users/{id}")]
         public async Task<IActionResult> UpdateUser([FromBody] UpdateUserForAdminViewModel formdata, [FromRoute]int id)
         {
+            //int userId = Convert.ToInt32(User.Claims.First(c => c.Type == "UserID").Value);
+            int adminId = 1;
+
             if (!ModelState.IsValid)
             {
                 return BadRequest(new ResponseViewModel
@@ -228,7 +226,7 @@ namespace WTP.WebAPI.Controllers
             user.UserName = formdata.UserName;
             user.Email = formdata.Email;
 
-            var result = await _appUserService.UpdateAsync(user);
+            var result = await _appUserService.UpdateAsync(user, adminId);
 
             if (result.Succeeded)
             {
@@ -255,7 +253,9 @@ namespace WTP.WebAPI.Controllers
         [Route("users/{id}")]
         public async Task<IActionResult> DeleteUser([FromRoute]int id)
         {
-            bool success = await _appUserService.DeleteAsync(id);
+            //int userId = Convert.ToInt32(User.Claims.First(c => c.Type == "UserID").Value);
+            int adminId = 1;
+            bool success = await _appUserService.DeleteAsync(id, adminId);
 
             if (success)
                 return Ok(new ResponseViewModel
@@ -278,7 +278,10 @@ namespace WTP.WebAPI.Controllers
         [Route("users/{id}/block")]
         public async Task<IActionResult> LockUser([FromBody]LockViewModel formDate, [FromRoute]int id)
         {
-            bool success = await _appUserService.LockAsync(id, formDate.Days);
+            //int userId = Convert.ToInt32(User.Claims.First(c => c.Type == "UserID").Value);
+            int adminId = 1;
+
+            bool success = await _appUserService.LockAsync(id, formDate.Days, adminId);
 
             if (success)
                 return Ok(new ResponseViewModel
@@ -301,7 +304,10 @@ namespace WTP.WebAPI.Controllers
         [Route("users/{id}/unblock")]
         public async Task<IActionResult> UnLockUser([FromRoute]int id)
         {
-            bool success = await _appUserService.UnLockAsync(id);
+            //int userId = Convert.ToInt32(User.Claims.First(c => c.Type == "UserID").Value);
+            int adminId = 1;
+
+            bool success = await _appUserService.UnLockAsync(id, adminId);
             
             if (success)
                 return Ok(new ResponseViewModel
@@ -318,34 +324,6 @@ namespace WTP.WebAPI.Controllers
 
             //return StatusCode(Microsoft.AspNetCore.Http.StatusCodes.Status406NotAcceptable);
         }
-
-        [HttpGet]
-        //[Authorize(Policy = "RequireAdministratorRole")]
-        [Route("users/pagination")]
-        public async Task<PageResult<AppUserDto>> Pagination(int? page, int pagesize = 10)
-        {
-            var users = await _appUserService.GetAllUsersAsync();
-            var countDetails = users.Count();
-            if (countDetails == 0)
-                return null;
-
-            List<AppUserDto> resultList = new List<AppUserDto>();
-            foreach (var user in users)
-            {
-                if (user.DeletedStatus != true)
-                    resultList.Add(user);
-            }
-
-            var result = new PageResult<AppUserDto>
-            {
-                Count = countDetails,
-                PageIndex = page ?? 1,
-                PageSize = 10,
-                Items = resultList.Skip((page - 1 ?? 0) * pagesize).Take(pagesize).ToList()
-            };
-            return result;
-        }
-
 
         [HttpGet]
         //[Authorize(Policy = "RequireAdministratorRole")]

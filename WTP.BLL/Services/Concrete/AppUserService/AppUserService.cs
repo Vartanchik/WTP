@@ -28,26 +28,26 @@ namespace WTP.BLL.Services.Concrete.AppUserService
             _historyService = historyService;
         }
 
-        public async Task<IdentityResult> CreateAsync(AppUserDto appUserDto, string password)
+        public async Task<IdentityResult> CreateAsync(AppUserDto appUserDto, string password, int adminId = 1)
         {
             var appUser = _mapper.Map<AppUser>(appUserDto);
 
             var result = await _appUserRepository.CreateAsync(appUser, password);
 
-            //HistoryDto history = new HistoryDto
-            //{
-            //    DateOfOperation = DateTime.Now,
-            //    Description = "Create new user account",
-            //    PreviousUserEmail = null,
-            //    PreviousUserName = null,
-            //    NewUserEmail = appUserDto.Email,
-            //    NewUserName = appUserDto.UserName,
-            //    AppUserId = 0,//appUserDto.Id,
-            //    OperationId = (int)OperationEnum.Create,
-            //    AdminId = 1//Convert.ToInt32(User.Claims.First(c => c.Type == "UserID").Value)
-            //};
-            
-            //await _historyService.CreateAsync(history);
+            HistoryDto history = new HistoryDto
+            {
+                DateOfOperation = DateTime.Now,
+                Description = "Create new user account",
+                PreviousUserEmail = null,
+                PreviousUserName = null,
+                NewUserEmail = appUserDto.Email,
+                NewUserName = appUserDto.UserName,
+                AppUserId = appUser.Id,
+                OperationId = (int)OperationEnum.Create,
+                AdminId = adminId
+            };
+
+            await _historyService.CreateAsync(history);
 
             return result;
         }
@@ -163,7 +163,7 @@ namespace WTP.BLL.Services.Concrete.AppUserService
             return appUserDto;
         }
                      
-        public async Task<IdentityResult> UpdateAsync(AppUserDto appUserDto)
+        public async Task<IdentityResult> UpdateAsync(AppUserDto appUserDto, int adminId = 1)
         {
             var user = await _appUserRepository.GetAsync(appUserDto.Id);
             HistoryDto history = new HistoryDto
@@ -176,7 +176,7 @@ namespace WTP.BLL.Services.Concrete.AppUserService
                 NewUserName = appUserDto.UserName,
                 AppUserId = appUserDto.Id,
                 OperationId = (int)OperationEnum.Update,
-                AdminId = 1//Convert.ToInt32(User.Claims.First(c => c.Type == "UserID").Value)
+                AdminId = adminId
             };
 
             var appUser = _mapper.Map<AppUser>(appUserDto);
@@ -268,7 +268,7 @@ namespace WTP.BLL.Services.Concrete.AppUserService
             return result;
         }
 
-        public async Task<bool> DeleteAsync(int id)
+        public async Task<bool> DeleteAsync(int id, int adminId = 1)
         {
             var user = await _appUserRepository.GetAsync(id);
             HistoryDto history = new HistoryDto
@@ -281,7 +281,7 @@ namespace WTP.BLL.Services.Concrete.AppUserService
                 NewUserName = user.UserName,
                 AppUserId = user.Id,
                 OperationId = (int)OperationEnum.Delete,
-                AdminId = 1//Convert.ToInt32(User.Claims.First(c => c.Type == "UserID").Value)
+                AdminId = adminId
             };
 
             await _historyService.CreateAsync(history);
@@ -295,7 +295,7 @@ namespace WTP.BLL.Services.Concrete.AppUserService
             return _mapper.Map<IList<AppUserDto>>(allUsers);
         }
 
-        public async Task<bool> LockAsync(int id, int? days)
+        public async Task<bool> LockAsync(int id, int? days, int adminId = 1)
         {
             var user = await _appUserRepository.GetAsync(id);
 
@@ -309,7 +309,7 @@ namespace WTP.BLL.Services.Concrete.AppUserService
                 NewUserName = user.UserName,
                 AppUserId = user.Id,
                 OperationId = (int)OperationEnum.Lock,
-                AdminId = 1//Convert.ToInt32(User.Claims.First(c => c.Type == "UserID").Value)
+                AdminId = adminId
             };
 
             await _historyService.CreateAsync(history);
@@ -317,7 +317,7 @@ namespace WTP.BLL.Services.Concrete.AppUserService
             return await _appUserRepository.LockAsync(id, days);
         }
 
-        public async Task<bool> UnLockAsync(int id)
+        public async Task<bool> UnLockAsync(int id, int adminId = 1)
         {
             var user = await _appUserRepository.GetAsync(id);
 
@@ -331,7 +331,7 @@ namespace WTP.BLL.Services.Concrete.AppUserService
                 NewUserName = user.UserName,
                 AppUserId = user.Id,
                 OperationId = (int)OperationEnum.UnLock,
-                AdminId = 1//Convert.ToInt32(User.Claims.First(c => c.Type == "UserID").Value)
+                AdminId = adminId
             };
 
             await _historyService.CreateAsync(history);
