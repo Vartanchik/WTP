@@ -1,14 +1,12 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
-using WTP.BLL.ModelsDto.AppUser;
+﻿using System.Threading.Tasks;
+using WTP.BLL.ModelsDto.Azure;
 
 namespace WTP.BLL.Services.Concrete.AzureBlobStorageService
 {
     public interface IAzureBlobStorageService
     {
-        Task<string> UploadFileAsync(IFormFile file, int userId);
+        Task<string> UploadFileAsync(FileDataDto file, AzureBlobStorageConfigDto configuration);
 
-        Task<FileStreamResult> DownloadFileAsync(string userPhoto);
+        Task<FileDataDto> DownloadFileAsync(string blockBlobNamge, AzureBlobStorageConfigDto configuration);
     }
 }

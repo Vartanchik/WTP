@@ -138,5 +138,17 @@ namespace WTP.BLL.Services.Concrete.AppUserService
 
             return await _appUserRepository.ConfirmEmailAsync(appUser, token);
         }
+
+        public async Task<IdentityResult> UpdatePhotoAsync(int userId, string userPhoto)
+        {
+
+            var appUserDto = await _appUserRepository.GetAsync(userId);
+
+            appUserDto.Photo = userPhoto;
+
+            var appUser = _mapper.Map<AppUser>(appUserDto);
+
+            return await _appUserRepository.UpdateAsync(appUserDto);
+        }
     }
 }

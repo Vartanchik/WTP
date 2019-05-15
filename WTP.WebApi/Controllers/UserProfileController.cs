@@ -10,6 +10,7 @@ using WTP.BLL.ModelsDto.AppUser;
 using WTP.WebAPI.Utility.Extensions;
 using AutoMapper;
 using Microsoft.AspNetCore.Http.Extensions;
+using WTP.BLL.ModelsDto.Azure;
 
 namespace WTP.WebAPI.ViewModels.Controllers
 {
@@ -72,24 +73,48 @@ namespace WTP.WebAPI.ViewModels.Controllers
 
         [HttpPost("[action]")]
         [Authorize(Policy = "RequireLoggedIn")]
-        public async Task<IActionResult> UploadFile([FromForm]FileFormDataModel formData)
+        public async Task<IActionResult> UploadPhoto([FromForm]PhotoFormDataModel formData)
         {
+            var azureBlobStorageConfigDto = GetAzureBlobStorageConfigDto();
+
+            var fileDataModel = new FileDataModel(formData.File.OpenReadStream(), formData.File.ContentType, formData.File.FileName);
+
+            var fileDataDto = _mapper.Map<FileDataDto>(fileDataModel);
+
+            string userPhotoUrl = await _azureBlobStorageService.UploadFileAsync(fileDataDto, azureBlobStorageConfigDto);
+
             int userId = this.GetCurrentUserId();
 
-            var userPhoto = await _azureBlobStorageService.UploadFileAsync(formData.File, userId);
+            var result = await _appUserService.UpdatePhotoAsync(userId, userPhotoUrl);
 
-            return (userPhoto != null)
-                ? Ok(new ResponseViewModel(200, "User photo was updated.", userPhoto))
+            return (userPhotoUrl != null && result.Succeeded)
+                ? Ok(userPhotoUrl)
                 : (IActionResult)BadRequest(new ResponseViewModel(400, "Photo updated failed."));
         }
 
         [HttpGet("[action]/{imageId:minlength(1)}")]
-        //[Authorize(Policy = "RequireLoggedIn")]
         public async Task<IActionResult> Image()
         {
             var requestUrl = UriHelper.GetDisplayUrl(Request);
 
-            return await _azureBlobStorageService.DownloadFileAsync(requestUrl);
+            var azureBlobStorageConfigDto = GetAzureBlobStorageConfigDto();
+
+            var fileDataDto =  await _azureBlobStorageService.DownloadFileAsync(requestUrl, azureBlobStorageConfigDto);
+
+            return File(fileDataDto.Stream, fileDataDto.Type, fileDataDto.Name);
+        }
+
+        private AzureBlobStorageConfigDto GetAzureBlobStorageConfigDto()
+        {
+            var azureBlobStorageConfigModel = new AzureBlobStorageConfigModel()
+            {
+                AccountName = _configuration["AppSettings:AccountName"],
+                AccountKey = _configuration["AppSettings:AccountKey"],
+                ContainerName = _configuration["AppSettings:ContainerName"],
+                BlobStorageUrl = _configuration["Url:ImageStorageUrl"]
+            };
+
+            return _mapper.Map<AzureBlobStorageConfigDto>(azureBlobStorageConfigModel);
         }
     }
 }

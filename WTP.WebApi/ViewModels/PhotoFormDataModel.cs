@@ -2,7 +2,7 @@
 
 namespace WTP.WebAPI.ViewModels
 {
-    public class FileFormDataModel
+    public class PhotoFormDataModel
     {
         public IFormFile File { get; set; }
     }

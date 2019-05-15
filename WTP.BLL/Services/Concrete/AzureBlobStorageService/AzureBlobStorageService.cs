@@ -1,85 +1,47 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using Microsoft.WindowsAzure.Storage;
+﻿using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Auth;
 using Microsoft.WindowsAzure.Storage.Blob;
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using WTP.BLL.Services.Concrete.AppUserService;
+using WTP.BLL.ModelsDto.Azure;
 using WTP.Logging;
 
 namespace WTP.BLL.Services.Concrete.AzureBlobStorageService
 {
     public class AzureBlobStorageService : IAzureBlobStorageService
     {
-        private readonly IConfiguration _configuration;
-
         private readonly ILog _log;
 
-        private readonly CloudBlobContainer _cloudBlobContainer;
-
-        private readonly IAppUserService _appUserService;
-
-        public AzureBlobStorageService(IConfiguration configuration, ILog log, IAppUserService appUserService)
+        public AzureBlobStorageService(ILog log)
         {
-            _configuration = configuration;
-
             _log = log;
-
-            _appUserService = appUserService;
-
-            var accountName = _configuration["AppSettings:AccountName"];
-
-            var containerName = _configuration["AppSettings:ContainerName"];
-
-            var accountKey = _configuration["AppSettings:AccountKey"];
-
-            var storageCredentials = new StorageCredentials(accountName, accountKey);
-
-            var cloudStorageAccount = new CloudStorageAccount(storageCredentials, true);
-
-            var cloudBlobClient = cloudStorageAccount.CreateCloudBlobClient();
-
-            _cloudBlobContainer = cloudBlobClient.GetContainerReference(containerName);
         }
 
-        public async Task<string> UploadFileAsync(IFormFile file, int userId)
+        public async Task<string> UploadFileAsync(FileDataDto file, AzureBlobStorageConfigDto configuration)
         {
-            var user = await _appUserService.GetAsync(userId);
+            var cloudBlobContainer = GetCloudBlobContainer(configuration);
 
-            if (user.Photo == null || user.Photo == _configuration["Photo:DefaultPhoto"])
-            {
-                user.Photo = _configuration["Url:ImageStorageUrl"] + userId.ToString();
+            var blockBlobNamge = configuration.BlobStorageUrl + Guid.NewGuid().ToString();
 
-                var result = await _appUserService.UpdateAsync(user);
+            var cloudBlockBlob = cloudBlobContainer.GetBlockBlobReference(blockBlobNamge);
 
-                if (!result.Succeeded)
-                {
-                    return null;
-                }
-            }
+            await cloudBlockBlob.DeleteIfExistsAsync();
 
-            CloudBlockBlob cloudBlockBlob;
+            cloudBlockBlob.Metadata.Add("Name", file.Name);
 
-            cloudBlockBlob = _cloudBlobContainer.GetBlockBlobReference(user.Photo);
+            cloudBlockBlob.Properties.ContentType = file.Type;
 
-            if (await cloudBlockBlob.ExistsAsync())
-            {
-                await cloudBlockBlob.DeleteAsync();
-            }
+            await cloudBlockBlob.UploadFromStreamAsync(file.Stream);
 
-            cloudBlockBlob.Properties.ContentType = file.ContentType;
-
-            await cloudBlockBlob.UploadFromStreamAsync(file.OpenReadStream());
-
-            return user.Photo;
+            return blockBlobNamge;
         }
 
-        public async Task<FileStreamResult> DownloadFileAsync(string userPhoto)
+        public async Task<FileDataDto> DownloadFileAsync(string blockBlobNamge, AzureBlobStorageConfigDto configuration)
         {
-            var cloudBlockBlob = _cloudBlobContainer.GetBlockBlobReference(userPhoto);
+            var cloudBlobContainer = GetCloudBlobContainer(configuration);
+
+            var cloudBlockBlob = cloudBlobContainer.GetBlockBlobReference(blockBlobNamge);
 
             var memoryStream = new MemoryStream();
 
@@ -87,7 +49,24 @@ namespace WTP.BLL.Services.Concrete.AzureBlobStorageService
 
             memoryStream.Seek(0, SeekOrigin.Begin);
 
-            return new FileStreamResult(memoryStream, cloudBlockBlob.Properties.ContentType);
+            return new FileDataDto(memoryStream, cloudBlockBlob.Properties.ContentType, cloudBlockBlob.Metadata["Name"]);
+        }
+
+        private CloudBlobContainer GetCloudBlobContainer(AzureBlobStorageConfigDto configuration)
+        {
+            var accountName = configuration.AccountName;
+
+            var accountKey = configuration.AccountKey;
+
+            var containerName = configuration.ContainerName;
+
+            var storageCredentials = new StorageCredentials(accountName, accountKey);
+
+            var cloudStorageAccount = new CloudStorageAccount(storageCredentials, true);
+
+            var cloudBlobClient = cloudStorageAccount.CreateCloudBlobClient();
+
+            return cloudBlobClient.GetContainerReference(containerName);
         }
     }
 }

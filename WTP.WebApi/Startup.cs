@@ -195,6 +195,22 @@ namespace WTP.WebAPI
                     Title = "WTP API",
                     Description = ".NET Core API",
                 });
+
+                // Swagger 2.+ support
+                var security = new Dictionary<string, IEnumerable<string>>
+                {
+                    {"Bearer", new string[] { }},
+                };
+
+                c.AddSecurityDefinition("Bearer", new ApiKeyScheme
+                {
+                    Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+                    Name = "Authorization",
+                    In = "header",
+                    Type = "apiKey"
+                });
+
+                c.AddSecurityRequirement(security);
             });
         }
 

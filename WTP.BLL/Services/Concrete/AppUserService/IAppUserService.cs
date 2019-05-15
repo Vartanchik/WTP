@@ -21,5 +21,6 @@ namespace WTP.BLL.Services.Concrete.AppUserService
         Task<string> GenerateEmailConfirmationTokenAsync(AppUserDto appUserDto);
         Task<AppUserDto> FindByIdAsync(string userId);
         Task<IdentityResult> ConfirmEmailAsync(AppUserDto appUserDto, string token);
+        Task<IdentityResult> UpdatePhotoAsync(int userId, string userPhoto);
     }
 }
