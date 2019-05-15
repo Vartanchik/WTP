@@ -3,7 +3,7 @@ using Microsoft.Extensions.Caching.Distributed;
 using Newtonsoft.Json;
 using System;
 using System.Threading.Tasks;
-using WTP.DAL.DomainModels;
+using WTP.DAL.Entities;
 using WTP.DAL.Repositories.ConcreteRepositories.AppUserExtended;
 using WTP.DAL.Repositories.GenericRepository;
 

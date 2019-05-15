@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using WTP.BLL.ModelsDto.AppUser;
-using WTP.BLL.ModelsDto.RefreshToken;
+using WTP.BLL.Models.AppUser;
+using WTP.BLL.Models.RefreshToken;
 using WTP.BLL.Services.Concrete.AppUserService;
 using WTP.BLL.Services.Concrete.RefreshTokenService;
 using WTP.WebAPI.Helpers;
-using WTP.WebAPI.ViewModels;
+using WTP.WebAPI.Dto;
 
 namespace WTP.WebAPI.Controllers
 {
@@ -35,13 +35,15 @@ namespace WTP.WebAPI.Controllers
 
 
         [HttpPost("[action]")]
-        public async Task<IActionResult> Auth([FromBody] AccessRequestModel model) // granttype = "refresh_token or password"
+        [ProducesResponseType(typeof(AccessResponseDto), 200)]
+        [ProducesResponseType(typeof(ResponseDto), 401)]
+        public async Task<IActionResult> Auth([FromBody] AccessRequestDto model) // granttype = "refresh_token or password"
         {
             // We will return Generic 500 HTTP Server Status Error
             // If we receive an invalid payload
             if (model == null)
             {
-                return BadRequest(new ResponseViewModel(500, "Login failed.", "Something going wrong."));
+                return BadRequest(new ResponseDto(500, "Login failed.", "Something going wrong."));
             }
 
             switch (model.GrantType)
@@ -52,20 +54,20 @@ namespace WTP.WebAPI.Controllers
                     return await UpdateAccessToken(model);
                 default:
                     // not supported - return a HTTP 401 (Unauthorized)
-                    return Unauthorized(new ResponseViewModel(401, "Login failed.", "Something going wrong."));
+                    return Unauthorized(new ResponseDto(401, "Login failed.", "Something going wrong."));
             }
         }
 
         // Method to Create New JWT and Refresh Token
-        private async Task<IActionResult> Login(AccessRequestModel model)
+        private async Task<IActionResult> Login(AccessRequestDto model)
         {
             var user = await _appUserService.GetByEmailAsync(model.Email);
 
             if (user != null && await _appUserService.CheckPasswordAsync(user.Id, model.Password))
             {
-                if (!await _appUserService.IsEmailConfirmedAsync(user))
+                if (!await _appUserService.IsEmailConfirmedAsync(user.Id))
                 {
-                    return Unauthorized(new ResponseViewModel(401, "Login failed.", "We sent you an confirmation email. Please confirm your registration."));
+                    return Unauthorized(new ResponseDto(401, "Login failed.", "We sent you an confirmation email. Please confirm your registration."));
                 }
 
                 var newRefreshToken = CreateRefreshToken(user.Id);
@@ -84,11 +86,11 @@ namespace WTP.WebAPI.Controllers
                 return Ok(new { accessToken, message = "Login successful." });
             }
 
-            return BadRequest(new ResponseViewModel(400, "Authentication failed.", "Incorrect email or password."));
+            return BadRequest(new ResponseDto(400, "Authentication failed.", "Incorrect email or password."));
         }
 
         // Create access Token
-        private async Task<AccessResponseModel> CreateAccessToken(AppUserDto user, string refreshToken)
+        private async Task<AccessResponseDto> CreateAccessToken(AppUserModel user, string refreshToken)
         {
             double tokenExpiryTime = Convert.ToDouble(_appSettings.ExpireTime);
 
@@ -121,7 +123,7 @@ namespace WTP.WebAPI.Controllers
 
             var encodedToken = tokenHandler.WriteToken(newtoken);
 
-            return new AccessResponseModel()
+            return new AccessResponseDto()
             {
                 Token = encodedToken,
                 Expiration = newtoken.ValidTo,
@@ -133,9 +135,9 @@ namespace WTP.WebAPI.Controllers
         }
 
         // Method to create new RefreshToken
-        private RefreshTokenDto CreateRefreshToken(int userId)
+        private RefreshTokenModel CreateRefreshToken(int userId)
         {
-            return new RefreshTokenDto()
+            return new RefreshTokenModel()
             {
                 Value = Guid.NewGuid().ToString("N"),
                 CreatedDate = DateTime.UtcNow,
@@ -145,7 +147,7 @@ namespace WTP.WebAPI.Controllers
         }
 
         // Method to Refresh JWT and Refresh Token
-        private async Task<IActionResult> UpdateAccessToken(AccessRequestModel model)
+        private async Task<IActionResult> UpdateAccessToken(AccessRequestDto model)
         {
             try
             {

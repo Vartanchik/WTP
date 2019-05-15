@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using WTP.DAL.DomainModels;
+using WTP.DAL.Entities;
 using WTP.DAL.Repositories.GenericRepository;
 
 namespace WTP.DAL.Repositories.ConcreteRepositories.RefreshTokenExtended

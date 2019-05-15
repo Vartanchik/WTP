@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using WTP.DAL.DomainModels;
+using WTP.DAL.Entities;
 
 namespace WTP.DAL.Repositories.ConcreteRepositories.RefreshTokenExtended
 {

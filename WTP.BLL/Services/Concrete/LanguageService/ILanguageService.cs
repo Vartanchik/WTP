@@ -1,15 +1,15 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using WTP.BLL.ModelsDto.Language;
+using WTP.BLL.Models.Language;
 
 namespace WTP.BLL.Services.Concrete.LanguageService
 {
     public interface ILanguageService
     {
-        Task CreateAsync(LanguageDto languageDto);
-        Task UpdateAsync(LanguageDto languageDto);
+        Task CreateAsync(LanguageModel languageDto);
+        Task UpdateAsync(LanguageModel languageDto);
         Task DeleteAsync(int id);
-        Task<LanguageDto> GetAsync(int id);
-        Task<IEnumerable<LanguageDto>> GetAllAsync();
+        Task<LanguageModel> GetAsync(int id);
+        Task<IEnumerable<LanguageModel>> GetAllAsync();
     }
 }
