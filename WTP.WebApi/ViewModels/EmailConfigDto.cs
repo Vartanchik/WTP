@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace WTP.WebAPI.ViewModels
 {
-    public class EmailConfigModel
+    public class EmailConfigDto
     {
         public string Email { get; set; }
 
@@ -16,7 +16,7 @@ namespace WTP.WebAPI.ViewModels
 
         public string Port { get; set; }
 
-        public EmailConfigModel(IConfiguration configuration)
+        public EmailConfigDto(IConfiguration configuration)
         {
             Email = configuration["Email:Email"];
 

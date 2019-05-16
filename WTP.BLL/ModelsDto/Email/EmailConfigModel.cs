@@ -4,7 +4,7 @@ using System.Text;
 
 namespace WTP.BLL.ModelsDto.Email
 {
-    public class EmailConfigDto
+    public class EmailConfigModel
     {
         public string Email { get; set; }
 

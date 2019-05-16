@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace WTP.WebAPI.ViewModels
 {
-    public class AzureBlobStorageConfigModel
+    public class AzureBlobStorageConfigDto
     {
         public string AccountName { get; set; }
 
@@ -16,7 +16,7 @@ namespace WTP.WebAPI.ViewModels
 
         public string BlobStorageUrl { get; set; }
 
-        public AzureBlobStorageConfigModel(IConfiguration configuration)
+        public AzureBlobStorageConfigDto(IConfiguration configuration)
         {
             AccountName = configuration["AppSettings:AccountName"];
 

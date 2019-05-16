@@ -4,7 +4,7 @@ using System.Text;
 
 namespace WTP.BLL.ModelsDto.Azure
 {
-    public class AzureBlobStorageConfigDto
+    public class AzureBlobStorageConfigModel
     {
         public string AccountName { get; set; }
 

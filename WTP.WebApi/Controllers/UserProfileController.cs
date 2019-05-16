@@ -1,7 +1,5 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using WTP.BLL.Services.Concrete.AzureBlobStorageService;
@@ -75,13 +73,13 @@ namespace WTP.WebAPI.ViewModels.Controllers
         [Authorize(Policy = "RequireLoggedIn")]
         public async Task<IActionResult> UploadPhoto([FromForm]PhotoFormDataModel formData)
         {
-            var azureBlobStorageConfigDto = _mapper.Map<AzureBlobStorageConfigDto>(new AzureBlobStorageConfigModel(_configuration));
+            var azureBlobStorageConfigModel = _mapper.Map<AzureBlobStorageConfigModel>(new AzureBlobStorageConfigDto(_configuration));
 
             var fileDataModel = new FileDataModel(formData.File.OpenReadStream(), formData.File.ContentType, formData.File.FileName);
 
             var fileDataDto = _mapper.Map<FileDataDto>(fileDataModel);
 
-            string userPhotoUrl = await _azureBlobStorageService.UploadFileAsync(fileDataDto, azureBlobStorageConfigDto);
+            string userPhotoUrl = await _azureBlobStorageService.UploadFileAsync(fileDataDto, azureBlobStorageConfigModel);
 
             int userId = this.GetCurrentUserId();
 
@@ -97,9 +95,9 @@ namespace WTP.WebAPI.ViewModels.Controllers
         {
             var requestUrl = UriHelper.GetDisplayUrl(Request);
 
-            var azureBlobStorageConfigDto = _mapper.Map<AzureBlobStorageConfigDto>(new AzureBlobStorageConfigModel(_configuration));
+            var azureBlobStorageConfigModel = _mapper.Map<AzureBlobStorageConfigModel>(new AzureBlobStorageConfigDto(_configuration));
 
-            var fileDataDto =  await _azureBlobStorageService.DownloadFileAsync(requestUrl, azureBlobStorageConfigDto);
+            var fileDataDto =  await _azureBlobStorageService.DownloadFileAsync(requestUrl, azureBlobStorageConfigModel);
 
             return File(fileDataDto.Stream, fileDataDto.Type, fileDataDto.Name);
         }

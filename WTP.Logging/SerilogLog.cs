@@ -1,5 +1,6 @@
 ﻿using Microsoft.ApplicationInsights.Extensibility;
 using Serilog;
+using Serilog.Events;
 
 namespace WTP.Logging
 {
@@ -10,7 +11,7 @@ namespace WTP.Logging
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Verbose()
                 .WriteTo.ColoredConsole()
-                .WriteTo.File(@"../WTP.Logging/logs/log.txt", rollingInterval: RollingInterval.Day)
+                .WriteTo.File(path: @"../WTP.Logging/logs/log.txt", restrictedToMinimumLevel: LogEventLevel.Information, rollingInterval: RollingInterval.Day)
                 .WriteTo.ApplicationInsights(TelemetryConfiguration.Active, TelemetryConverter.Traces)
                 .CreateLogger();
         }

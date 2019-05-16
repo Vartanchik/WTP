@@ -12,8 +12,8 @@ namespace WTP.WebAPI.Services
         {
             CreateMap<AppUserDto, AppUserDtoViewModel>();
             CreateMap<AppUserDtoViewModel, AppUserDto>();
-            CreateMap<AzureBlobStorageConfigModel, AzureBlobStorageConfigDto>();
-            CreateMap<EmailConfigModel, EmailConfigDto>();
+            CreateMap<AzureBlobStorageConfigDto, AzureBlobStorageConfigModel>();
+            CreateMap<EmailConfigDto, EmailConfigModel>();
             CreateMap<FileDataModel, FileDataDto>();
             CreateMap<FileDataDto, FileDataModel>();
         }

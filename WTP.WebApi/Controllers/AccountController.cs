@@ -177,7 +177,7 @@ namespace WTP.WebAPI.Controllers
                 "Account",
                 new { userId = userForConfirmEmail.Id, token }, protocol: HttpContext.Request.Scheme);
 
-            var emailConfigDto = _mapper.Map<EmailConfigDto>(new EmailConfigModel(_configuration));
+            var emailConfigDto = _mapper.Map<BLL.ModelsDto.Email.EmailConfigModel>(new ViewModels.EmailConfigDto(_configuration));
 
             await _emailService.SendEmailAsync(
                 email,
@@ -195,7 +195,7 @@ namespace WTP.WebAPI.Controllers
             var callbackUrl = Url.Action("ResetPassword", "Account",
                 new { userId = user.Id, code = token }, protocol: HttpContext.Request.Scheme);
 
-            var emailConfigDto = _mapper.Map<EmailConfigDto>(new EmailConfigModel(_configuration));
+            var emailConfigDto = _mapper.Map<BLL.ModelsDto.Email.EmailConfigModel>(new ViewModels.EmailConfigDto(_configuration));
 
             await _emailService.SendEmailAsync(
                 user.Email,

@@ -18,7 +18,7 @@ namespace WTP.BLL.Services.Concrete.AzureBlobStorageService
             _log = log;
         }
 
-        public async Task<string> UploadFileAsync(FileDataDto file, AzureBlobStorageConfigDto configuration)
+        public async Task<string> UploadFileAsync(FileDataDto file, AzureBlobStorageConfigModel configuration)
         {
             var cloudBlobContainer = GetCloudBlobContainer(configuration);
 
@@ -37,7 +37,7 @@ namespace WTP.BLL.Services.Concrete.AzureBlobStorageService
             return blockBlobNamge;
         }
 
-        public async Task<FileDataDto> DownloadFileAsync(string blockBlobNamge, AzureBlobStorageConfigDto configuration)
+        public async Task<FileDataDto> DownloadFileAsync(string blockBlobNamge, AzureBlobStorageConfigModel configuration)
         {
             var cloudBlobContainer = GetCloudBlobContainer(configuration);
 
@@ -52,7 +52,7 @@ namespace WTP.BLL.Services.Concrete.AzureBlobStorageService
             return new FileDataDto(memoryStream, cloudBlockBlob.Properties.ContentType, cloudBlockBlob.Metadata["Name"]);
         }
 
-        private CloudBlobContainer GetCloudBlobContainer(AzureBlobStorageConfigDto configuration)
+        private CloudBlobContainer GetCloudBlobContainer(AzureBlobStorageConfigModel configuration)
         {
             var accountName = configuration.AccountName;
 
