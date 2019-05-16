@@ -6,13 +6,13 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using WTP.Logging;
-using WTP.BLL.ModelsDto.AppUser;
+using WTP.BLL.Models.AppUser;
 using WTP.BLL.Services.Concrete.AppUserService;
 using WTP.BLL.Services.Concrete.EmailService;
 using WTP.WebAPI.Utility.Extensions;
-using WTP.WebAPI.ViewModels;
+using WTP.WebAPI.Dto;
 using AutoMapper;
-using WTP.BLL.ModelsDto.Email;
+using WTP.BLL.Models.Email;
 
 namespace WTP.WebAPI.Controllers
 {
@@ -35,14 +35,16 @@ namespace WTP.WebAPI.Controllers
         }
 
         [HttpPost("[action]")]
-        public async Task<IActionResult> Register([FromBody] RegisterViewModel formData)
+        [ProducesResponseType(typeof(ResponseDto), 200)]
+        [ProducesResponseType(typeof(ResponseDto), 400)]
+        public async Task<IActionResult> Register([FromBody] RegisterDto formData)
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(new ResponseViewModel(400, "Invalid value was entered! Please, redisplay form."));
+                return BadRequest(new ResponseDto(400, "Invalid value was entered! Please, redisplay form."));
             }
 
-            var user = new AppUserDto
+            var user = new AppUserModel
             {
                 Email = formData.Email,
                 UserName = formData.UserName,
@@ -55,7 +57,7 @@ namespace WTP.WebAPI.Controllers
             {
                 await SendEmailConfirmationAsync(formData.Email);
 
-                return Ok(new ResponseViewModel {
+                return Ok(new ResponseDto {
                     StatusCode = 200,
                     Message = "Registration is successful.",
                     Info = "To complete the registration, check the email and click on the link indicated in the letter."
@@ -64,26 +66,15 @@ namespace WTP.WebAPI.Controllers
 
             var errorInfo = result.Errors.First(err => err.Code == "DuplicateUserName" || err.Code == "DuplicateEmail");
 
-            return BadRequest(new ResponseViewModel(400, "Registration is faild.", errorInfo.Description));
+            return BadRequest(new ResponseDto(400, "Registration is faild.", errorInfo.Description));
         }
 
         [HttpGet]
         [AllowAnonymous]
+        [ProducesResponseType(302)]
         public async Task<IActionResult> ConfirmEmail(string userId, string token)
         {
-            if (userId == null || token == null)
-            {
-                return Redirect($"{_configuration["Url:BaseUrl"]}/home?confirmed=false");
-            }
-
-            var user = await _appUserService.FindByIdAsync(userId);
-
-            if (user == null)
-            {
-                return Redirect($"{_configuration["Url:BaseUrl"]}/home?confirmed=false");
-            }
-
-            var result = await _appUserService.ConfirmEmailAsync(user, token);
+            var result = await _appUserService.ConfirmEmailAsync(Convert.ToInt32(userId), token);
 
             return result.Succeeded
                 ? Redirect($"{_configuration["Url:BaseUrl"]}/home?confirmed=true")
@@ -92,21 +83,23 @@ namespace WTP.WebAPI.Controllers
 
         [HttpPost("[action]")]
         [AllowAnonymous]
-        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordViewModel formData)
+        [ProducesResponseType(typeof(ResponseDto), 200)]
+        [ProducesResponseType(typeof(ResponseDto), 400)]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto formData)
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(new ResponseViewModel(400, "Error", "Invalid value was entered! Please, redisplay form."));
+                return BadRequest(new ResponseDto(400, "Error", "Invalid value was entered! Please, redisplay form."));
             }
 
             var user = await _appUserService.GetByEmailAsync(formData.Email);
 
-            if (user != null && await _appUserService.IsEmailConfirmedAsync(user))
+            if (user != null && await _appUserService.IsEmailConfirmedAsync(user.Id))
             {
                 await SendResetPasswordEmailAsync(user);
             }
 
-            return Ok(new ResponseViewModel(200,
+            return Ok(new ResponseDto(200,
                 "Instructions are sent. Please, check Your email.",
                 "If there is no user with such email, or email is not confirmed - the letter won\'t be delivered!"
                 ));
@@ -114,6 +107,7 @@ namespace WTP.WebAPI.Controllers
 
         [HttpGet("[action]")]
         [AllowAnonymous]
+        [ProducesResponseType(302)]
         public IActionResult ResetPassword([FromQuery] string userId = null, [FromQuery] string code = null)
         {
             if(userId == null || code == null)
@@ -128,42 +122,45 @@ namespace WTP.WebAPI.Controllers
 
         [HttpPost("[action]")]
         [AllowAnonymous]
-        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordViewModel formData)
+        [ProducesResponseType(typeof(ResponseDto), 200)]
+        [ProducesResponseType(typeof(ResponseDto), 400)]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto formData)
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(new ResponseViewModel(400, "Invalid value was entered! Please, redisplay form."));
+                return BadRequest(new ResponseDto(400, "Invalid value was entered! Please, redisplay form."));
             }
 
             var token = HttpUtility.UrlDecode(formData.Code);
-
-            var user = await _appUserService.GetAsync(formData.Id);
-
-            var result = await _appUserService.ResetPasswordAsync(user, token, formData.NewPassword);
+            var result = await _appUserService.ResetPasswordAsync(new ResetPasswordModel(formData.Id,
+                                                                                       token,
+                                                                                       formData.NewPassword));
 
             return result.Succeeded
-                ? Ok(new ResponseViewModel(200, "Password reset is successful!"))
-                : (IActionResult)BadRequest(new ResponseViewModel(500, "Password reset is failed!"));
+                ? Ok(new ResponseDto(200, "Completed.", "Password reset is successful."))
+                : (IActionResult)BadRequest(new ResponseDto(400, "Password reset is failed.", "Something going wrong."));
         }
 
         [HttpPost("[action]")]
         [Authorize(Policy = "RequireLoggedIn")]
-        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordViewModel formdata)
+        [ProducesResponseType(typeof(ResponseDto), 200)]
+        [ProducesResponseType(typeof(ResponseDto), 400)]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDto formdata)
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(new ResponseViewModel(400, "Invalid value was entered! Please, redisplay form."));
+                return BadRequest(new ResponseDto(400, "Invalid value was entered! Please, redisplay form."));
             }
 
             int userId = this.GetCurrentUserId();
 
-            var result = await _appUserService.ChangePasswordAsync(new ChangePasswordDto(userId,
+            var result = await _appUserService.ChangePasswordAsync(new ChangePasswordModel(userId,
                                                                                          formdata.CurrentPassword,
                                                                                          formdata.NewPassword));
 
             return result.Succeeded 
-                ? Ok(new ResponseViewModel(200, "Password update successful."))
-                : (IActionResult)BadRequest(new ResponseViewModel(500, "Change password failed.", result.Errors.First().Description));
+                ? Ok(new ResponseDto(200, "Completed.", "Password update successful."))
+                : (IActionResult)BadRequest(new ResponseDto(500, "Change password failed.", result.Errors.First().Description));
         }
 
         private async Task SendEmailConfirmationAsync(string email)
@@ -177,7 +174,7 @@ namespace WTP.WebAPI.Controllers
                 "Account",
                 new { userId = userForConfirmEmail.Id, token }, protocol: HttpContext.Request.Scheme);
 
-            var emailConfigDto = _mapper.Map<BLL.ModelsDto.Email.EmailConfigModel>(new ViewModels.EmailConfigDto(_configuration));
+            var emailConfigDto = _mapper.Map<EmailConfigModel>(new EmailConfigDto(_configuration));
 
             await _emailService.SendEmailAsync(
                 email,
@@ -188,14 +185,15 @@ namespace WTP.WebAPI.Controllers
                 );
         }
 
-        private async Task SendResetPasswordEmailAsync(AppUserDto user)
+
+        private async Task SendResetPasswordEmailAsync(AppUserModel user)
         {
             var token = await _appUserService.GeneratePasswordResetTokenAsync(user);
 
             var callbackUrl = Url.Action("ResetPassword", "Account",
                 new { userId = user.Id, code = token }, protocol: HttpContext.Request.Scheme);
 
-            var emailConfigDto = _mapper.Map<BLL.ModelsDto.Email.EmailConfigModel>(new ViewModels.EmailConfigDto(_configuration));
+            var emailConfigDto = _mapper.Map<EmailConfigModel>(new EmailConfigDto(_configuration));
 
             await _emailService.SendEmailAsync(
                 user.Email,

@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using WTP.BLL.ModelsDto.AppUser;
-using WTP.DAL.DomainModels;
+using WTP.BLL.Models.AppUser;
+using WTP.DAL.Entities;
 using WTP.DAL.Repositories.ConcreteRepositories.AppUserExtended;
 
 namespace WTP.BLL.Services.Concrete.AppUserService
@@ -20,7 +20,7 @@ namespace WTP.BLL.Services.Concrete.AppUserService
             _appUserRepository = appUserRepository("CACHE");
         }
 
-        public async Task<IdentityResult> CreateAsync(AppUserDto appUserDto, string password)
+        public async Task<IdentityResult> CreateAsync(AppUserModel appUserDto, string password)
         {
             var appUser = _mapper.Map<AppUser>(appUserDto);
 
@@ -29,36 +29,36 @@ namespace WTP.BLL.Services.Concrete.AppUserService
             return result;
         }
 
-        public async Task<AppUserDto> GetAsync(int userId)
+        public async Task<AppUserModel> GetAsync(int userId)
         {
             var appUser = await _appUserRepository.GetAsync(userId);
 
-            var appUserDto = _mapper.Map<AppUserDto>(appUser);
+            var appUserDto = _mapper.Map<AppUserModel>(appUser);
 
             return appUserDto;
         }
 
-        public async Task<AppUserDto> GetByEmailAsync(string email)
+        public async Task<AppUserModel> GetByEmailAsync(string email)
         {
             var appUser = await _appUserRepository.GetByEmailAsync(email);
 
-            var appUserDto = _mapper.Map<AppUserDto>(appUser);
+            var appUserDto = _mapper.Map<AppUserModel>(appUser);
 
             return appUserDto;
         }
 
-        public async Task<AppUserDto> GetByNameAsync(string userName)
+        public async Task<AppUserModel> GetByNameAsync(string userName)
         {
             var appUser = await _appUserRepository.GetByNameAsync(userName);
 
-            var appUserDto = _mapper.Map<AppUserDto>(appUser);
+            var appUserDto = _mapper.Map<AppUserModel>(appUser);
 
             return appUserDto;
         }
                      
-        public async Task<IdentityResult> UpdateAsync(AppUserDto appUserDto)
+        public async Task<IdentityResult> UpdateAsync(AppUserModel appUserDto)
         {
-            if (await GetAsync(appUserDto.Id) != null)
+            if (await _appUserRepository.GetAsync(appUserDto.Id) != null)
             {
                 var appUser = _mapper.Map<AppUser>(appUserDto);
 
@@ -68,7 +68,7 @@ namespace WTP.BLL.Services.Concrete.AppUserService
             return IdentityResult.Failed();
         }
 
-        public async Task<IList<string>> GetRolesAsync(AppUserDto appUserDto)
+        public async Task<IList<string>> GetRolesAsync(AppUserModel appUserDto)
         {
             var appUser = _mapper.Map<AppUser>(appUserDto);
 
@@ -80,28 +80,30 @@ namespace WTP.BLL.Services.Concrete.AppUserService
             return await _appUserRepository.CheckPasswordAsync(userId, password);
         }
 
-        public async Task<bool> IsEmailConfirmedAsync(AppUserDto appUserDto)
+        public async Task<bool> IsEmailConfirmedAsync(int userId)
         {
-            var appUser = _mapper.Map<AppUser>(appUserDto);
-
-            return await _appUserRepository.IsEmailConfirmedAsync(appUser);
+            return await _appUserRepository.IsEmailConfirmedAsync(userId);
         }
 
-        public async Task<string> GeneratePasswordResetTokenAsync(AppUserDto appUserDto)
+        public async Task<string> GeneratePasswordResetTokenAsync(AppUserModel appUserDto)
         {
             var appUser = _mapper.Map<AppUser>(appUserDto);
 
             return await _appUserRepository.GeneratePasswordResetTokenAsync(appUser);
         }
 
-        public async Task<IdentityResult> ResetPasswordAsync(AppUserDto appUserDto, string token, string newPassword)
+        public async Task<IdentityResult> ResetPasswordAsync(ResetPasswordModel resetPasswordDto)
         {
-            var appUser = _mapper.Map<AppUser>(appUserDto);
+            var appUser = _appUserRepository.GetAsync(resetPasswordDto.Id);
 
-            return await _appUserRepository.ResetPasswordAsync(appUser, token, newPassword);
+            return appUser == null
+                ? IdentityResult.Failed()
+                : await _appUserRepository.ResetPasswordAsync(appUser.Result,
+                                                              resetPasswordDto.Token,
+                                                              resetPasswordDto.NewPassword);
         }
 
-        public async Task<IdentityResult> ChangePasswordAsync(ChangePasswordDto changePasswordDto)
+        public async Task<IdentityResult> ChangePasswordAsync(ChangePasswordModel changePasswordDto)
         {
             if (await GetAsync(changePasswordDto.UserId) == null)
             {
@@ -118,25 +120,25 @@ namespace WTP.BLL.Services.Concrete.AppUserService
                                                                 changePasswordDto.NewPassword);
         }
 
-        public async Task<string> GenerateEmailConfirmationTokenAsync(AppUserDto appUserDto)
+        public async Task<string> GenerateEmailConfirmationTokenAsync(AppUserModel appUserDto)
         {
             var appUser = _mapper.Map<AppUser>(appUserDto);
 
             return await _appUserRepository.GenerateEmailConfirmationTokenAsync(appUser);
         }
 
-        public async Task<AppUserDto> FindByIdAsync(string userId)
+        public async Task<AppUserModel> FindByIdAsync(string userId)
         {
             var appUser = await _appUserRepository.FindByIdAsync(userId);
 
-            return _mapper.Map<AppUserDto>(appUser);
+            return _mapper.Map<AppUserModel>(appUser);
         }
 
-        public async Task<IdentityResult> ConfirmEmailAsync(AppUserDto appUserDto, string token)
+        public async Task<IdentityResult> ConfirmEmailAsync(int userId, string token)
         {
-            var appUser = _mapper.Map<AppUser>(appUserDto);
-
-            return await _appUserRepository.ConfirmEmailAsync(appUser, token);
+            return _appUserRepository.GetAsync(userId) == null || token == null
+                ? IdentityResult.Failed() 
+                : await _appUserRepository.ConfirmEmailAsync(userId, token);
         }
 
         public async Task<IdentityResult> UpdatePhotoAsync(int userId, string userPhoto)

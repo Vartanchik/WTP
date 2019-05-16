@@ -23,7 +23,7 @@ using WTP.BLL.Services.Concrete.TeamService;
 using WTP.BLL.Services.Concrete.RefreshTokenService;
 using WTP.BLL.Services.Concrete.EmailService;
 using WTP.DAL;
-using WTP.DAL.DomainModels;
+using WTP.DAL.Entities;
 using WTP.DAL.Repositories.ConcreteRepositories.AppUserExtended;
 using WTP.DAL.Repositories.GenericRepository;
 using WTP.DAL.UnitOfWork;
@@ -92,8 +92,8 @@ namespace WTP.WebAPI
 
             services.AddScoped(provider => new MapperConfiguration(config =>
             {
-                config.AddProfile(new DtoMapProfile(provider.GetService<IConfiguration>()));
-                config.AddProfile(new DtoViewModelMapProfile());
+                config.AddProfile(new ModelProfile(Configuration["Photo:DefaultPhoto"]));
+                config.AddProfile(new DtoProfile());
             }).CreateMapper());
 
             //// In production, the Angular files will be served from this directory

@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using WTP.DAL.DomainModels;
+using WTP.DAL.Entities;
 using WTP.DAL.Repositories.GenericRepository;
 
 namespace WTP.DAL.Repositories.ConcreteRepositories.AppUserExtended
@@ -74,9 +74,9 @@ namespace WTP.DAL.Repositories.ConcreteRepositories.AppUserExtended
             return user;
         }
 
-        public async Task<bool> IsEmailConfirmedAsync(AppUser appUser)
+        public async Task<bool> IsEmailConfirmedAsync(int userId)
         {
-            var user = await GetAsync(appUser.Id);
+            var user = await GetAsync(userId);
 
             return await _userManager.IsEmailConfirmedAsync(user);
         }
@@ -90,16 +90,18 @@ namespace WTP.DAL.Repositories.ConcreteRepositories.AppUserExtended
         {
             var user = await GetAsync(appUser.Id);
 
-            return await _userManager.ResetPasswordAsync(user, token, newPassword);
+            return await _userManager.ResetPasswordAsync(user,
+                                                         token,
+                                                         newPassword);
         }
 
         public async Task<IdentityResult> ChangePasswordAsync(int userId, string currentPassword, string newPassword)
         {
-            AppUser user = await GetAsync(userId);
+            var user = await GetAsync(userId);
 
-            return await _userManager.ChangePasswordAsync(user: user,
-                            currentPassword: currentPassword,
-                            newPassword: newPassword);
+            return await _userManager.ChangePasswordAsync(user,
+                                                          currentPassword,
+                                                          newPassword);
         }
 
         public async Task<string> GenerateEmailConfirmationTokenAsync(AppUser appUser)
@@ -112,9 +114,9 @@ namespace WTP.DAL.Repositories.ConcreteRepositories.AppUserExtended
             return await _userManager.FindByIdAsync(userId);
         }
 
-        public async Task<IdentityResult> ConfirmEmailAsync(AppUser appUser, string token)
+        public async Task<IdentityResult> ConfirmEmailAsync(int userId, string token)
         {
-            var user = await GetAsync(appUser.Id);
+            var user = await GetAsync(userId);
 
             return await _userManager.ConfirmEmailAsync(user, token);
         }

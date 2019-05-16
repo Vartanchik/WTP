@@ -4,13 +4,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using WTP.BLL.Services.Concrete.AzureBlobStorageService;
 using WTP.BLL.Services.Concrete.AppUserService;
-using WTP.BLL.ModelsDto.AppUser;
+using WTP.BLL.Models.AppUser;
 using WTP.WebAPI.Utility.Extensions;
 using AutoMapper;
 using Microsoft.AspNetCore.Http.Extensions;
-using WTP.BLL.ModelsDto.Azure;
+using WTP.BLL.Models.Azure;
 
-namespace WTP.WebAPI.ViewModels.Controllers
+namespace WTP.WebAPI.Dto.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -35,59 +35,63 @@ namespace WTP.WebAPI.ViewModels.Controllers
             _azureBlobStorageService = azureBlobStorageService;
         }
 
-        //GET : /api/UserProfile
+        //GET : /api/UserProfile/id
         [HttpGet]
         [Authorize(Policy = "RequireLoggedIn")]
+        [ProducesResponseType(typeof(AppUserApiDto), 200)]
+        [ProducesResponseType(typeof(ResponseDto), 404)]
         public async Task<IActionResult> GetUserProfile()
         {
             int userId = this.GetCurrentUserId();
             var appUserDto = await _appUserService.GetAsync(userId);
 
-            var appUserDtoViewModel = _mapper.Map<AppUserDtoViewModel>(appUserDto);
+            var appUserDtoViewModel = _mapper.Map<AppUserApiDto>(appUserDto);
 
             return appUserDto == null
-                ? NotFound(new ResponseViewModel(404, "User not found.", "Something going wrong."))
+                ? NotFound(new ResponseDto(404, "Userprofile not found.", "Something going wrong."))
                 : (IActionResult)Ok(appUserDtoViewModel);
         }
 
         //PUT : /api/UserProfile
         [HttpPut]
         [Authorize(Policy = "RequireLoggedIn")]
-        public async Task<IActionResult> UpdateUserProfile([FromBody] AppUserDtoViewModel formData)
+        [ProducesResponseType(typeof(ResponseDto), 200)]
+        [ProducesResponseType(typeof(ResponseDto), 400)]
+        public async Task<IActionResult> UpdateUserProfile([FromBody] AppUserApiDto formData)
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(new ResponseViewModel(400, "User profile updated faild.", "Invalid value was entered! Please, redisplay form."));
+                return BadRequest(new ResponseDto(400, "User profile updated faild.", "Invalid value was entered! Please, redisplay form."));
             }
 
-            var appUserDto = _mapper.Map<AppUserDto>(formData);
+            var appUserDto = _mapper.Map<AppUserModel>(formData);
 
             var result = await _appUserService.UpdateAsync(appUserDto);
 
             return result.Succeeded
-                ? Ok(new ResponseViewModel(200, "Completed.", "User profile updated successfully."))
-                : (IActionResult)BadRequest(new ResponseViewModel(500, $"User profile updated faild.", "Something going wrong."));
+                ? Ok(new ResponseDto(200,"Completed.", "User profile updated successfully."))
+                : (IActionResult)BadRequest(new ResponseDto(500, $"User profile updated faild.", "Something going wrong."));
         }
 
         [HttpPost("[action]")]
         [Authorize(Policy = "RequireLoggedIn")]
-        public async Task<IActionResult> UploadPhoto([FromForm]PhotoFormDataModel formData)
+        public async Task<IActionResult> UploadPhoto([FromForm]PhotoFormDataDto formData)
         {
             var azureBlobStorageConfigModel = _mapper.Map<AzureBlobStorageConfigModel>(new AzureBlobStorageConfigDto(_configuration));
 
-            var fileDataModel = new FileDataModel(formData.File.OpenReadStream(), formData.File.ContentType, formData.File.FileName);
+            var fileDataDto = new FileDataDto(formData.File.OpenReadStream(), formData.File.ContentType, formData.File.FileName);
 
-            var fileDataDto = _mapper.Map<FileDataDto>(fileDataModel);
+            var fileDataModel = _mapper.Map<FileDataModel>(fileDataDto);
 
-            string userPhotoUrl = await _azureBlobStorageService.UploadFileAsync(fileDataDto, azureBlobStorageConfigModel);
+            string userPhotoUrl = await _azureBlobStorageService.UploadFileAsync(fileDataModel, azureBlobStorageConfigModel);
 
             int userId = this.GetCurrentUserId();
 
             var result = await _appUserService.UpdatePhotoAsync(userId, userPhotoUrl);
 
             return (userPhotoUrl != null && result.Succeeded)
-                ? Ok(new ResponseViewModel(200, "Photo was updated.", userPhotoUrl))
-                : (IActionResult)BadRequest(new ResponseViewModel(400, "Photo updated failed."));
+                ? Ok(new ResponseDto(200, "Photo was updated.", userPhotoUrl))
+                : (IActionResult)BadRequest(new ResponseDto(400, "Photo updated failed."));
         }
 
         [HttpGet("[action]/{imageId:minlength(1)}")]
@@ -97,9 +101,9 @@ namespace WTP.WebAPI.ViewModels.Controllers
 
             var azureBlobStorageConfigModel = _mapper.Map<AzureBlobStorageConfigModel>(new AzureBlobStorageConfigDto(_configuration));
 
-            var fileDataDto =  await _azureBlobStorageService.DownloadFileAsync(requestUrl, azureBlobStorageConfigModel);
+            var fileDataModel =  await _azureBlobStorageService.DownloadFileAsync(requestUrl, azureBlobStorageConfigModel);
 
-            return File(fileDataDto.Stream, fileDataDto.Type, fileDataDto.Name);
+            return File(fileDataModel.Stream, fileDataModel.Type, fileDataModel.Name);
         }
     }
 }

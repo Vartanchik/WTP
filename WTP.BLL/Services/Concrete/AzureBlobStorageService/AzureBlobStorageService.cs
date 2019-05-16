@@ -4,7 +4,7 @@ using Microsoft.WindowsAzure.Storage.Blob;
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using WTP.BLL.ModelsDto.Azure;
+using WTP.BLL.Models.Azure;
 using WTP.Logging;
 
 namespace WTP.BLL.Services.Concrete.AzureBlobStorageService
@@ -18,7 +18,7 @@ namespace WTP.BLL.Services.Concrete.AzureBlobStorageService
             _log = log;
         }
 
-        public async Task<string> UploadFileAsync(FileDataDto file, AzureBlobStorageConfigModel configuration)
+        public async Task<string> UploadFileAsync(FileDataModel file, AzureBlobStorageConfigModel configuration)
         {
             var cloudBlobContainer = GetCloudBlobContainer(configuration);
 
@@ -37,7 +37,7 @@ namespace WTP.BLL.Services.Concrete.AzureBlobStorageService
             return blockBlobNamge;
         }
 
-        public async Task<FileDataDto> DownloadFileAsync(string blockBlobNamge, AzureBlobStorageConfigModel configuration)
+        public async Task<FileDataModel> DownloadFileAsync(string blockBlobNamge, AzureBlobStorageConfigModel configuration)
         {
             var cloudBlobContainer = GetCloudBlobContainer(configuration);
 
@@ -49,7 +49,7 @@ namespace WTP.BLL.Services.Concrete.AzureBlobStorageService
 
             memoryStream.Seek(0, SeekOrigin.Begin);
 
-            return new FileDataDto(memoryStream, cloudBlockBlob.Properties.ContentType, cloudBlockBlob.Metadata["Name"]);
+            return new FileDataModel(memoryStream, cloudBlockBlob.Properties.ContentType, cloudBlockBlob.Metadata["Name"]);
         }
 
         private CloudBlobContainer GetCloudBlobContainer(AzureBlobStorageConfigModel configuration)

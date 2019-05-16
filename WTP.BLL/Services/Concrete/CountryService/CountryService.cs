@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using WTP.BLL.ModelsDto.Country;
-using WTP.DAL.DomainModels;
+using WTP.BLL.Models.Country;
+using WTP.DAL.Entities;
 using WTP.DAL.UnitOfWork;
 
 namespace WTP.BLL.Services.Concrete.CountryService
@@ -18,14 +18,14 @@ namespace WTP.BLL.Services.Concrete.CountryService
             _mapper = mapper;
         }
 
-        public async Task CreateAsync(CountryDto countryDto)
+        public async Task CreateAsync(CountryModel countryDto)
         {
             var country = _mapper.Map<Country>(countryDto);
 
             await _uow.Countries.CreateAsync(country);
         }
 
-        public async Task UpdateAsync(CountryDto countryDto)
+        public async Task UpdateAsync(CountryModel countryDto)
         {
             var country = _mapper.Map<Country>(countryDto);
 
@@ -37,18 +37,18 @@ namespace WTP.BLL.Services.Concrete.CountryService
             await _uow.Countries.DeleteAsync(id);
         }
 
-        public async Task<CountryDto> GetAsync(int id)
+        public async Task<CountryModel> GetAsync(int id)
         {
             var country = await _uow.Countries.GetAsync(id);
 
-            return _mapper.Map<CountryDto>(country);
+            return _mapper.Map<CountryModel>(country);
         }
 
-        public async Task<IEnumerable<CountryDto>> GetAllAsync()
+        public async Task<IEnumerable<CountryModel>> GetAllAsync()
         {
             var countries = await _uow.Countries.GetAllAsync();
 
-            return _mapper.Map<IEnumerable<CountryDto>>(countries);
+            return _mapper.Map<IEnumerable<CountryModel>>(countries);
         }
     }
 }

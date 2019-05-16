@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using WTP.DAL.DomainModels;
+using WTP.DAL.Entities;
 
 namespace WTP.DAL
 {

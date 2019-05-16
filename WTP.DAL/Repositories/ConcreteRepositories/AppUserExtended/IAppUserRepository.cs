@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using WTP.DAL.DomainModels;
+using WTP.DAL.Entities;
 
 namespace WTP.DAL.Repositories.ConcreteRepositories.AppUserExtended
 {
@@ -14,12 +14,12 @@ namespace WTP.DAL.Repositories.ConcreteRepositories.AppUserExtended
         Task<IList<string>> GetRolesAsync(AppUser appUser);
         Task<bool> CheckPasswordAsync(int userId, string password);
         Task<AppUser> GetAsync(int appUserId);
-        Task<bool> IsEmailConfirmedAsync(AppUser appUser);
+        Task<bool> IsEmailConfirmedAsync(int userId);
         Task<string> GeneratePasswordResetTokenAsync(AppUser appUser);
         Task<IdentityResult> ResetPasswordAsync(AppUser appUser, string token, string newPassword);
         Task<IdentityResult> ChangePasswordAsync(int userId, string currentPassword, string newPassword);
         Task<string> GenerateEmailConfirmationTokenAsync(AppUser appUser);
         Task<AppUser> FindByIdAsync(string userId);
-        Task<IdentityResult> ConfirmEmailAsync(AppUser appUser, string token);
+        Task<IdentityResult> ConfirmEmailAsync(int userId, string token);
     }
 }
