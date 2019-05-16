@@ -23,11 +23,44 @@ namespace WTP.DAL
         {
             base.OnModelCreating(builder);
 
+            builder.Entity<AppUser>()
+                .Property(p => p.Enabled)
+                    .HasDefaultValue(true)
+                    .ValueGeneratedNever();
+
             builder.Entity<IdentityRole<int>>().HasData(
                     new { Id = 1, Name = "Admin", NormalizedName = "ADMIN" },
                     new { Id = 2, Name = "User", NormalizedName = "USER" },
                     new { Id = 3, Name = "Moderator", NormalizedName = "MODERATOR" }
             );
+
+            builder.Entity<Gender>().HasData(
+                    new Gender { Id = 1, Name = "Male" },
+                    new Gender { Id = 2, Name = "Female"}
+                );
+
+            builder.Entity<Country>().HasData(
+                    new Country { Id = 1, Name = "Ukraine" },
+                    new Country { Id = 2, Name = "Spanish" },
+                    new Country { Id = 3, Name = "USA" },
+                    new Country { Id = 4, Name = "Brazil" },
+                    new Country { Id = 5, Name = "German" }
+                );
+
+            builder.Entity<Language>().HasData(
+                    new Language { Id = 1, Name = "English" },
+                    new Language { Id = 2, Name = "German" },
+                    new Language { Id = 3, Name = "Russian" },
+                    new Language { Id = 4, Name = "Spanish" },
+                    new Language { Id = 5, Name = "Ukrainian" },
+                    new Language { Id = 6, Name = "Japanese" },
+                    new Language { Id = 7, Name = "Korean" },
+                    new Language { Id = 8, Name = "French" },
+                    new Language { Id = 9, Name = "Italian" },
+                    new Language { Id = 10, Name = "Czech" },
+                    new Language { Id = 11, Name = "Swedish" },
+                    new Language { Id = 12, Name = "Greek" }
+                );
 
             builder.Entity<AppUserLanguage>()
                 .HasKey(_ => new { _.AppUserId, _.LanguageId });

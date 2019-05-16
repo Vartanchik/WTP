@@ -24,5 +24,6 @@ namespace WTP.BLL.Models.AppUser
         public List<TeamModel> Teams { get; set; }
         public string SecurityStamp { get; set; }
         public virtual List<RefreshTokenModel> Tokens { get; set; }
+        public bool Enabled { get; set; }
     }
 }

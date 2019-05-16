@@ -10,14 +10,14 @@ using WTP.DAL;
 namespace WTP.DAL.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20190507144022_InitailCreate")]
-    partial class InitailCreate
+    [Migration("20190516131952_WithDefaultData")]
+    partial class WithDefaultData
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.2.4-servicing-10062")
+                .HasAnnotation("ProductVersion", "2.2.3-servicing-35854")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -149,7 +149,7 @@ namespace WTP.DAL.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
-            modelBuilder.Entity("WTP.DAL.DomainModels.AppUser", b =>
+            modelBuilder.Entity("WTP.DAL.Entities.AppUser", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -168,6 +168,9 @@ namespace WTP.DAL.Migrations
                         .HasMaxLength(256);
 
                     b.Property<bool>("EmailConfirmed");
+
+                    b.Property<bool>("Enabled")
+                        .HasDefaultValue(true);
 
                     b.Property<int?>("GenderId");
 
@@ -215,7 +218,7 @@ namespace WTP.DAL.Migrations
                     b.ToTable("AspNetUsers");
                 });
 
-            modelBuilder.Entity("WTP.DAL.DomainModels.AppUserLanguage", b =>
+            modelBuilder.Entity("WTP.DAL.Entities.AppUserLanguage", b =>
                 {
                     b.Property<int?>("AppUserId");
 
@@ -228,7 +231,7 @@ namespace WTP.DAL.Migrations
                     b.ToTable("AppUserLanguage");
                 });
 
-            modelBuilder.Entity("WTP.DAL.DomainModels.Country", b =>
+            modelBuilder.Entity("WTP.DAL.Entities.Country", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -239,9 +242,49 @@ namespace WTP.DAL.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Countries");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Ukraine"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Spanish"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "USA"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Name = "Brazil"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Name = "German"
+                        });
                 });
 
-            modelBuilder.Entity("WTP.DAL.DomainModels.Gender", b =>
+            modelBuilder.Entity("WTP.DAL.Entities.Game", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Name");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Game");
+                });
+
+            modelBuilder.Entity("WTP.DAL.Entities.Gender", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -252,9 +295,34 @@ namespace WTP.DAL.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Genders");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Male"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Female"
+                        });
                 });
 
-            modelBuilder.Entity("WTP.DAL.DomainModels.Language", b =>
+            modelBuilder.Entity("WTP.DAL.Entities.Goal", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Name");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Goal");
+                });
+
+            modelBuilder.Entity("WTP.DAL.Entities.Language", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -265,26 +333,106 @@ namespace WTP.DAL.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Languages");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "English"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "German"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "Russian"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Name = "Spanish"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Name = "Ukrainian"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Name = "Japanese"
+                        },
+                        new
+                        {
+                            Id = 7,
+                            Name = "Korean"
+                        },
+                        new
+                        {
+                            Id = 8,
+                            Name = "French"
+                        },
+                        new
+                        {
+                            Id = 9,
+                            Name = "Italian"
+                        },
+                        new
+                        {
+                            Id = 10,
+                            Name = "Czech"
+                        },
+                        new
+                        {
+                            Id = 11,
+                            Name = "Swedish"
+                        },
+                        new
+                        {
+                            Id = 12,
+                            Name = "Greek"
+                        });
                 });
 
-            modelBuilder.Entity("WTP.DAL.DomainModels.Player", b =>
+            modelBuilder.Entity("WTP.DAL.Entities.Player", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int?>("AppUserId");
+                    b.Property<string>("About");
+
+                    b.Property<int>("AppUserId");
+
+                    b.Property<int>("Decency");
+
+                    b.Property<int>("GameId");
+
+                    b.Property<int>("GoalId");
 
                     b.Property<string>("Name");
+
+                    b.Property<int>("Rank");
+
+                    b.Property<int>("ServerId");
 
                     b.HasKey("Id");
 
                     b.HasIndex("AppUserId");
 
+                    b.HasIndex("GameId");
+
+                    b.HasIndex("GoalId");
+
+                    b.HasIndex("ServerId");
+
                     b.ToTable("Players");
                 });
 
-            modelBuilder.Entity("WTP.DAL.DomainModels.RefreshToken", b =>
+            modelBuilder.Entity("WTP.DAL.Entities.RefreshToken", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -306,7 +454,20 @@ namespace WTP.DAL.Migrations
                     b.ToTable("RefreshTokens");
                 });
 
-            modelBuilder.Entity("WTP.DAL.DomainModels.Team", b =>
+            modelBuilder.Entity("WTP.DAL.Entities.Server", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Name");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Server");
+                });
+
+            modelBuilder.Entity("WTP.DAL.Entities.Team", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -333,7 +494,7 @@ namespace WTP.DAL.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<int>", b =>
                 {
-                    b.HasOne("WTP.DAL.DomainModels.AppUser")
+                    b.HasOne("WTP.DAL.Entities.AppUser")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -341,7 +502,7 @@ namespace WTP.DAL.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<int>", b =>
                 {
-                    b.HasOne("WTP.DAL.DomainModels.AppUser")
+                    b.HasOne("WTP.DAL.Entities.AppUser")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -354,7 +515,7 @@ namespace WTP.DAL.Migrations
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("WTP.DAL.DomainModels.AppUser")
+                    b.HasOne("WTP.DAL.Entities.AppUser")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -362,54 +523,70 @@ namespace WTP.DAL.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<int>", b =>
                 {
-                    b.HasOne("WTP.DAL.DomainModels.AppUser")
+                    b.HasOne("WTP.DAL.Entities.AppUser")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("WTP.DAL.DomainModels.AppUser", b =>
+            modelBuilder.Entity("WTP.DAL.Entities.AppUser", b =>
                 {
-                    b.HasOne("WTP.DAL.DomainModels.Country", "Country")
+                    b.HasOne("WTP.DAL.Entities.Country", "Country")
                         .WithMany()
                         .HasForeignKey("CountryId");
 
-                    b.HasOne("WTP.DAL.DomainModels.Gender", "Gender")
+                    b.HasOne("WTP.DAL.Entities.Gender", "Gender")
                         .WithMany()
                         .HasForeignKey("GenderId");
                 });
 
-            modelBuilder.Entity("WTP.DAL.DomainModels.AppUserLanguage", b =>
+            modelBuilder.Entity("WTP.DAL.Entities.AppUserLanguage", b =>
                 {
-                    b.HasOne("WTP.DAL.DomainModels.AppUser", "AppUser")
+                    b.HasOne("WTP.DAL.Entities.AppUser", "AppUser")
                         .WithMany("AppUserLanguages")
                         .HasForeignKey("AppUserId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("WTP.DAL.DomainModels.Language", "Language")
+                    b.HasOne("WTP.DAL.Entities.Language", "Language")
                         .WithMany("AppUserLanguages")
                         .HasForeignKey("LanguageId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("WTP.DAL.DomainModels.Player", b =>
+            modelBuilder.Entity("WTP.DAL.Entities.Player", b =>
                 {
-                    b.HasOne("WTP.DAL.DomainModels.AppUser")
+                    b.HasOne("WTP.DAL.Entities.AppUser", "AppUser")
                         .WithMany("Players")
-                        .HasForeignKey("AppUserId");
+                        .HasForeignKey("AppUserId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("WTP.DAL.Entities.Game", "Game")
+                        .WithMany()
+                        .HasForeignKey("GameId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("WTP.DAL.Entities.Goal", "Goal")
+                        .WithMany()
+                        .HasForeignKey("GoalId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("WTP.DAL.Entities.Server", "Server")
+                        .WithMany()
+                        .HasForeignKey("ServerId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("WTP.DAL.DomainModels.RefreshToken", b =>
+            modelBuilder.Entity("WTP.DAL.Entities.RefreshToken", b =>
                 {
-                    b.HasOne("WTP.DAL.DomainModels.AppUser", "AppUser")
+                    b.HasOne("WTP.DAL.Entities.AppUser", "AppUser")
                         .WithMany("Tokens")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("WTP.DAL.DomainModels.Team", b =>
+            modelBuilder.Entity("WTP.DAL.Entities.Team", b =>
                 {
-                    b.HasOne("WTP.DAL.DomainModels.AppUser")
+                    b.HasOne("WTP.DAL.Entities.AppUser")
                         .WithMany("Teams")
                         .HasForeignKey("AppUserId");
                 });
