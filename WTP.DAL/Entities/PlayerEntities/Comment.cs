@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace WTP.DAL.Entities
+namespace WTP.DAL.Entities.PlayerEntities
 {
-    public class Comment
+    public class Comment : IEntity
     {
         public int Id { get; set; }
         public DateTime? Date { get; set; }

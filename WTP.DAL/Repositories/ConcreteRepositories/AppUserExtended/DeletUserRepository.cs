@@ -3,9 +3,9 @@ using WTP.DAL.Repositories.GenericRepository;
 
 namespace WTP.DAL.Repositories.ConcreteRepositories.AppUserExtended
 {
-    internal class AppUserRepository : RepositoryBase<AppUser>, IAppUserRepository
+    internal class DeletUserRepository : RepositoryBase<DeletedUser>, IRepository<DeletedUser>
     {
-        public AppUserRepository(ApplicationDbContext context)
+        public DeletUserRepository(ApplicationDbContext context)
             : base(context)
         {
         }

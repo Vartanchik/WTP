@@ -1,4 +1,4 @@
-﻿namespace WTP.DAL.Entities
+﻿namespace WTP.DAL.Entities.AppUserEntities
 {
     public class AppUserLanguage
     {

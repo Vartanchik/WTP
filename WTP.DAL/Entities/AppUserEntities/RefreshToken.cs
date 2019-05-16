@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Text;
 
-namespace WTP.DAL.Entities
+namespace WTP.DAL.Entities.AppUserEntities
 {
     public class RefreshToken : IEntity
     {

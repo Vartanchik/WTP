@@ -1,15 +1,17 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace WTP.DAL.Repositories.GenericRepository
 {
     public interface IRepository<TEntity> where TEntity : class, IEntity
     {
+        Task<TEntity> FindByIdAsync(int id);
+        IQueryable<TEntity> FindAllAsync();
+        IQueryable<TEntity> FindByConditionAsync(Expression<Func<TEntity, bool>> expression);
         Task CreateAsync(TEntity entity);
-        Task UpdateAsync(TEntity entity);
-        Task DeleteAsync(int id);
-        Task<TEntity> GetAsync(int id);
-        Task<IEnumerable<TEntity>> GetAllAsync();      
+        void UpdateAsync(TEntity entity);
+        void DeleteAsync(TEntity entity);
     }
 }

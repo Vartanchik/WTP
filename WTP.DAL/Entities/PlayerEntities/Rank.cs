@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace WTP.DAL.Entities
+﻿namespace WTP.DAL.Entities.PlayerEntities
 {
-    public class Rank
+    public class Rank : IEntity
     {
         public int Id { get; set; }
         public int GameId { get; set; }

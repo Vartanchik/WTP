@@ -36,7 +36,7 @@ namespace WTP.BLL.Services.Concrete.GenderService
         }
         public async Task<GenderModel> GetAsync(int id)
         {
-            var gender = await _uow.Genders.GetAsync(id);
+            var gender = await _uow.Genders.GetByIdAsync(id);
 
             return _mapper.Map<GenderModel>(gender);
         }

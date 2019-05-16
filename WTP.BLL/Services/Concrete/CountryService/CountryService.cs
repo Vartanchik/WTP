@@ -39,7 +39,7 @@ namespace WTP.BLL.Services.Concrete.CountryService
 
         public async Task<CountryModel> GetAsync(int id)
         {
-            var country = await _uow.Countries.GetAsync(id);
+            var country = await _uow.Countries.GetByIdAsync(id);
 
             return _mapper.Map<CountryModel>(country);
         }

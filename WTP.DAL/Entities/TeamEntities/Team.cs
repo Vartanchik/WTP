@@ -1,4 +1,4 @@
-﻿namespace WTP.DAL.Entities
+﻿namespace WTP.DAL.Entities.TeamEntities
 {
     public class Team : IEntity
     {

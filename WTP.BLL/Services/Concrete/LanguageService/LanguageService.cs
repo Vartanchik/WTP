@@ -39,7 +39,7 @@ namespace WTP.BLL.Services.Concrete.LanguageService
 
         public async Task<LanguageModel> GetAsync(int id)
         {
-            var language = await _uow.Languages.GetAsync(id);
+            var language = await _uow.Languages.GetByIdAsync(id);
 
             return _mapper.Map<LanguageModel>(language);
         }

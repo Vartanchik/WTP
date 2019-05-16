@@ -1,13 +1,16 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using WTP.DAL.Entities;
+using WTP.DAL.Entities.AppUserEntities;
+using WTP.DAL.Entities.PlayerEntities;
+using WTP.DAL.Entities.TeamEntities;
 
 namespace WTP.DAL
 {
     public class ApplicationDbContext : IdentityDbContext<AppUser, IdentityRole<int>, int>
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+            : base(options)
         {
         }
 
@@ -23,10 +26,26 @@ namespace WTP.DAL
         {
             base.OnModelCreating(builder);
 
+            SetStartData(builder);
+
+            builder.Entity<AppUserLanguage>()
+                .HasKey(_ => new { _.AppUserId, _.LanguageId });
+            builder.Entity<AppUserLanguage>()
+                .HasOne(_ => _.AppUser)
+                .WithMany(_ => _.AppUserLanguages)
+                .HasForeignKey(_ => _.AppUserId);
+            builder.Entity<AppUserLanguage>()
+                .HasOne(_ => _.Language)
+                .WithMany(_ => _.AppUserLanguages)
+                .HasForeignKey(_ => _.LanguageId);
+        }
+
+        private void SetStartData(ModelBuilder builder)
+        {
             builder.Entity<AppUser>()
-                .Property(p => p.Enabled)
-                    .HasDefaultValue(true)
-                    .ValueGeneratedNever();
+               .Property(p => p.Enabled)
+                   .HasDefaultValue(true)
+                   .ValueGeneratedNever();
 
             builder.Entity<IdentityRole<int>>().HasData(
                     new { Id = 1, Name = "Admin", NormalizedName = "ADMIN" },
@@ -36,7 +55,7 @@ namespace WTP.DAL
 
             builder.Entity<Gender>().HasData(
                     new Gender { Id = 1, Name = "Male" },
-                    new Gender { Id = 2, Name = "Female"}
+                    new Gender { Id = 2, Name = "Female" }
                 );
 
             builder.Entity<Country>().HasData(
@@ -61,17 +80,6 @@ namespace WTP.DAL
                     new Language { Id = 11, Name = "Swedish" },
                     new Language { Id = 12, Name = "Greek" }
                 );
-
-            builder.Entity<AppUserLanguage>()
-                .HasKey(_ => new { _.AppUserId, _.LanguageId });
-            builder.Entity<AppUserLanguage>()
-                .HasOne(_ => _.AppUser)
-                .WithMany(_ => _.AppUserLanguages)
-                .HasForeignKey(_ => _.AppUserId);
-            builder.Entity<AppUserLanguage>()
-                .HasOne(_ => _.Language)
-                .WithMany(_ => _.AppUserLanguages)
-                .HasForeignKey(_ => _.LanguageId);
         }
     }
 }

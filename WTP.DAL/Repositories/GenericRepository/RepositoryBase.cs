@@ -1,55 +1,55 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
+using System;
+using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace WTP.DAL.Repositories.GenericRepository
 {
-    public class RepositoryBase<TEntity> : IRepository<TEntity> where TEntity : class , IEntity
+    public class RepositoryBase<TEntity> : IRepository<TEntity> where TEntity : class, IEntity
     {
         private readonly ApplicationDbContext _context;
-        private readonly DbSet<TEntity> _dbset;
+        private readonly DbSet<TEntity> _dbSet;
 
         public RepositoryBase(ApplicationDbContext context)
         {
             _context = context;
-            _dbset = context.Set<TEntity>();
+            _dbSet = _context.Set<TEntity>();
         }
 
-        public virtual async Task CreateAsync(TEntity item)
+        public async Task CreateAsync(TEntity entity)
         {
-            await _dbset.AddAsync(item);
-
-            await _context.SaveChangesAsync();
+            await _dbSet.AddAsync(entity);
         }
 
-        public virtual async Task UpdateAsync(TEntity item)
+        public void DeleteAsync(TEntity entity)
         {
-            _dbset.Update(item);
-
-            await _context.SaveChangesAsync();
-        }
-
-        public virtual async Task DeleteAsync(int id)
-        {
-            var entity = await GetAsync(id);
-
-            if(entity != null)
+            if (_context.Entry(entity).State == EntityState.Detached)
             {
-                _context.Entry(entity).State = EntityState.Deleted;
-
-                await _context.SaveChangesAsync();
+                _dbSet.Attach(entity);
             }
+            _dbSet.Remove(entity);
         }
 
-        public virtual async Task<TEntity> GetAsync(int id)
+        public IQueryable<TEntity> FindAllAsync()
         {
-            return await _dbset.FindAsync(id);
+            return _dbSet.AsQueryable();
         }
 
-        public virtual async Task<IEnumerable<TEntity>> GetAllAsync()
+        public IQueryable<TEntity> FindByConditionAsync(Expression<Func<TEntity, bool>> expression)
         {
-            //return _dbset;
-            return await _dbset.ToListAsync();
+            return _dbSet.Where(expression).AsNoTracking();
+        }
+
+        public async Task<TEntity> FindByIdAsync(int id)
+        {
+            return await _dbSet.FindAsync(id);
+        }
+
+        public void UpdateAsync(TEntity entity)
+        {
+            _dbSet.Attach(entity);
+            _context.Entry(entity).State = EntityState.Modified;
         }
     }
 }

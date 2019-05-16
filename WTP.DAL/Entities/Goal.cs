@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace WTP.DAL.Entities
+﻿namespace WTP.DAL.Entities
 {
-    public class Goal
+    public class Goal : IEntity
     {
         public int Id { get; set; }
         public string Name { get; set; }

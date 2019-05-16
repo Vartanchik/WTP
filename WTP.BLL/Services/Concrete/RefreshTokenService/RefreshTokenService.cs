@@ -37,7 +37,7 @@ namespace WTP.BLL.Services.Concrete.RefreshTokenService
 
         public async Task<RefreshTokenModel> GetAsync(int id)
         {
-            var token = await _refreshToken.GetAsync(id);
+            var token = await _refreshToken.GetByIdAsync(id);
 
             return _mapper.Map<RefreshTokenModel>(token);
         }
