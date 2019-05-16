@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WTP.BLL.ModelsDto.History;
+using WTP.BLL.Shared.HistoryState;
 using WTP.DAL.DomainModels;
 using WTP.DAL.UnitOfWork;
 
@@ -26,27 +28,92 @@ namespace WTP.BLL.Services.Concrete.HistoryService
 
             await _uow.Histories.CreateAsync(record);
         }
+
         public async Task UpdateAsync(HistoryDto genderDto)
         {
             var record = _mapper.Map<History>(genderDto);
 
             await _uow.Histories.UpdateAsync(record);
         }
+
         public async Task DeleteAsync(int id)
         {
             await _uow.Histories.DeleteAsync(id);
         }
+
         public async Task<HistoryDto> GetAsync(int id)
         {
             var record = await _uow.Histories.GetAsync(id);
 
             return _mapper.Map<HistoryDto>(record);
         }
+
         public async Task<IEnumerable<HistoryDto>> GetAllAsync()
         {
             var records = await _uow.Histories.GetAllAsync();
 
             return _mapper.Map<IEnumerable<HistoryDto>>(records);
+        }
+
+        public List<HistoryDto> Filter(List<HistoryDto> histories, string name)
+        {
+            if (histories == null)
+                return null;
+
+            if (!String.IsNullOrEmpty(name))
+            {
+                histories = histories.Where(p => p.NewUserName.Contains(name)).ToList();
+            }
+
+            return histories;
+        }
+
+        public List<HistoryDto> Sort(List<HistoryDto> histories, HistorySortState sortOrder)
+        {
+            if (histories == null)
+                return null;
+
+            switch (sortOrder)
+            {
+                case HistorySortState.NameDesc:
+                    histories = histories.OrderByDescending(s => s.NewUserName).ToList();
+                    break;
+                case HistorySortState.EmailAsc:
+                    histories = histories.OrderBy(s => s.NewUserEmail).ToList();
+                    break;
+                case HistorySortState.EmailDesc:
+                    histories = histories.OrderByDescending(s => s.NewUserEmail).ToList();
+                    break;
+                case HistorySortState.IdAsc:
+                    histories = histories.OrderBy(s => s.Id).ToList();
+                    break;
+                case HistorySortState.IdDesc:
+                    histories = histories.OrderByDescending(s => s.Id).ToList();
+                    break;
+                case HistorySortState.UserIdAsc:
+                    histories = histories.OrderBy(s => s.AppUserId).ToList();
+                    break;
+                case HistorySortState.UserIdDesc:
+                    histories = histories.OrderByDescending(s => s.AppUserId).ToList();
+                    break;
+                case HistorySortState.AdminIdAsc:
+                    histories = histories.OrderBy(s => s.AdminId).ToList();
+                    break;
+                case HistorySortState.AdminIdDesc:
+                    histories = histories.OrderByDescending(s => s.AdminId).ToList();
+                    break;
+                case HistorySortState.DateAsc:
+                    histories = histories.OrderBy(s => s.DateOfOperation).ToList();
+                    break;
+                case HistorySortState.NameAsc:
+                    histories = histories.OrderBy(s => s.NewUserName).ToList();
+                    break;
+                default:
+                    histories = histories.OrderByDescending(s => s.DateOfOperation).ToList();
+                    break;
+            }
+
+            return histories;
         }
     }
 }

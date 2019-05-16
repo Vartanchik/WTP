@@ -9,7 +9,7 @@ namespace WTP.WebAPI.ViewModels
     public class UserIndexViewModel
     {
         public IEnumerable<AppUserDto> Users { get; set; } // List of users at current page
-        public UserPageViewModel PageViewModel { get; set; } // data about paging
+        public PageViewModel PageViewModel { get; set; } // data about paging
         public UserFilterViewModel FilterViewModel { get; set; } // data about filters
         public UserSortViewModel SortViewModel { get; set; } // data about sorting
     }

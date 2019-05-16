@@ -2,20 +2,21 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using WTP.BLL.Shared.SortState;
 
 namespace WTP.WebAPI.ViewModels
 {
-    public enum SortState
-    {
-        NameAsc,    // by Name Ascending
-        NameDesc,   // by Name Descending
-        EmailAsc,   // by Email Ascending
-        EmailDesc,  // by Email Descending
-        IdAsc,      // by Id Ascending
-        IdDesc      // by Id Descending
-        //UserAsc, // 
-        //UserDesc // 
-    }
+    //public enum SortState
+    //{
+    //    NameAsc,    // by Name Ascending
+    //    NameDesc,   // by Name Descending
+    //    EmailAsc,   // by Email Ascending
+    //    EmailDesc,  // by Email Descending
+    //    IdAsc,      // by Id Ascending
+    //    IdDesc      // by Id Descending
+    //    //UserAsc, // 
+    //    //UserDesc // 
+    //}
 
     public class UserSortViewModel
     {

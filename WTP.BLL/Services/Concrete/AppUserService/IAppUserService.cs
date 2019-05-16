@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using WTP.BLL.ModelsDto.AppUser;
+using WTP.BLL.Shared.SortState;
 
 namespace WTP.BLL.Services.Concrete.AppUserService
 {
@@ -27,5 +28,8 @@ namespace WTP.BLL.Services.Concrete.AppUserService
         Task<IList<AppUserDto>> GetAllUsersAsync();
         Task<bool> LockAsync(int id, int? days,int adminId = 1);
         Task<bool> UnLockAsync(int id,int adminId=1);
+
+        List<AppUserDto> Filter(List<AppUserDto> users, string name);
+        List<AppUserDto> Sort(List<AppUserDto> users, SortState sortOrder, bool enableDeleted, bool enableLocked);
     }
 }

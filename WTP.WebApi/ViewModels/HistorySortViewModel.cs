@@ -2,24 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using WTP.BLL.Shared.HistoryState;
 
 namespace WTP.WebAPI.ViewModels
 {
-    public enum HistorySortState
-    {
-        NameAsc,    // by Name Ascending
-        NameDesc,   // by Name Descending
-        EmailAsc,   // by Email Ascending
-        EmailDesc,  // by Email Descending
-        IdAsc,      // by Id Ascending
-        IdDesc,     // by Id Descending
-        UserIdAsc,
-        UserIdDesc,
-        AdminIdAsc,
-        AdminIdDesc,
-        DateAsc,
-        DateDesc
-    }
 
     public class HistorySortViewModel
     {

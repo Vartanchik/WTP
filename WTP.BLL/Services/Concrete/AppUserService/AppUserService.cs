@@ -2,12 +2,14 @@
 using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using WTP.BLL.ModelsDto.AppUser;
 using WTP.BLL.ModelsDto.AppUserLanguage;
 using WTP.BLL.ModelsDto.History;
 using WTP.BLL.Services.Concrete.HistoryService;
 using WTP.BLL.Services.Concrete.LanguageService;
+using WTP.BLL.Shared.SortState;
 using WTP.DAL.DomainModels;
 using WTP.DAL.Repositories.ConcreteRepositories.AppUserExtended;
 
@@ -336,6 +338,56 @@ namespace WTP.BLL.Services.Concrete.AppUserService
 
             await _historyService.CreateAsync(history);
             return await _appUserRepository.UnLockAsync(id);
+        }
+
+        public List<AppUserDto> Filter(List<AppUserDto> users, string name)
+        {
+            if (users == null)
+                return null;
+            //return null;
+
+            if (!String.IsNullOrEmpty(name))
+            {
+                users = users.Where(p => p.UserName.Contains(name)).ToList();
+            }
+
+            return users;
+        }
+
+        public List<AppUserDto> Sort(List<AppUserDto> users, SortState sortOrder, bool enableDeleted, bool enableLocked)
+        {
+            if (users == null)
+                return null;
+
+            switch (sortOrder)
+            {
+                case SortState.NameDesc:
+                    users = users.OrderByDescending(s => s.UserName).ToList();
+                    break;
+                case SortState.EmailAsc:
+                    users = users.OrderBy(s => s.Email).ToList();
+                    break;
+                case SortState.EmailDesc:
+                    users = users.OrderByDescending(s => s.Email).ToList();
+                    break;
+                case SortState.IdAsc:
+                    users = users.OrderBy(s => s.Id).ToList();
+                    break;
+                case SortState.IdDesc:
+                    users = users.OrderByDescending(s => s.Id).ToList();
+                    break;
+                default:
+                    users = users.OrderBy(s => s.UserName).ToList();
+                    break;
+            }
+
+            if (!enableDeleted)
+                users = users.Where(s => s.DeletedStatus == false).ToList();
+
+            if (!enableLocked)
+                users = users.Where(s => s.LockoutEnd == null).ToList();
+
+            return users;
         }
     }
 }
