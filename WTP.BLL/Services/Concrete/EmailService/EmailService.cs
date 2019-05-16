@@ -1,22 +1,15 @@
 ﻿using System.Net;
 using System.Net.Mail;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
+using WTP.BLL.ModelsDto.Email;
 
 namespace WTP.BLL.Services.Concrete.EmailService
 {
     public class EmailService : IEmailService
     {
-        private readonly IConfiguration _configuration;
-
-        public EmailService(IConfiguration configuration)
+        public async Task SendEmailAsync(string email, string subject, string message, EmailConfigDto configuration)
         {
-            _configuration = configuration;
-        }
-
-        public async Task SendEmailAsync(string email, string subject, string message)
-        {
-            var emailMessage = new MailMessage(_configuration["Email:Email"], email)
+            var emailMessage = new MailMessage(configuration.Email, email)
             {
                 Subject = subject,
                 IsBodyHtml = true,
@@ -25,10 +18,10 @@ namespace WTP.BLL.Services.Concrete.EmailService
 
             using (var client = new SmtpClient())
             {
-                client.Host = _configuration["Email:Host"];
-                client.Port = int.Parse(_configuration["Email:Port"]);
+                client.Host = configuration.Host;
+                client.Port = int.Parse(configuration.Port);
                 client.EnableSsl = true;
-                client.Credentials = new NetworkCredential(_configuration["Email:Email"], _configuration["Email:Password"]);
+                client.Credentials = new NetworkCredential(configuration.Email, configuration.Password);
                 await client.SendMailAsync(emailMessage);
             }
         }

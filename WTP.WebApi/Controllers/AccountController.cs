@@ -12,6 +12,7 @@ using WTP.BLL.Services.Concrete.EmailService;
 using WTP.WebAPI.Utility.Extensions;
 using WTP.WebAPI.ViewModels;
 using AutoMapper;
+using WTP.BLL.ModelsDto.Email;
 
 namespace WTP.WebAPI.Controllers
 {
@@ -22,13 +23,15 @@ namespace WTP.WebAPI.Controllers
         private readonly IEmailService _emailService;
         private readonly ILog _log;
         private readonly IConfiguration _configuration;
+        private readonly IMapper _mapper;
 
-        public AccountController(IAppUserService appUserService, IEmailService emailService, ILog log, IConfiguration configuration)
+        public AccountController(IAppUserService appUserService, IEmailService emailService, ILog log, IConfiguration configuration, IMapper mapper)
         {
             _emailService = emailService;
             _log = log;
             _appUserService = appUserService;
             _configuration = configuration;
+            _mapper = mapper;
         }
 
         [HttpPost("[action]")]
@@ -174,9 +177,15 @@ namespace WTP.WebAPI.Controllers
                 "Account",
                 new { userId = userForConfirmEmail.Id, token }, protocol: HttpContext.Request.Scheme);
 
-            await _emailService.SendEmailAsync(email, "Just one click and you're on WTP",
+            var emailConfigDto = _mapper.Map<EmailConfigDto>(new EmailConfigModel(_configuration));
+
+            await _emailService.SendEmailAsync(
+                email,
+                "Just one click and you're on WTP",
                 $"Thanks for registering to be a part of evolving esports with WTP. After you: " +
-                $"<a href='{callbackUrl}'>confirm your email</a> you'll be able to enjoy all the benefits of the WTP platform.");
+                $"<a href='{callbackUrl}'>confirm your email</a> you'll be able to enjoy all the benefits of the WTP platform.",
+                emailConfigDto
+                );
         }
 
         private async Task SendResetPasswordEmailAsync(AppUserDto user)
@@ -186,10 +195,14 @@ namespace WTP.WebAPI.Controllers
             var callbackUrl = Url.Action("ResetPassword", "Account",
                 new { userId = user.Id, code = token }, protocol: HttpContext.Request.Scheme);
 
+            var emailConfigDto = _mapper.Map<EmailConfigDto>(new EmailConfigModel(_configuration));
+
             await _emailService.SendEmailAsync(
                 user.Email,
                 "WTP Password Reset",
-                $"If You want to reset Your password, follow this: <a href='{callbackUrl}'>link</a>");
+                $"If You want to reset Your password, follow this: <a href='{callbackUrl}'>link</a>",
+                emailConfigDto
+                );
         }
     }
 }

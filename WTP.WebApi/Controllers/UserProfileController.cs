@@ -75,7 +75,7 @@ namespace WTP.WebAPI.ViewModels.Controllers
         [Authorize(Policy = "RequireLoggedIn")]
         public async Task<IActionResult> UploadPhoto([FromForm]PhotoFormDataModel formData)
         {
-            var azureBlobStorageConfigDto = GetAzureBlobStorageConfigDto();
+            var azureBlobStorageConfigDto = _mapper.Map<AzureBlobStorageConfigDto>(new AzureBlobStorageConfigModel(_configuration));
 
             var fileDataModel = new FileDataModel(formData.File.OpenReadStream(), formData.File.ContentType, formData.File.FileName);
 
@@ -97,24 +97,11 @@ namespace WTP.WebAPI.ViewModels.Controllers
         {
             var requestUrl = UriHelper.GetDisplayUrl(Request);
 
-            var azureBlobStorageConfigDto = GetAzureBlobStorageConfigDto();
+            var azureBlobStorageConfigDto = _mapper.Map<AzureBlobStorageConfigDto>(new AzureBlobStorageConfigModel(_configuration));
 
             var fileDataDto =  await _azureBlobStorageService.DownloadFileAsync(requestUrl, azureBlobStorageConfigDto);
 
             return File(fileDataDto.Stream, fileDataDto.Type, fileDataDto.Name);
-        }
-
-        private AzureBlobStorageConfigDto GetAzureBlobStorageConfigDto()
-        {
-            var azureBlobStorageConfigModel = new AzureBlobStorageConfigModel()
-            {
-                AccountName = _configuration["AppSettings:AccountName"],
-                AccountKey = _configuration["AppSettings:AccountKey"],
-                ContainerName = _configuration["AppSettings:ContainerName"],
-                BlobStorageUrl = _configuration["Url:ImageStorageUrl"]
-            };
-
-            return _mapper.Map<AzureBlobStorageConfigDto>(azureBlobStorageConfigModel);
         }
     }
 }
