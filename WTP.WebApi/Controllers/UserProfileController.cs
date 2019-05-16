@@ -88,7 +88,7 @@ namespace WTP.WebAPI.ViewModels.Controllers
             var result = await _appUserService.UpdatePhotoAsync(userId, userPhotoUrl);
 
             return (userPhotoUrl != null && result.Succeeded)
-                ? Ok(userPhotoUrl)
+                ? Ok(new ResponseViewModel(200, "Photo was updated.", userPhotoUrl))
                 : (IActionResult)BadRequest(new ResponseViewModel(400, "Photo updated failed."));
         }
 

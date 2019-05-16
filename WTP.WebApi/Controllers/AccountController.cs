@@ -113,9 +113,14 @@ namespace WTP.WebAPI.Controllers
         [AllowAnonymous]
         public IActionResult ResetPassword([FromQuery] string userId = null, [FromQuery] string code = null)
         {
-            return userId == null || code == null
-                ? Redirect($"{_configuration["Url:BaseUrl"]}/account/forgot-password?resetIsFailed=true")
-                : Redirect($"{_configuration["Url:BaseUrl"]}/account/reset-password?userId={userId}&code={code}");
+            if(userId == null || code == null)
+            {
+                return Redirect($"{_configuration["Url:BaseUrl"]}/account/forgot-password?resetIsFailed=true");
+            }
+
+            code = HttpUtility.UrlEncode(code);
+
+            return Redirect($"{_configuration["Url:BaseUrl"]}/account/reset-password?userId={userId}&code={code}");
         }
 
         [HttpPost("[action]")]
@@ -127,9 +132,11 @@ namespace WTP.WebAPI.Controllers
                 return BadRequest(new ResponseViewModel(400, "Invalid value was entered! Please, redisplay form."));
             }
 
+            var token = HttpUtility.UrlDecode(formData.Code);
+
             var user = await _appUserService.GetAsync(formData.Id);
 
-            var result = await _appUserService.ResetPasswordAsync(user, formData.Code, formData.NewPassword);
+            var result = await _appUserService.ResetPasswordAsync(user, token, formData.NewPassword);
 
             return result.Succeeded
                 ? Ok(new ResponseViewModel(200, "Password reset is successful!"))
@@ -175,8 +182,6 @@ namespace WTP.WebAPI.Controllers
         private async Task SendResetPasswordEmailAsync(AppUserDto user)
         {
             var token = await _appUserService.GeneratePasswordResetTokenAsync(user);
-
-            token = HttpUtility.UrlEncode(token);
 
             var callbackUrl = Url.Action("ResetPassword", "Account",
                 new { userId = user.Id, code = token }, protocol: HttpContext.Request.Scheme);
