@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using WTP.BLL.Models.Language;
+using WTP.BLL.Dto.Language;
 using WTP.DAL.Entities;
 using WTP.DAL.UnitOfWork;
 
@@ -19,14 +19,14 @@ namespace WTP.BLL.Services.Concrete.LanguageService
             _mapper = mapper;
         }
 
-        public async Task CreateAsync(LanguageModel languageDto)
+        public async Task CreateAsync(LanguageDto languageDto)
         {
             var language = _mapper.Map<Language>(languageDto);
 
             await _uow.Languages.CreateAsync(language);
         }
 
-        public async Task UpdateAsync(LanguageModel languageDto)
+        public async Task UpdateAsync(LanguageDto languageDto)
         {
             var language = _mapper.Map<Language>(languageDto);
 
@@ -38,18 +38,18 @@ namespace WTP.BLL.Services.Concrete.LanguageService
             await _uow.Languages.DeleteAsync(id);
         }
 
-        public async Task<LanguageModel> GetAsync(int id)
+        public async Task<LanguageDto> GetAsync(int id)
         {
             var language = await _uow.Languages.GetAsync(id);
 
-            return _mapper.Map<LanguageModel>(language);
+            return _mapper.Map<LanguageDto>(language);
         }
 
-        public async Task<IEnumerable<LanguageModel>> GetAllAsync()
+        public async Task<IEnumerable<LanguageDto>> GetAllAsync()
         {
             var languages = await _uow.Languages.AsQueryable().ToListAsync();
 
-            return _mapper.Map<IEnumerable<LanguageModel>>(languages);
+            return _mapper.Map<IEnumerable<LanguageDto>>(languages);
         }
     }
 }

@@ -2,7 +2,7 @@
 using System.Net;
 using System.Net.Mail;
 using System.Threading.Tasks;
-using WTP.BLL.Models.Email;
+using WTP.BLL.Dto.Email;
 using WTP.Logging;
 
 namespace WTP.BLL.Services.EmailService
@@ -16,7 +16,7 @@ namespace WTP.BLL.Services.EmailService
             _log = log;
         }
 
-        public async Task SendEmailAsync(string email, string subject, string message, EmailConfigModel configuration)
+        public async Task SendEmailAsync(string email, string subject, string message, EmailConfigDto configuration)
         {
             try
             {

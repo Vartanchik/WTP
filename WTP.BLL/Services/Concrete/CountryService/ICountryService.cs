@@ -1,15 +1,15 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using WTP.BLL.Models.Country;
+using WTP.BLL.Dto.Country;
 
 namespace WTP.BLL.Services.Concrete.CountryService
 {
     public interface ICountryService
     {
-        Task CreateAsync(CountryModel countryDto);
-        Task UpdateAsync(CountryModel countryDto);
+        Task CreateAsync(CountryDto countryDto);
+        Task UpdateAsync(CountryDto countryDto);
         Task DeleteAsync(int id);
-        Task<CountryModel> GetAsync(int id);
-        Task<IEnumerable<CountryModel>> GetAllAsync();
+        Task<CountryDto> GetAsync(int id);
+        Task<IEnumerable<CountryDto>> GetAllAsync();
     }
 }

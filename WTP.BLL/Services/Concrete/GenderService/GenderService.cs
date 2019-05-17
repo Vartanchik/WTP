@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using WTP.BLL.Models.Gender;
+using WTP.BLL.Dto.Gender;
 using WTP.DAL.Entities;
 using WTP.DAL.UnitOfWork;
 
@@ -19,13 +19,13 @@ namespace WTP.BLL.Services.Concrete.GenderService
             _mapper = mapper;
         }
 
-        public async Task CreateAsync(GenderModel genderDto)
+        public async Task CreateAsync(GenderDto genderDto)
         {
             var gender = _mapper.Map<Gender>(genderDto);
 
             await _uow.Genders.CreateAsync(gender);
         }
-        public async Task UpdateAsync(GenderModel genderDto)
+        public async Task UpdateAsync(GenderDto genderDto)
         {
             var gender = _mapper.Map<Gender>(genderDto);
 
@@ -35,17 +35,17 @@ namespace WTP.BLL.Services.Concrete.GenderService
         {
             await _uow.Genders.DeleteAsync(id);
         }
-        public async Task<GenderModel> GetAsync(int id)
+        public async Task<GenderDto> GetAsync(int id)
         {
             var gender = await _uow.Genders.GetAsync(id);
 
-            return _mapper.Map<GenderModel>(gender);
+            return _mapper.Map<GenderDto>(gender);
         }
-        public async Task<IEnumerable<GenderModel>> GetAllAsync()
+        public async Task<IEnumerable<GenderDto>> GetAllAsync()
         {
             var genders = await _uow.Genders.AsQueryable().ToListAsync();
 
-            return _mapper.Map<IEnumerable<GenderModel>>(genders);
+            return _mapper.Map<IEnumerable<GenderDto>>(genders);
         }
     }
 }

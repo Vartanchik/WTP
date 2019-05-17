@@ -1,13 +1,13 @@
 ﻿using FluentValidation;
 using System;
 using System.Linq;
-using WTP.WebAPI.Dto;
+using WTP.WebAPI.Models;
 using Microsoft.AspNetCore.Http;
 using System.IO;
 
 namespace WTP.WebAPI.Utility.FluentValidators
 {
-    public class PhotoFormDataModelValidator : AbstractValidator<PhotoFormDataDto>
+    public class PhotoFormDataModelValidator : AbstractValidator<PhotoFormDataModel>
     {
         private readonly string[] _supportedTypes = new[] { "png", "jpg" };
 

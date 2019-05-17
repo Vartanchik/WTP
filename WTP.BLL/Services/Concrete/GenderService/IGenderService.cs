@@ -1,15 +1,15 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using WTP.BLL.Models.Gender;
+using WTP.BLL.Dto.Gender;
 
 namespace WTP.BLL.Services.Concrete.GenderService
 {
     public interface IGenderService
     {
-        Task CreateAsync(GenderModel genderDto);
-        Task UpdateAsync(GenderModel genderDto);
+        Task CreateAsync(GenderDto genderDto);
+        Task UpdateAsync(GenderDto genderDto);
         Task DeleteAsync(int id);
-        Task<GenderModel> GetAsync(int id);
-        Task<IEnumerable<GenderModel>> GetAllAsync();
+        Task<GenderDto> GetAsync(int id);
+        Task<IEnumerable<GenderDto>> GetAllAsync();
     }
 }

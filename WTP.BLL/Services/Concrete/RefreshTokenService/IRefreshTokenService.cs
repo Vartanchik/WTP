@@ -2,17 +2,17 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using WTP.BLL.Models.RefreshToken;
+using WTP.BLL.Dto.RefreshToken;
 
 namespace WTP.BLL.Services.Concrete.RefreshTokenService
 {
     public interface IRefreshTokenService
     {
-        Task CreateAsync(RefreshTokenModel tokenDto);
+        Task CreateAsync(RefreshTokenDto tokenDto);
         Task DeleteAsync(int id);
         Task DeleteRangeAsync(int userId);
-        Task<RefreshTokenModel> GetAsync(int id);
-        Task<IEnumerable<RefreshTokenModel>> GetRangeAsync(int id);
-        Task<RefreshTokenModel> GetByUserIdAsync(int userId, string refreshToken);
+        Task<RefreshTokenDto> GetAsync(int id);
+        Task<IEnumerable<RefreshTokenDto>> GetRangeAsync(int id);
+        Task<RefreshTokenDto> GetByUserIdAsync(int userId, string refreshToken);
     }
 }

@@ -1,14 +1,14 @@
 ﻿using System.Threading.Tasks;
-using WTP.BLL.Models.Azure;
+using WTP.BLL.Dto.Azure;
 
 namespace WTP.BLL.Services.AzureBlobStorageService
 {
     public interface IAzureBlobStorageService
     {
-        Task<string> UploadFileAsync(FileDataModel file, AzureBlobStorageConfigModel configuration);
+        Task<string> UploadFileAsync(FileDataDto file, AzureBlobStorageConfigDto configuration);
 
-        Task<FileDataModel> DownloadFileAsync(string blockBlobNamge, AzureBlobStorageConfigModel configuration);
+        Task<FileDataDto> DownloadFileAsync(string blockBlobNamge, AzureBlobStorageConfigDto configuration);
 
-        Task<bool> DeleteFileIfExistsAsync(string blockBlobNamge, AzureBlobStorageConfigModel configuration);
+        Task<bool> DeleteFileIfExistsAsync(string blockBlobNamge, AzureBlobStorageConfigDto configuration);
     }
 }

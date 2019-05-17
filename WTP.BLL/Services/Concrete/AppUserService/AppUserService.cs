@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using WTP.BLL.Models.AppUser;
+using WTP.BLL.Dto.AppUser;
 using WTP.DAL.Entities;
 using WTP.DAL.Repositories.ConcreteRepositories.AppUserExtended;
 
@@ -20,7 +20,7 @@ namespace WTP.BLL.Services.Concrete.AppUserService
             _appUserRepository = appUserRepository("CACHE");
         }
 
-        public async Task<IdentityResult> CreateAsync(AppUserModel appUserDto, string password)
+        public async Task<IdentityResult> CreateAsync(AppUserDto appUserDto, string password)
         {
             var appUser = _mapper.Map<AppUser>(appUserDto);
 
@@ -29,34 +29,34 @@ namespace WTP.BLL.Services.Concrete.AppUserService
             return result;
         }
 
-        public async Task<AppUserModel> GetAsync(int userId)
+        public async Task<AppUserDto> GetAsync(int userId)
         {
             var appUser = await _appUserRepository.GetAsync(userId);
 
-            var appUserDto = _mapper.Map<AppUserModel>(appUser);
+            var appUserDto = _mapper.Map<AppUserDto>(appUser);
 
             return appUserDto;
         }
 
-        public async Task<AppUserModel> GetByEmailAsync(string email)
+        public async Task<AppUserDto> GetByEmailAsync(string email)
         {
             var appUser = await _appUserRepository.GetByEmailAsync(email);
 
-            var appUserDto = _mapper.Map<AppUserModel>(appUser);
+            var appUserDto = _mapper.Map<AppUserDto>(appUser);
 
             return appUserDto;
         }
 
-        public async Task<AppUserModel> GetByNameAsync(string userName)
+        public async Task<AppUserDto> GetByNameAsync(string userName)
         {
             var appUser = await _appUserRepository.GetByNameAsync(userName);
 
-            var appUserDto = _mapper.Map<AppUserModel>(appUser);
+            var appUserDto = _mapper.Map<AppUserDto>(appUser);
 
             return appUserDto;
         }
                      
-        public async Task<IdentityResult> UpdateAsync(AppUserModel appUserDto)
+        public async Task<IdentityResult> UpdateAsync(AppUserDto appUserDto)
         {
             if (await _appUserRepository.GetAsync(appUserDto.Id) != null)
             {
@@ -68,7 +68,7 @@ namespace WTP.BLL.Services.Concrete.AppUserService
             return IdentityResult.Failed();
         }
 
-        public async Task<IList<string>> GetRolesAsync(AppUserModel appUserDto)
+        public async Task<IList<string>> GetRolesAsync(AppUserDto appUserDto)
         {
             var appUser = _mapper.Map<AppUser>(appUserDto);
 
@@ -85,14 +85,14 @@ namespace WTP.BLL.Services.Concrete.AppUserService
             return await _appUserRepository.IsEmailConfirmedAsync(userId);
         }
 
-        public async Task<string> GeneratePasswordResetTokenAsync(AppUserModel appUserDto)
+        public async Task<string> GeneratePasswordResetTokenAsync(AppUserDto appUserDto)
         {
             var appUser = _mapper.Map<AppUser>(appUserDto);
 
             return await _appUserRepository.GeneratePasswordResetTokenAsync(appUser);
         }
 
-        public async Task<IdentityResult> ResetPasswordAsync(ResetPasswordModel resetPasswordDto)
+        public async Task<IdentityResult> ResetPasswordAsync(ResetPasswordDto resetPasswordDto)
         {
             var appUser = _appUserRepository.GetAsync(resetPasswordDto.Id);
 
@@ -103,7 +103,7 @@ namespace WTP.BLL.Services.Concrete.AppUserService
                                                               resetPasswordDto.NewPassword);
         }
 
-        public async Task<IdentityResult> ChangePasswordAsync(ChangePasswordModel changePasswordDto)
+        public async Task<IdentityResult> ChangePasswordAsync(ChangePasswordDto changePasswordDto)
         {
             if (await GetAsync(changePasswordDto.UserId) == null)
             {
@@ -120,18 +120,18 @@ namespace WTP.BLL.Services.Concrete.AppUserService
                                                                 changePasswordDto.NewPassword);
         }
 
-        public async Task<string> GenerateEmailConfirmationTokenAsync(AppUserModel appUserDto)
+        public async Task<string> GenerateEmailConfirmationTokenAsync(AppUserDto appUserDto)
         {
             var appUser = _mapper.Map<AppUser>(appUserDto);
 
             return await _appUserRepository.GenerateEmailConfirmationTokenAsync(appUser);
         }
 
-        public async Task<AppUserModel> FindByIdAsync(string userId)
+        public async Task<AppUserDto> FindByIdAsync(string userId)
         {
             var appUser = await _appUserRepository.FindByIdAsync(userId);
 
-            return _mapper.Map<AppUserModel>(appUser);
+            return _mapper.Map<AppUserDto>(appUser);
         }
 
         public async Task<IdentityResult> ConfirmEmailAsync(int userId, string token)

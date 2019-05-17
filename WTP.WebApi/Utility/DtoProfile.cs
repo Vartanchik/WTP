@@ -1,8 +1,7 @@
 ﻿using AutoMapper;
-using WTP.BLL.Models.AppUser;
-using WTP.BLL.Models.Azure;
-using WTP.BLL.Models.Email;
-using WTP.WebAPI.Dto;
+using WTP.BLL.Dto.Azure;
+using WTP.BLL.Dto.Email;
+using WTP.WebAPI.Models;
 
 namespace WTP.WebAPI.Services
 {
@@ -10,12 +9,8 @@ namespace WTP.WebAPI.Services
     {
         public DtoProfile()
         {
-            CreateMap<AppUserModel, AppUserDto>();
-            CreateMap<AppUserDto, AppUserModel>();
-            CreateMap<AzureBlobStorageConfigDto, AzureBlobStorageConfigModel>();
-            CreateMap<EmailConfigDto, EmailConfigModel>();
-            CreateMap<FileDataDto, FileDataModel>();
-            CreateMap<FileDataModel, FileDataDto>();
+            CreateMap<AzureBlobStorageConfigModel, AzureBlobStorageConfigDto>();
+            CreateMap<EmailConfigModel, EmailConfigDto>();
         }
     }
 }

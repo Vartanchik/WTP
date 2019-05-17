@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using WTP.BLL.Models.AppUser;
-using WTP.BLL.Models.RefreshToken;
+using WTP.BLL.Dto.AppUser;
+using WTP.BLL.Dto.RefreshToken;
 using WTP.BLL.Services.Concrete.AppUserService;
 using WTP.BLL.Services.Concrete.RefreshTokenService;
 using WTP.WebAPI.Helpers;
-using WTP.WebAPI.Dto;
+using WTP.WebAPI.Models;
 
 namespace WTP.WebAPI.Controllers
 {
@@ -40,13 +40,13 @@ namespace WTP.WebAPI.Controllers
         /// <response code="200">Login or Token update</response>
         /// <response code="401">Unauthorized rsult</response>
         [HttpPost("[action]")]
-        [ProducesResponseType(typeof(AccessResponseDto), 200)]
-        [ProducesResponseType(typeof(ResponseDto), 401)]
-        public async Task<IActionResult> Auth([FromBody] AccessRequestDto model) // granttype = "refresh_token or password"
+        [ProducesResponseType(typeof(AccessResponseModel), 200)]
+        [ProducesResponseType(typeof(ResponseModel), 401)]
+        public async Task<IActionResult> Auth([FromBody] AccessRequestModel model) // granttype = "refresh_token or password"
         {
             if (model == null)
             {
-                return BadRequest(new ResponseDto(500, "Login failed.", "Something going wrong."));
+                return BadRequest(new ResponseModel(500, "Login failed.", "Something going wrong."));
             }
 
             switch (model.GrantType)
@@ -56,11 +56,11 @@ namespace WTP.WebAPI.Controllers
                 case "refresh_token":
                     return await UpdateAccessToken(model);
                 default:
-                    return Unauthorized(new ResponseDto(401, "Login failed.", "Something going wrong."));
+                    return Unauthorized(new ResponseModel(401, "Login failed.", "Something going wrong."));
             }
         }
 
-        private async Task<IActionResult> Login(AccessRequestDto model)
+        private async Task<IActionResult> Login(AccessRequestModel model)
         {
             var user = await _appUserService.GetByEmailAsync(model.Email);
 
@@ -68,7 +68,7 @@ namespace WTP.WebAPI.Controllers
             {
                 if (!await _appUserService.IsEmailConfirmedAsync(user.Id))
                 {
-                    return Unauthorized(new ResponseDto(401, "Login failed.", "We sent you an confirmation email. Please confirm your registration."));
+                    return Unauthorized(new ResponseModel(401, "Login failed.", "We sent you an confirmation email. Please confirm your registration."));
                 }
 
                 var newRefreshToken = CreateRefreshToken(user.Id);
@@ -87,10 +87,10 @@ namespace WTP.WebAPI.Controllers
                 return Ok(new { accessToken, message = "Login successful." });
             }
 
-            return BadRequest(new ResponseDto(400, "Authentication failed.", "Incorrect email or password."));
+            return BadRequest(new ResponseModel(400, "Authentication failed.", "Incorrect email or password."));
         }
 
-        private async Task<AccessResponseDto> CreateAccessToken(AppUserModel user, string refreshToken)
+        private async Task<AccessResponseModel> CreateAccessToken(AppUserDto user, string refreshToken)
         {
             double tokenExpiryTime = Convert.ToDouble(_appSettings.ExpireTime);
 
@@ -122,7 +122,7 @@ namespace WTP.WebAPI.Controllers
 
             var encodedToken = tokenHandler.WriteToken(newtoken);
 
-            return new AccessResponseDto()
+            return new AccessResponseModel()
             {
                 Token = encodedToken,
                 Expiration = newtoken.ValidTo,
@@ -133,9 +133,9 @@ namespace WTP.WebAPI.Controllers
             };
         }
 
-        private RefreshTokenModel CreateRefreshToken(int userId)
+        private RefreshTokenDto CreateRefreshToken(int userId)
         {
-            return new RefreshTokenModel()
+            return new RefreshTokenDto()
             {
                 Value = Guid.NewGuid().ToString("N"),
                 CreatedDate = DateTime.UtcNow,
@@ -144,7 +144,7 @@ namespace WTP.WebAPI.Controllers
             };
         }
 
-        private async Task<IActionResult> UpdateAccessToken(AccessRequestDto model)
+        private async Task<IActionResult> UpdateAccessToken(AccessRequestModel model)
         {
             try
             {
