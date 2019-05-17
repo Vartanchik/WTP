@@ -8,5 +8,7 @@ namespace WTP.BLL.Services.AzureBlobStorageService
         Task<string> UploadFileAsync(FileDataModel file, AzureBlobStorageConfigModel configuration);
 
         Task<FileDataModel> DownloadFileAsync(string blockBlobNamge, AzureBlobStorageConfigModel configuration);
+
+        Task<bool> DeleteFileIfExistsAsync(string blockBlobNamge, AzureBlobStorageConfigModel configuration);
     }
 }

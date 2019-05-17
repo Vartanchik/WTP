@@ -22,23 +22,11 @@ namespace WTP.BLL.Services.AzureBlobStorageService
         {
             try
             {
-                var blockBlobNamge = file.BlobName;
-
-                if (blockBlobNamge == null)
-                {
-                    blockBlobNamge = configuration.BlobStorageUrl + Guid.NewGuid().ToString();
-                }
+                var blockBlobNamge = configuration.BlobStorageUrl + Guid.NewGuid().ToString();
 
                 var cloudBlobContainer = GetCloudBlobContainer(configuration);
 
-                if (cloudBlobContainer == null)
-                {
-                    return null;
-                }
-
                 var cloudBlockBlob = cloudBlobContainer.GetBlockBlobReference(blockBlobNamge);
-
-                await cloudBlockBlob.DeleteIfExistsAsync();
 
                 cloudBlockBlob.Metadata.Add("Name", Base64Encode(file.Name));
 
@@ -64,11 +52,6 @@ namespace WTP.BLL.Services.AzureBlobStorageService
 
                 var cloudBlockBlob = cloudBlobContainer.GetBlockBlobReference(blockBlobNamge);
 
-                if (!await cloudBlockBlob.ExistsAsync())
-                {
-                    return null;
-                }
-
                 var memoryStream = new MemoryStream();
 
                 await cloudBlockBlob.DownloadToStreamAsync(memoryStream);
@@ -85,30 +68,39 @@ namespace WTP.BLL.Services.AzureBlobStorageService
             }
         }
 
-        private CloudBlobContainer GetCloudBlobContainer(AzureBlobStorageConfigModel configuration)
+        public async Task<bool> DeleteFileIfExistsAsync(string blockBlobNamge, AzureBlobStorageConfigModel configuration)
         {
             try
             {
-                var accountName = configuration.AccountName;
+                var cloudBlobContainer = GetCloudBlobContainer(configuration);
 
-                var accountKey = configuration.AccountKey;
+                var cloudBlockBlob = cloudBlobContainer.GetBlockBlobReference(blockBlobNamge);
 
-                var containerName = configuration.ContainerName;
-
-                var storageCredentials = new StorageCredentials(accountName, accountKey);
-
-                var cloudStorageAccount = new CloudStorageAccount(storageCredentials, true);
-
-                var cloudBlobClient = cloudStorageAccount.CreateCloudBlobClient();
-
-                return cloudBlobClient.GetContainerReference(containerName);
+                return await cloudBlockBlob.DeleteIfExistsAsync();
             }
             catch (Exception ex)
             {
-                _log.Error($"GetCloudBlobContainer error message:{ex.Message}");
+                _log.Error($"UploadFileAsync error message:{ex.Message}");
 
-                return null;
+                return false;
             }
+        }
+
+        private CloudBlobContainer GetCloudBlobContainer(AzureBlobStorageConfigModel configuration)
+        {
+            var accountName = configuration.AccountName;
+
+            var accountKey = configuration.AccountKey;
+
+            var containerName = configuration.ContainerName;
+
+            var storageCredentials = new StorageCredentials(accountName, accountKey);
+
+            var cloudStorageAccount = new CloudStorageAccount(storageCredentials, true);
+
+            var cloudBlobClient = cloudStorageAccount.CreateCloudBlobClient();
+
+            return cloudBlobClient.GetContainerReference(containerName);
         }
 
         private string Base64Encode(string plainText)
