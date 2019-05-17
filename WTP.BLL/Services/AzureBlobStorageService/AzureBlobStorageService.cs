@@ -36,9 +36,10 @@ namespace WTP.BLL.Services.AzureBlobStorageService
 
                 return blockBlobNamge;
             }
+            // TODO: Add concrete exceptions
             catch (Exception ex)
             {
-                _log.Error($"UploadFileAsync error message:{ex.Message}");
+                _log.Error($"{this.ToString()} - error message:{ex.Message}");
 
                 return null;
             }
@@ -60,9 +61,10 @@ namespace WTP.BLL.Services.AzureBlobStorageService
 
                 return new FileDataModel(memoryStream, cloudBlockBlob.Properties.ContentType, Base64Decode(cloudBlockBlob.Metadata["Name"]));
             }
-            catch (Exception ex)
+            // TODO: Add concrete exceptions
+            catch (IOException ex)
             {
-                _log.Error($"DownloadFileAsync error message:{ex.Message}");
+                _log.Error($"{this.ToString()} - error message:{ex.Message}");
 
                 return null;
             }
@@ -78,9 +80,10 @@ namespace WTP.BLL.Services.AzureBlobStorageService
 
                 return await cloudBlockBlob.DeleteIfExistsAsync();
             }
+            // TODO: Add concrete exceptions
             catch (Exception ex)
             {
-                _log.Error($"UploadFileAsync error message:{ex.Message}");
+                _log.Error($"{this.ToString()} - error message:{ex.Message}");
 
                 return false;
             }

@@ -36,9 +36,10 @@ namespace WTP.BLL.Services.EmailService
                     await client.SendMailAsync(emailMessage);
                 }
             }
+            // TODO: Add concrete exceptions
             catch (Exception ex)
             {
-                _log.Error($"SendEmailAsync error message:{ex.Message}");
+                _log.Error($"{this.ToString()} - error message:{ex.Message}");
             }
         }
     }
