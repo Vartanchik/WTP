@@ -21,43 +21,55 @@ namespace WTP.WebAPI.Dto.Controllers
             _mapper = mapper;
         }
 
-        //GET : /api/UserProfile/id
+        /// <summary>
+        /// Get Userprofile of current user
+        /// </summary>
+        /// <returns>Current Userprofile</returns>
+        /// <returns>Response DTO</returns>
+        /// <response code="200">Returns AppUser DTO</response>
+        /// <response code="404">Userprofile not found</response>
         [HttpGet]
         [Authorize(Policy = "RequireLoggedIn")]
-        [ProducesResponseType(typeof(AppUserApiDto), 200)]
+        [ProducesResponseType(typeof(AppUserDto), 200)]
         [ProducesResponseType(typeof(ResponseDto), 404)]
         public async Task<IActionResult> GetUserProfile()
         {
             int userId = this.GetCurrentUserId();
 
-            var appUserDto = await _appUserService.GetAsync(userId);
+            var appUserModel = await _appUserService.GetAsync(userId);
 
-            var appUserDtoViewModel = _mapper.Map<AppUserApiDto>(appUserDto);
+            var appUserDto = _mapper.Map<AppUserDto>(appUserModel);
 
             return appUserDto == null
                 ? NotFound(new ResponseDto(404, "Userprofile not found.", "Something going wrong.")) 
-                : (IActionResult)Ok(appUserDtoViewModel);
+                : (IActionResult)Ok(appUserDto);
         }
 
-        //PUT : /api/UserProfile
+        /// <summary>
+        /// Update current user Userprofile
+        /// </summary>
+        /// <param name="formData"></param>
+        /// <returns>Response DTO</returns>
+        /// <response code="200">Successful performance</response>
+        /// <response code="400">The action failed</response>
         [HttpPut]
         [Authorize(Policy = "RequireLoggedIn")]
         [ProducesResponseType(typeof(ResponseDto), 200)]
         [ProducesResponseType(typeof(ResponseDto), 400)]
-        public async Task<IActionResult> UpdateUserProfile([FromBody] AppUserApiDto formData)
+        public async Task<IActionResult> UpdateUserProfile([FromBody] AppUserDto formData)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(new ResponseDto(400, "User profile updated faild.", "Invalid value was entered! Please, redisplay form."));
             }
 
-            var appUserDto = _mapper.Map<AppUserModel>(formData);
+            var appUserModel = _mapper.Map<AppUserModel>(formData);
 
-            var result = await _appUserService.UpdateAsync(appUserDto);
+            var result = await _appUserService.UpdateAsync(appUserModel);
 
             return result.Succeeded
                 ? Ok(new ResponseDto(200,"Completed.", "User profile updated successfully."))
-                : (IActionResult)BadRequest(new ResponseDto(500, $"User profile updated faild.", "Something going wrong."));
+                : (IActionResult)BadRequest(new ResponseDto(400, $"User profile updated faild.", "Something going wrong."));
         }
     }
 }

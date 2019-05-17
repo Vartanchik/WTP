@@ -8,8 +8,8 @@ namespace WTP.WebAPI.Services
     {
         public DtoProfile()
         {
-            CreateMap<AppUserModel, AppUserApiDto>();
-            CreateMap<AppUserApiDto, AppUserModel>();
+            CreateMap<AppUserModel, AppUserDto>();
+            CreateMap<AppUserDto, AppUserModel>();
         }
     }
 }
