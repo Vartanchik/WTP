@@ -18,25 +18,6 @@ namespace WTP.DAL.Repositories.ConcreteRepositories.RefreshTokenExtended
             _context = context;
         }
 
-        public override async Task CreateAsync(RefreshToken item)
-        {
-            await _context.RefreshTokens.AddAsync(item);
-
-            await _context.SaveChangesAsync();
-        }
-
-        public override async Task DeleteAsync(int id)
-        {
-            var entity = await GetAsync(id);
-
-            if (entity != null)
-            {
-                _context.Entry(entity).State = EntityState.Deleted;
-
-                await _context.SaveChangesAsync();
-            }
-        }
-
         public async Task DeleteRangeAsync(int userId)
         {
             var tokens = await GetRangeAsync(userId);

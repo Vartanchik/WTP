@@ -10,8 +10,8 @@ namespace WTP.WebAPI.Services
     {
         public DtoProfile()
         {
-            CreateMap<AppUserModel, AppUserApiDto>();
-            CreateMap<AppUserApiDto, AppUserModel>();
+            CreateMap<AppUserModel, AppUserDto>();
+            CreateMap<AppUserDto, AppUserModel>();
             CreateMap<AzureBlobStorageConfigDto, AzureBlobStorageConfigModel>();
             CreateMap<EmailConfigDto, EmailConfigModel>();
             CreateMap<FileDataDto, FileDataModel>();

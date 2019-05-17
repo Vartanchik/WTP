@@ -20,6 +20,6 @@ namespace WTP.DAL.Entities
         public List<Player> Players { get; set; }
         public List<Team> Teams { get; set; }
         public virtual List<RefreshToken> Tokens { get; set; }
-        //public bool Enabled { get; set; }
+        public bool Enabled { get; set; }
     }
 }

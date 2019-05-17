@@ -11,7 +11,7 @@ using WTP.BLL.Models.Team;
 
 namespace WTP.WebAPI.Dto
 {
-    public class AppUserApiDto
+    public class AppUserDto
     {
         [Required]
         public int Id { get; set; } 

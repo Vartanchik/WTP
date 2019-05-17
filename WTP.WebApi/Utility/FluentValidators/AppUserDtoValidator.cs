@@ -7,7 +7,7 @@ using WTP.WebAPI.Dto;
 
 namespace WTP.WebAPI.FluentValidators
 {
-    public class AppUserDtoValidator : AbstractValidator<AppUserApiDto>
+    public class AppUserDtoValidator : AbstractValidator<AppUserDto>
     {
         public AppUserDtoValidator()
         {

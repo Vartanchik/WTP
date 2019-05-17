@@ -34,6 +34,13 @@ namespace WTP.WebAPI.Controllers
             _mapper = mapper;
         }
 
+        /// <summary>
+        /// Registration of new user
+        /// </summary>
+        /// <param name="formData"></param>
+        /// <returns></returns>
+        /// <response code="200">Successful performance</response>
+        /// <response code="400">The action failed</response>
         [HttpPost("[action]")]
         [ProducesResponseType(typeof(ResponseDto), 200)]
         [ProducesResponseType(typeof(ResponseDto), 400)]
@@ -57,7 +64,8 @@ namespace WTP.WebAPI.Controllers
             {
                 await SendEmailConfirmationAsync(formData.Email);
 
-                return Ok(new ResponseDto {
+                return Ok(new ResponseDto
+                {
                     StatusCode = 200,
                     Message = "Registration is successful.",
                     Info = "To complete the registration, check the email and click on the link indicated in the letter."
@@ -69,6 +77,13 @@ namespace WTP.WebAPI.Controllers
             return BadRequest(new ResponseDto(400, "Registration is faild.", errorInfo.Description));
         }
 
+        /// <summary>
+        /// Confirmation user email
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        /// <response code="302">Successful performance</response>
         [HttpGet]
         [AllowAnonymous]
         [ProducesResponseType(302)]
@@ -81,6 +96,13 @@ namespace WTP.WebAPI.Controllers
                 : Redirect($"{_configuration["Url:BaseUrl"]}/home?confirmed=false");
         }
 
+        /// <summary>
+        /// Send email to reset password
+        /// </summary>
+        /// <param name="formData"></param>
+        /// <returns></returns>
+        /// <response code="200">Successful performance</response>
+        /// <response code="400">The action failed</response>
         [HttpPost("[action]")]
         [AllowAnonymous]
         [ProducesResponseType(typeof(ResponseDto), 200)]
@@ -105,12 +127,19 @@ namespace WTP.WebAPI.Controllers
                 ));
         }
 
+        /// <summary>
+        /// No description
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="code"></param>
+        /// <returns></returns>
+        /// <response code="302">Successful performance</response>
         [HttpGet("[action]")]
         [AllowAnonymous]
         [ProducesResponseType(302)]
         public IActionResult ResetPassword([FromQuery] string userId = null, [FromQuery] string code = null)
         {
-            if(userId == null || code == null)
+            if (userId == null || code == null)
             {
                 return Redirect($"{_configuration["Url:BaseUrl"]}/account/forgot-password?resetIsFailed=true");
             }
@@ -120,6 +149,13 @@ namespace WTP.WebAPI.Controllers
             return Redirect($"{_configuration["Url:BaseUrl"]}/account/reset-password?userId={userId}&code={code}");
         }
 
+        /// <summary>
+        /// Reset user password by email 
+        /// </summary>
+        /// <param name="formData"></param>
+        /// <returns></returns>
+        /// <response code="200">Successful performance</response>
+        /// <response code="400">The action failed</response>
         [HttpPost("[action]")]
         [AllowAnonymous]
         [ProducesResponseType(typeof(ResponseDto), 200)]
@@ -141,6 +177,13 @@ namespace WTP.WebAPI.Controllers
                 : (IActionResult)BadRequest(new ResponseDto(400, "Password reset is failed.", "Something going wrong."));
         }
 
+        /// <summary>
+        /// Change password of current user
+        /// </summary>
+        /// <param name="formdata"></param>
+        /// <returns></returns>
+        /// <response code="200">Successful performance</response>
+        /// <response code="400">The action failed</response>
         [HttpPost("[action]")]
         [Authorize(Policy = "RequireLoggedIn")]
         [ProducesResponseType(typeof(ResponseDto), 200)]
@@ -155,10 +198,10 @@ namespace WTP.WebAPI.Controllers
             int userId = this.GetCurrentUserId();
 
             var result = await _appUserService.ChangePasswordAsync(new ChangePasswordModel(userId,
-                                                                                         formdata.CurrentPassword,
-                                                                                         formdata.NewPassword));
+                                                                                           formdata.CurrentPassword,
+                                                                                           formdata.NewPassword));
 
-            return result.Succeeded 
+            return result.Succeeded
                 ? Ok(new ResponseDto(200, "Completed.", "Password update successful."))
                 : (IActionResult)BadRequest(new ResponseDto(500, "Change password failed.", result.Errors.First().Description));
         }

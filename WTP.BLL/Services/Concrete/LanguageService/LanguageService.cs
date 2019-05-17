@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using WTP.BLL.Models.Language;
@@ -46,7 +47,7 @@ namespace WTP.BLL.Services.Concrete.LanguageService
 
         public async Task<IEnumerable<LanguageModel>> GetAllAsync()
         {
-            var languages = await _uow.Languages.GetAllAsync();
+            var languages = await _uow.Languages.AsQueryable().ToListAsync();
 
             return _mapper.Map<IEnumerable<LanguageModel>>(languages);
         }
