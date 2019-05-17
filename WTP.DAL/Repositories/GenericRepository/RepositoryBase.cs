@@ -1,10 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace WTP.DAL.Repositories.GenericRepository
 {
-    public class RepositoryBase<TEntity> : IRepository<TEntity> where TEntity : class , IEntity
+    public class RepositoryBase<TEntity> : IRepository<TEntity> where TEntity : class, IEntity
     {
         private readonly ApplicationDbContext _context;
         private readonly DbSet<TEntity> _dbset;
@@ -18,26 +19,28 @@ namespace WTP.DAL.Repositories.GenericRepository
         public virtual async Task CreateAsync(TEntity item)
         {
             await _dbset.AddAsync(item);
-
-            await _context.SaveChangesAsync();
         }
 
         public virtual async Task UpdateAsync(TEntity item)
         {
-            _dbset.Update(item);
+            _context.Entry(item).State = EntityState.Modified;
+        }
 
-            await _context.SaveChangesAsync();
+        public virtual async Task CreateOrUpdate(TEntity item)
+        {
+            if (item.Id == 0)
+                await _dbset.AddAsync(item);
+            else
+                _context.Entry(item).State = EntityState.Modified;
         }
 
         public virtual async Task DeleteAsync(int id)
         {
             var entity = await GetAsync(id);
 
-            if(entity != null)
+            if (entity != null)
             {
                 _context.Entry(entity).State = EntityState.Deleted;
-
-                await _context.SaveChangesAsync();
             }
         }
 
@@ -46,10 +49,9 @@ namespace WTP.DAL.Repositories.GenericRepository
             return await _dbset.FindAsync(id);
         }
 
-        public virtual async Task<IEnumerable<TEntity>> GetAllAsync()
+        public virtual IQueryable<TEntity> AsQueryable()
         {
-            //return _dbset;
-            return await _dbset.ToListAsync();
+            return _dbset.AsQueryable<TEntity>();
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using WTP.BLL.Models.Country;
@@ -46,7 +47,7 @@ namespace WTP.BLL.Services.Concrete.CountryService
 
         public async Task<IEnumerable<CountryModel>> GetAllAsync()
         {
-            var countries = await _uow.Countries.GetAllAsync();
+            var countries = await _uow.Countries.AsQueryable().ToListAsync();
 
             return _mapper.Map<IEnumerable<CountryModel>>(countries);
         }
