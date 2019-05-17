@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using WTP.BLL.Models.Azure;
 
-namespace WTP.BLL.Services.Concrete.AzureBlobStorageService
+namespace WTP.BLL.Services.AzureBlobStorageService
 {
     public interface IAzureBlobStorageService
     {

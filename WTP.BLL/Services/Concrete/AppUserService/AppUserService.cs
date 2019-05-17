@@ -140,17 +140,5 @@ namespace WTP.BLL.Services.Concrete.AppUserService
                 ? IdentityResult.Failed() 
                 : await _appUserRepository.ConfirmEmailAsync(userId, token);
         }
-
-        public async Task<IdentityResult> UpdatePhotoAsync(int userId, string userPhoto)
-        {
-
-            var appUserDto = await _appUserRepository.GetAsync(userId);
-
-            appUserDto.Photo = userPhoto;
-
-            var appUser = _mapper.Map<AppUser>(appUserDto);
-
-            return await _appUserRepository.UpdateAsync(appUserDto);
-        }
     }
 }

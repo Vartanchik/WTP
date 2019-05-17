@@ -21,7 +21,7 @@ using WTP.BLL.Services.Concrete.LanguageService;
 using WTP.BLL.Services.Concrete.PlayerService;
 using WTP.BLL.Services.Concrete.TeamService;
 using WTP.BLL.Services.Concrete.RefreshTokenService;
-using WTP.BLL.Services.Concrete.EmailService;
+using WTP.BLL.Services.EmailService;
 using WTP.DAL;
 using WTP.DAL.Entities;
 using WTP.DAL.Repositories.ConcreteRepositories.AppUserExtended;
@@ -32,7 +32,7 @@ using WTP.DAL.Repositories.ConcreteRepositories.RefreshTokenExtended;
 using WTP.WebAPI.Helpers;
 using WTP.WebAPI.Services;
 using System.Collections.Generic;
-using WTP.BLL.Services.Concrete.AzureBlobStorageService;
+using WTP.BLL.Services.AzureBlobStorageService;
 
 namespace WTP.WebAPI
 {

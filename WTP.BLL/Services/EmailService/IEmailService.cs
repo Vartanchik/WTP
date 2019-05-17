@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using WTP.BLL.Models.Email;
 
-namespace WTP.BLL.Services.Concrete.EmailService
+namespace WTP.BLL.Services.EmailService
 {
     public interface IEmailService
     {

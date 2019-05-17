@@ -10,15 +10,19 @@ namespace WTP.WebAPI.Dto
 
         public string Name { get; set; }
 
+        public string BlobName { get; set; }
+
         public FileDataDto()
         {
         }
 
-        public FileDataDto(Stream fileStream, string fileType, string fileName = null)
+        public FileDataDto(Stream fileStream, string fileType, string fileName, string blobName = null)
         {
             Stream = fileStream;
 
             Type = fileType;
+
+            BlobName = blobName;
 
             Name = fileName;
         }

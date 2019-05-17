@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using WTP.BLL.Services.Concrete.AzureBlobStorageService;
+using WTP.BLL.Services.AzureBlobStorageService;
 using WTP.BLL.Services.Concrete.AppUserService;
 using WTP.BLL.Models.AppUser;
 using WTP.WebAPI.Utility.Extensions;
@@ -75,27 +75,43 @@ namespace WTP.WebAPI.Dto.Controllers
 
         [HttpPost("[action]")]
         [Authorize(Policy = "RequireLoggedIn")]
+        [ProducesResponseType(typeof(ResponseDto), 200)]
+        [ProducesResponseType(typeof(ResponseDto), 404)]
         public async Task<IActionResult> UploadPhoto([FromForm]PhotoFormDataDto formData)
         {
+            int userId = this.GetCurrentUserId();
+
+            var appUserModel = await _appUserService.GetAsync(userId);
+
             var azureBlobStorageConfigModel = _mapper.Map<AzureBlobStorageConfigModel>(new AzureBlobStorageConfigDto(_configuration));
 
             var fileDataDto = new FileDataDto(formData.File.OpenReadStream(), formData.File.ContentType, formData.File.FileName);
+
+            if (appUserModel.Photo != null && appUserModel.Photo != _configuration["Photo:DefaultPhoto"])
+            {
+                fileDataDto.BlobName = appUserModel.Photo;
+            }
 
             var fileDataModel = _mapper.Map<FileDataModel>(fileDataDto);
 
             string userPhotoUrl = await _azureBlobStorageService.UploadFileAsync(fileDataModel, azureBlobStorageConfigModel);
 
-            int userId = this.GetCurrentUserId();
+            if (appUserModel.Photo == null || appUserModel.Photo == _configuration["Photo:DefaultPhoto"])
+            {
+                appUserModel.Photo = userPhotoUrl;
 
-            var result = await _appUserService.UpdatePhotoAsync(userId, userPhotoUrl);
+                await _appUserService.UpdateAsync(appUserModel);
+            }
 
-            return (userPhotoUrl != null && result.Succeeded)
+            return (userPhotoUrl != null)
                 ? Ok(new ResponseDto(200, "Photo was updated.", userPhotoUrl))
-                : (IActionResult)BadRequest(new ResponseDto(400, "Photo updated failed."));
+                : (IActionResult)BadRequest(new ResponseDto(400, "Photo upload failed."));
         }
 
-        [HttpGet("[action]/{imageId:minlength(1)}")]
-        public async Task<IActionResult> Image()
+        [HttpGet("[action]/{photoId:minlength(1)}")]
+        [ProducesResponseType(typeof(FileStreamResult), 200)]
+        [ProducesResponseType(typeof(ResponseDto), 404)]
+        public async Task<IActionResult> Photo()
         {
             var requestUrl = UriHelper.GetDisplayUrl(Request);
 
@@ -103,7 +119,9 @@ namespace WTP.WebAPI.Dto.Controllers
 
             var fileDataModel =  await _azureBlobStorageService.DownloadFileAsync(requestUrl, azureBlobStorageConfigModel);
 
-            return File(fileDataModel.Stream, fileDataModel.Type, fileDataModel.Name);
+            return fileDataModel != null
+                ? File(fileDataModel.Stream, fileDataModel.Type, fileDataModel.Name)
+                : (IActionResult)BadRequest(new ResponseDto(404, "Photo not found."));
         }
     }
 }

@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using WTP.Logging;
 using WTP.BLL.Models.AppUser;
 using WTP.BLL.Services.Concrete.AppUserService;
-using WTP.BLL.Services.Concrete.EmailService;
+using WTP.BLL.Services.EmailService;
 using WTP.WebAPI.Utility.Extensions;
 using WTP.WebAPI.Dto;
 using AutoMapper;
