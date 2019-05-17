@@ -1,12 +1,13 @@
-﻿using WTP.DAL.Entities.AppUserEntities;
-using WTP.DAL.Repositories.GenericRepository;
+﻿using AutoMapper;
+using WTP.BLL.Models.AppUserModels;
+using WTP.BLL.UnitOfWork;
 
 namespace WTP.DAL.Repositories.ConcreteRepositories
 {
-    internal class CountryRepository : RepositoryBase<Country>, IRepository<Country>
+    internal class CountryRepository : RepositoryBase<CountryModel>, IRepository<CountryModel>
     {
-        public CountryRepository(ApplicationDbContext context)
-            : base(context)
+        public CountryRepository(ApplicationDbContext context, IMapper mapper)
+            : base(context, mapper)
         {
         }
     }

@@ -1,12 +1,13 @@
-﻿using WTP.DAL.Entities.AppUserEntities;
-using WTP.DAL.Repositories.GenericRepository;
+﻿using AutoMapper;
+using WTP.BLL.Models.AppUserModels;
+using WTP.BLL.UnitOfWork;
 
 namespace WTP.DAL.Repositories.ConcreteRepositories
 {
-    internal class LanguageRepository : RepositoryBase<Language>, IRepository<Language>
+    internal class LanguageRepository : RepositoryBase<LanguageModel>, IRepository<LanguageModel>
     {
-        public LanguageRepository(ApplicationDbContext context)
-            : base(context)
+        public LanguageRepository(ApplicationDbContext context, IMapper mapper)
+            : base(context, mapper)
         {
         }
     }

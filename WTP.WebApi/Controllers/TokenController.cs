@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using WTP.BLL.Models.AppUser;
+using WTP.BLL.Models.AppUserModels;
 using WTP.BLL.Models.RefreshToken;
 using WTP.BLL.Services.Concrete.AppUserService;
 using WTP.BLL.Services.Concrete.RefreshTokenService;

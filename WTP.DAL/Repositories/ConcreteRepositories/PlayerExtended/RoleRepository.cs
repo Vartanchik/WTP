@@ -1,12 +1,13 @@
-﻿using WTP.DAL.Entities.PlayerEntities;
-using WTP.DAL.Repositories.GenericRepository;
+﻿using AutoMapper;
+using WTP.BLL.Models.PlayerModels;
+using WTP.BLL.UnitOfWork;
 
 namespace WTP.DAL.Repositories.PlayerExtended
 {
-    internal class RoleRepository : RepositoryBase<Role>, IRepository<Role>
+    internal class RoleRepository : RepositoryBase<PlayerRoleModel>, IRepository<PlayerRoleModel>
     {
-        public RoleRepository(ApplicationDbContext context)
-            : base(context)
+        public RoleRepository(ApplicationDbContext context, IMapper mapper)
+            : base(context, mapper)
         {
         }
     }

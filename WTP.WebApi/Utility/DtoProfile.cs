@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using WTP.BLL.Models.AppUser;
+using WTP.BLL.Models.AppUserModels;
 using WTP.WebAPI.Dto;
 
 namespace WTP.WebAPI.Services

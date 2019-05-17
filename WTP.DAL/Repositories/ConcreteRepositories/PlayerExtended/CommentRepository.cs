@@ -1,12 +1,13 @@
-﻿using WTP.DAL.Entities.PlayerEntities;
-using WTP.DAL.Repositories.GenericRepository;
+﻿using AutoMapper;
+using WTP.BLL.Models.PlayerModels;
+using WTP.BLL.UnitOfWork;
 
 namespace WTP.DAL.Repositories.PlayerExtended
 {
-    internal class CommentRepository : RepositoryBase<Comment>, IRepository<Comment>
+    internal class CommentRepository : RepositoryBase<CommentModel>, IRepository<CommentModel>
     {
-        public CommentRepository(ApplicationDbContext context)
-            : base(context)
+        public CommentRepository(ApplicationDbContext context, IMapper mapper)
+            : base(context, mapper)
         {
         }
     }

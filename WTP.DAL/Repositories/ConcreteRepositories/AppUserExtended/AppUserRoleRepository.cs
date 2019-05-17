@@ -4,9 +4,9 @@ using WTP.BLL.UnitOfWork;
 
 namespace WTP.DAL.Repositories.ConcreteRepositories.AppUserExtended
 {
-    internal class AppUserRepository : RepositoryBase<AppUserModel>, IRepository<AppUserModel>
+    class AppUserRoleRepository : RepositoryBase<AppUserRoleModel>, IRepository<AppUserRoleModel>
     {
-        public AppUserRepository(ApplicationDbContext context, IMapper mapper)
+        public AppUserRoleRepository(ApplicationDbContext context, IMapper mapper)
             : base(context, mapper)
         {
         }

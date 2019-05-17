@@ -1,16 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
-using Microsoft.AspNetCore.Identity;
 using WTP.DAL.Entities.PlayerEntities;
 using WTP.DAL.Entities.TeamEntities;
 
 namespace WTP.DAL.Entities.AppUserEntities
 {
-    public class AppUser : IdentityUser<int>, IEntity
+    public class AppUser : IEntity
     {
-        public override int Id { get { return base.Id; } set { base.Id = value; } }
-        public override string UserName { get { return base.UserName; } set { base.UserName = value; } }
-        public override string Email { get { return base.Email; } set { base.Email = value; } }
+        public  int Id { get; set; }
+        public string UserName { get; set; }
+        public string Email { get; set; }
+        public bool EmailConfirmed { get; set; }
+        public string PasswordHash { get; set; }
+        public string SequrityStamp { get; set; }
+        public string ConcurrencyStamp { get; set; }
+        public int UserRoleId { get; set; }
+        public AppUserRole AppUserRole { get; set; }
+        public bool LockoutEnabled { get; set; }
+        public DateTime LockoutEnd { get; set; }
+        public bool DeletedEnabled { get; set; }
+        public DateTime DeletedEnd { get; set; }
         public string Photo { get; set; }
         public int? GenderId { get; set; }
         public Gender Gender { get; set; }
@@ -22,6 +31,5 @@ namespace WTP.DAL.Entities.AppUserEntities
         public List<Player> Players { get; set; }
         public List<Team> Teams { get; set; }
         public virtual List<RefreshToken> Tokens { get; set; }
-        public bool Enabled { get; set; }
     }
 }

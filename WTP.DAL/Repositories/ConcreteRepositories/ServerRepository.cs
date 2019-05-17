@@ -1,12 +1,13 @@
-﻿using WTP.DAL.Entities;
-using WTP.DAL.Repositories.GenericRepository;
+﻿using AutoMapper;
+using WTP.BLL.Models;
+using WTP.BLL.UnitOfWork;
 
 namespace WTP.DAL.Repositories.ConcreteRepositories
 {
-    internal class ServerRepository : RepositoryBase<Server>, IRepository<Server>
+    internal class ServerRepository : RepositoryBase<ServerModel>, IRepository<ServerModel>
     {
-        public ServerRepository(ApplicationDbContext context)
-            : base(context)
+        public ServerRepository(ApplicationDbContext context, IMapper mapper)
+            : base(context, mapper)
         {
         }
     }

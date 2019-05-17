@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using WTP.BLL.Models.AppUser;
+using WTP.BLL.Models.AppUserModels;
 using WTP.BLL.Models.Country;
 using WTP.BLL.Models.Gender;
 using WTP.BLL.Models.Language;
-using WTP.BLL.Models.Player;
-using WTP.BLL.Models.Team;
+using WTP.BLL.Models.PlayerModels;
+using WTP.BLL.Models.TeamModels;
 
 namespace WTP.WebAPI.Dto
 {

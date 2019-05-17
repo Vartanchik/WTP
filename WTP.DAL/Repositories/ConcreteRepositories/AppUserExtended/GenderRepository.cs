@@ -1,12 +1,13 @@
-﻿using WTP.DAL.Entities.AppUserEntities;
-using WTP.DAL.Repositories.GenericRepository;
+﻿using AutoMapper;
+using WTP.BLL.Models.AppUserModels;
+using WTP.BLL.UnitOfWork;
 
 namespace WTP.DAL.Repositories.ConcreteRepositories
 {
-    internal class GenderRepository : RepositoryBase<Gender>, IRepository<Gender>
+    internal class GenderRepository : RepositoryBase<GenderModel>, IRepository<GenderModel>
     {
-        public GenderRepository(ApplicationDbContext context)
-            : base(context)
+        public GenderRepository(ApplicationDbContext context, IMapper mapper)
+            : base(context, mapper)
         {
         }
     }

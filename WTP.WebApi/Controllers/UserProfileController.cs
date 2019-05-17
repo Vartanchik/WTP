@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WTP.BLL.Services.Concrete.AppUserService;
-using WTP.BLL.Models.AppUser;
+using WTP.BLL.Models.AppUserModels;
 using WTP.WebAPI.Utility.Extensions;
 using AutoMapper;
 
@@ -30,7 +30,7 @@ namespace WTP.WebAPI.Dto.Controllers
         {
             int userId = this.GetCurrentUserId();
 
-            var appUserDto = await _appUserService.GetAsync(userId);
+            var appUserDto = await _appUserService.FindByIdAsync(userId);
 
             var appUserDtoViewModel = _mapper.Map<AppUserApiDto>(appUserDto);
 

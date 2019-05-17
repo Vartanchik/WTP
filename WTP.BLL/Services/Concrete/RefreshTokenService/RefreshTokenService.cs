@@ -1,14 +1,49 @@
-﻿using AutoMapper;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using WTP.BLL.Models.RefreshToken;
-using WTP.DAL.Entities;
-using WTP.DAL.Repositories.ConcreteRepositories.RefreshTokenExtended;
+using WTP.BLL.Models.AppUserModels;
+using WTP.BLL.UnitOfWork;
 
 namespace WTP.BLL.Services.Concrete.RefreshTokenService
 {
     public class RefreshTokenService : IRefreshTokenService
     {
+        private readonly IUnitOfWork _uow;
+
+        public RefreshTokenService(IUnitOfWork unitOfWork)
+        {
+            _uow = unitOfWork;
+        }
+
+        public Task CreateAsync(RefreshTokenModel tokenDto)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public Task DeleteAsync(int id)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public Task DeleteRangeAsync(int userId)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public Task<RefreshTokenModel> GetAsync(int id)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public Task<RefreshTokenModel> GetByUserIdAsync(int userId, string refreshToken)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public Task<IEnumerable<RefreshTokenModel>> GetRangeAsync(int id)
+        {
+            throw new System.NotImplementedException();
+        }
+        /*
         private readonly IRefreshTokenRepository _refreshToken;
         private readonly IMapper _mapper;
 
@@ -55,5 +90,6 @@ namespace WTP.BLL.Services.Concrete.RefreshTokenService
 
             return _mapper.Map<RefreshTokenModel>(token);
         }
+        */
     }
 }

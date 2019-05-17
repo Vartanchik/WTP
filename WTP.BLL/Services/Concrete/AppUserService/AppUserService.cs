@@ -1,16 +1,122 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Identity;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using WTP.BLL.Models.AppUser;
-using WTP.DAL.Entities;
-using WTP.DAL.Repositories.ConcreteRepositories.AppUserExtended;
+using WTP.BLL.Models.AppUserModels;
+using WTP.BLL.UnitOfWork;
 
 namespace WTP.BLL.Services.Concrete.AppUserService
 {
     public class AppUserService : IAppUserService
     {
+        private readonly IUnitOfWork _ouw;
+
+        public AppUserService(IUnitOfWork unitOfWork)
+        {
+            _ouw = unitOfWork;
+        }
+
+        public async Task<OperationResult> ChangePasswordAsync(ChangePasswordModel model)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> CheckPasswordAsync(int userId, string password)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<OperationResult> ConfirmEmailAsync(int userId, string token)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<OperationResult> CreateAsync(AppUserModel model, string password)
+        {
+            OperationResult result;
+            try
+            {
+                await _ouw.AppUserModels.CreateAsync(new AppUserModel { PasswordHash = password });
+                /* _hasher.Hash(password) */
+
+                result = OperationResult.Success;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+
+            return result;
+        }
+
+        public async Task<OperationResult> DeleteAsync(int userId)
+        {
+            OperationResult result;
+            try
+            {
+                await _ouw.AppUserModels.DeleteAsync(userId);
+                result = OperationResult.Success;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+
+            return result;
+        }
+
+        public async Task<AppUserModel> FindByIdAsync(int userId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<AppUserModel> FindByIdAsync(string userId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<string> GenerateEmailConfirmationTokenAsync(AppUserModel model)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<string> GeneratePasswordResetTokenAsync(AppUserModel model)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<AppUserModel> GetByEmailAsync(string userEmail)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<AppUserModel> GetByNameAsync(string userName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<IList<string>> GetRolesAsync(AppUserModel model)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<bool> IsEmailConfirmedAsync(int userId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<OperationResult> ResetPasswordAsync(ResetPasswordModel model)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<OperationResult> UpdateAsync(AppUserModel model)
+        {
+            throw new NotImplementedException();
+        }
+
+        //
+
+        /*
         private readonly IMapper _mapper;
         private readonly IAppUserRepository _appUserRepository;
 
@@ -140,5 +246,6 @@ namespace WTP.BLL.Services.Concrete.AppUserService
                 ? IdentityResult.Failed() 
                 : await _appUserRepository.ConfirmEmailAsync(userId, token);
         }
+        */
     }
 }

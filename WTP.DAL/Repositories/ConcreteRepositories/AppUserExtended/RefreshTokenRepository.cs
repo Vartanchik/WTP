@@ -1,12 +1,13 @@
-﻿using WTP.DAL.Entities.AppUserEntities;
-using WTP.DAL.Repositories.GenericRepository;
+﻿using AutoMapper;
+using WTP.BLL.Models.AppUserModels;
+using WTP.BLL.UnitOfWork;
 
 namespace WTP.DAL.Repositories.ConcreteRepositories.AppUserExtended
 {
-    internal class RefreshTokenRepository : RepositoryBase<RefreshToken>, IRepository<RefreshToken>
+    internal class RefreshTokenRepository : RepositoryBase<RefreshTokenModel>, IRepository<RefreshTokenModel>
     {
-        public RefreshTokenRepository(ApplicationDbContext context)
-            : base(context)
+        public RefreshTokenRepository(ApplicationDbContext context, IMapper mapper)
+            : base(context, mapper)
         {
         }
     }

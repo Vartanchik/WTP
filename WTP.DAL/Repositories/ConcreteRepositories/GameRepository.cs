@@ -1,12 +1,13 @@
-﻿using WTP.DAL.Entities;
-using WTP.DAL.Repositories.GenericRepository;
+﻿using AutoMapper;
+using WTP.BLL.Models;
+using WTP.BLL.UnitOfWork;
 
 namespace WTP.DAL.Repositories.ConcreteRepositories
 {
-    internal class GameRepository : RepositoryBase<Game>, IRepository<Game>
+    internal class GameRepository : RepositoryBase<GameModel>, IRepository<GameModel>
     {
-        public GameRepository(ApplicationDbContext context)
-            : base(context)
+        public GameRepository(ApplicationDbContext context, IMapper mapper)
+            : base(context, mapper)
         {
         }
     }

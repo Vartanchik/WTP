@@ -1,49 +1,53 @@
-﻿using System;
+﻿using AutoMapper;
+using System;
 using System.Threading.Tasks;
-using WTP.DAL.Entities;
-using WTP.DAL.Entities.AppUserEntities;
-using WTP.DAL.Entities.PlayerEntities;
-using WTP.DAL.Entities.TeamEntities;
-using WTP.DAL.Repositories.GenericRepository;
+using WTP.BLL.Models;
+using WTP.BLL.Models.AppUserModels;
+using WTP.BLL.Models.PlayerModels;
+using WTP.BLL.Models.TeamModels;
+using WTP.BLL.UnitOfWork;
+using WTP.DAL.Repositories;
 
 namespace WTP.DAL.UnitOfWork
 {
     public class UnitOfWork : IUnitOfWork
     {
-        private readonly ApplicationDbContext   _context;
-        private IRepository<AppUser>            _appUsers;
-        private IRepository<DeletedUser>        _deletedUsers;
-        private IRepository<RefreshToken>       _tokens;
-        private IRepository<Country>            _countries;
-        private IRepository<Gender>             _genders;
-        private IRepository<Language>           _languages;
-        private IRepository<Player>             _players;
-        private IRepository<Server>             _servesr;
-        private IRepository<Goal>               _goals;
-        private IRepository<Role>               _roles;
-        private IRepository<Rank>               _ranks;
-        private IRepository<Comment>            _comments;
-        private IRepository<Team>               _teams;
-        private bool                            _disposed = false;
+        private readonly ApplicationDbContext _context;
+        private readonly IMapper _mapper;
+        private bool _disposed = false;
 
-        public IRepository<AppUser>         AppUsers => _appUsers ?? (_appUsers = new RepositoryBase<AppUser>(_context));
-        public IRepository<DeletedUser>     DeletedUsers => _deletedUsers ?? (_deletedUsers = new RepositoryBase<DeletedUser>(_context));
-        public IRepository<RefreshToken>    Tokens => _tokens ?? (_tokens = new RepositoryBase<RefreshToken>(_context));
-        public IRepository<Country>         Countries => _countries ?? (_countries = new RepositoryBase<Country>(_context));
-        public IRepository<Gender>          Genders => _genders ?? (_genders = new RepositoryBase<Gender>(_context));
-        public IRepository<Language>        Languages => _languages ?? (_languages = new RepositoryBase<Language>(_context));
-        public IRepository<Player>          Players => _players ?? (_players = new RepositoryBase<Player>(_context));
-        public IRepository<Server>          Servesr => _servesr ?? (_servesr = new RepositoryBase<Server>(_context));
-        public IRepository<Goal>            Goals => _goals ?? (_goals = new RepositoryBase<Goal>(_context));
-        public IRepository<Role>            Roles => _roles ?? (_roles = new RepositoryBase<Role>(_context));
-        public IRepository<Rank>            Ranks => _ranks ?? (_ranks = new RepositoryBase<Rank>(_context));
-        public IRepository<Comment>         Comments => _comments ?? (_comments = new RepositoryBase<Comment>(_context));
-        public IRepository<Team>            Teams => _teams ?? (_teams = new RepositoryBase<Team>(_context));
+        private IRepository<AppUserModel> _appUserModels;
+        private IRepository<RefreshTokenModel> _tokenModels;
+        private IRepository<CountryModel> _countrieModels;
+        private IRepository<GenderModel> _genderModels;
+        private IRepository<LanguageModel> _languageModels;
+        private IRepository<PlayerModel> _playerModels;
+        private IRepository<ServerModel> _servesr;
+        private IRepository<GoalModel> _goalModels;
+        private IRepository<AppUserRoleModel> _appUserRoleModels;
+        private IRepository<PlayerRoleModel> _playerRoleModels;
+        private IRepository<RankModel> _rankModels;
+        private IRepository<CommentModel> _commentModels;
+        private IRepository<TeamModel> _teamModels;
 
         public UnitOfWork(ApplicationDbContext context)
         {
             _context = context;
         }
+
+        public IRepository<AppUserModel> AppUserModels => _appUserModels ?? (_appUserModels = new RepositoryBase<AppUserModel>(_context, _mapper));
+        public IRepository<RefreshTokenModel> TokenModels => _tokenModels ?? (_tokenModels = new RepositoryBase<RefreshTokenModel>(_context, _mapper));
+        public IRepository<CountryModel> CountrieModels => _countrieModels ?? (_countrieModels = new RepositoryBase<CountryModel>(_context, _mapper));
+        public IRepository<GenderModel> GenderModels => _genderModels ?? (_genderModels = new RepositoryBase<GenderModel>(_context, _mapper));
+        public IRepository<LanguageModel> LanguageModels => _languageModels ?? (_languageModels = new RepositoryBase<LanguageModel>(_context, _mapper));
+        public IRepository<PlayerModel> PlayerModels => _playerModels ?? (_playerModels = new RepositoryBase<PlayerModel>(_context, _mapper));
+        public IRepository<ServerModel> Servesr => _servesr ?? (_servesr = new RepositoryBase<ServerModel>(_context, _mapper));
+        public IRepository<GoalModel> GoalModels => _goalModels ?? (_goalModels = new RepositoryBase<GoalModel>(_context, _mapper));
+        public IRepository<AppUserRoleModel> AppUserRoleModels => _appUserRoleModels ?? (_appUserRoleModels = new RepositoryBase<AppUserRoleModel>(_context, _mapper));
+        public IRepository<PlayerRoleModel> PlayerRoleModels => _playerRoleModels ?? (_playerRoleModels = new RepositoryBase<PlayerRoleModel>(_context, _mapper));
+        public IRepository<RankModel> RankModels => _rankModels ?? (_rankModels = new RepositoryBase<RankModel>(_context, _mapper));
+        public IRepository<CommentModel> CommentModels => _commentModels ?? (_commentModels = new RepositoryBase<CommentModel>(_context, _mapper));
+        public IRepository<TeamModel> TeamModels => _teamModels ?? (_teamModels = new RepositoryBase<TeamModel>(_context, _mapper));
 
         public void Commit()
         {
@@ -72,5 +76,6 @@ namespace WTP.DAL.UnitOfWork
             Dispose(true);
             GC.SuppressFinalize(this);
         }
+
     }
 }

@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using WTP.BLL.Models.RefreshToken;
+using WTP.BLL.Models.AppUserModels;
 
 namespace WTP.BLL.Services.Concrete.RefreshTokenService
 {

@@ -1,13 +1,11 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using WTP.DAL.Entities.AppUserEntities;
 using WTP.DAL.Entities.PlayerEntities;
 using WTP.DAL.Entities.TeamEntities;
 
 namespace WTP.DAL
 {
-    public class ApplicationDbContext : IdentityDbContext<AppUser, IdentityRole<int>, int>
+    public class ApplicationDbContext : DbContext
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
@@ -27,6 +25,20 @@ namespace WTP.DAL
             base.OnModelCreating(builder);
 
             SetStartData(builder);
+            ConfigureData(builder);
+        }
+
+        private void ConfigureData(ModelBuilder builder)
+        {
+            builder.Entity<AppUser>()
+              .Property(p => p.DeletedEnabled)
+                  .HasDefaultValue(true)
+                  .ValueGeneratedNever();
+
+            builder.Entity<AppUser>()
+               .Property(p => p.LockoutEnabled)
+                   .HasDefaultValue(true)
+                   .ValueGeneratedNever();
 
             builder.Entity<AppUserLanguage>()
                 .HasKey(_ => new { _.AppUserId, _.LanguageId });
@@ -43,14 +55,19 @@ namespace WTP.DAL
         private void SetStartData(ModelBuilder builder)
         {
             builder.Entity<AppUser>()
-               .Property(p => p.Enabled)
+               .Property(p => p.DeletedEnabled)
                    .HasDefaultValue(true)
                    .ValueGeneratedNever();
 
-            builder.Entity<IdentityRole<int>>().HasData(
-                    new { Id = 1, Name = "Admin", NormalizedName = "ADMIN" },
-                    new { Id = 2, Name = "User", NormalizedName = "USER" },
-                    new { Id = 3, Name = "Moderator", NormalizedName = "MODERATOR" }
+            builder.Entity<AppUser>()
+               .Property(p => p.LockoutEnabled)
+                   .HasDefaultValue(true)
+                   .ValueGeneratedNever();
+
+            builder.Entity<AppUserRole>().HasData(
+                    new AppUserRole { Id = 1, Name = "Admin"},
+                    new AppUserRole { Id = 2, Name = "User"},
+                    new AppUserRole { Id = 3, Name = "Moderator"}
             );
 
             builder.Entity<Gender>().HasData(
