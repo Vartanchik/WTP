@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace WTP.DAL.Entities
 {
-    public class AppUser : IdentityUser<int>, IEntity
+    public class AppUser : IdentityUser<int>, IEntity, IUser
     {
         public override int Id { get { return base.Id; } set { base.Id = value; } }
         public override string UserName { get { return base.UserName; } set { base.UserName = value; } }

@@ -37,14 +37,14 @@ namespace WTP.WebAPI.Controllers
         /// <summary>
         /// Registration of new user
         /// </summary>
-        /// <param name="formData"></param>
+        /// <param name="dot"></param>
         /// <returns></returns>
         /// <response code="200">Successful performance</response>
         /// <response code="400">The action failed</response>
         [HttpPost("[action]")]
         [ProducesResponseType(typeof(ResponseDto), 200)]
         [ProducesResponseType(typeof(ResponseDto), 400)]
-        public async Task<IActionResult> Register([FromBody] RegisterDto formData)
+        public async Task<IActionResult> Register([FromBody] RegisterDto dot)
         {
             if (!ModelState.IsValid)
             {
@@ -53,16 +53,16 @@ namespace WTP.WebAPI.Controllers
 
             var user = new AppUserModel
             {
-                Email = formData.Email,
-                UserName = formData.UserName,
+                Email = dot.Email,
+                UserName = dot.UserName,
                 SecurityStamp = Guid.NewGuid().ToString()
             };
 
-            var result = await _appUserService.CreateAsync(user, formData.Password);
+            var result = await _appUserService.CreateAsync(user, dot.Password);
 
             if (result.Succeeded)
             {
-                await SendEmailConfirmationAsync(formData.Email);
+                await SendEmailConfirmationAsync(dot.Email);
 
                 return Ok(new ResponseDto
                 {
@@ -99,7 +99,7 @@ namespace WTP.WebAPI.Controllers
         /// <summary>
         /// Send email to reset password
         /// </summary>
-        /// <param name="formData"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
         /// <response code="200">Successful performance</response>
         /// <response code="400">The action failed</response>
@@ -107,14 +107,14 @@ namespace WTP.WebAPI.Controllers
         [AllowAnonymous]
         [ProducesResponseType(typeof(ResponseDto), 200)]
         [ProducesResponseType(typeof(ResponseDto), 400)]
-        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto formData)
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto dto)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(new ResponseDto(400, "Error", "Invalid value was entered! Please, redisplay form."));
             }
 
-            var user = await _appUserService.GetByEmailAsync(formData.Email);
+            var user = await _appUserService.GetByEmailAsync(dto.Email);
 
             if (user != null && await _appUserService.IsEmailConfirmedAsync(user.Id))
             {
@@ -152,7 +152,7 @@ namespace WTP.WebAPI.Controllers
         /// <summary>
         /// Reset user password by email 
         /// </summary>
-        /// <param name="formData"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
         /// <response code="200">Successful performance</response>
         /// <response code="400">The action failed</response>
@@ -160,17 +160,17 @@ namespace WTP.WebAPI.Controllers
         [AllowAnonymous]
         [ProducesResponseType(typeof(ResponseDto), 200)]
         [ProducesResponseType(typeof(ResponseDto), 400)]
-        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto formData)
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto dto)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(new ResponseDto(400, "Invalid value was entered! Please, redisplay form."));
             }
 
-            var token = HttpUtility.UrlDecode(formData.Code);
-            var result = await _appUserService.ResetPasswordAsync(new ResetPasswordModel(formData.Id,
-                                                                                       token,
-                                                                                       formData.NewPassword));
+            var token = HttpUtility.UrlDecode(dto.Code);
+            var result = await _appUserService.ResetPasswordAsync(new ResetPasswordModel(dto.Id,
+                                                                                         token,
+                                                                                         dto.NewPassword));
 
             return result.Succeeded
                 ? Ok(new ResponseDto(200, "Completed.", "Password reset is successful."))
@@ -180,7 +180,7 @@ namespace WTP.WebAPI.Controllers
         /// <summary>
         /// Change password of current user
         /// </summary>
-        /// <param name="formdata"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
         /// <response code="200">Successful performance</response>
         /// <response code="400">The action failed</response>
@@ -188,7 +188,7 @@ namespace WTP.WebAPI.Controllers
         [Authorize(Policy = "RequireLoggedIn")]
         [ProducesResponseType(typeof(ResponseDto), 200)]
         [ProducesResponseType(typeof(ResponseDto), 400)]
-        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDto formdata)
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDto dto)
         {
             if (!ModelState.IsValid)
             {
@@ -198,8 +198,8 @@ namespace WTP.WebAPI.Controllers
             int userId = this.GetCurrentUserId();
 
             var result = await _appUserService.ChangePasswordAsync(new ChangePasswordModel(userId,
-                                                                                           formdata.CurrentPassword,
-                                                                                           formdata.NewPassword));
+                                                                                           dto.CurrentPassword,
+                                                                                           dto.NewPassword));
 
             return result.Succeeded
                 ? Ok(new ResponseDto(200, "Completed.", "Password update successful."))
@@ -227,7 +227,6 @@ namespace WTP.WebAPI.Controllers
                 emailConfigDto
                 );
         }
-
 
         private async Task SendResetPasswordEmailAsync(AppUserModel user)
         {

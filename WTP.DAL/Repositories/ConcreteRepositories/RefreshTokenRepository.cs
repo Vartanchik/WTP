@@ -1,15 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using WTP.DAL.Entities;
 using WTP.DAL.Repositories.GenericRepository;
 
-namespace WTP.DAL.Repositories.ConcreteRepositories.RefreshTokenExtended
+namespace WTP.DAL.Repositories.ConcreteRepositories
 {
-    public class RefreshTokenRepository : RepositoryBase<RefreshToken>, IRepository<RefreshToken>, IRefreshTokenRepository
+    public class RefreshTokenRepository<IToken> : RepositoryBase<RefreshToken>, ITokenRepository<RefreshToken>
     {
         private readonly ApplicationDbContext _context;
 

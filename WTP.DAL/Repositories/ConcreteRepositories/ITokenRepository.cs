@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using WTP.DAL.Entities;
 
-namespace WTP.DAL.Repositories.ConcreteRepositories.RefreshTokenExtended
+namespace WTP.DAL.Repositories.ConcreteRepositories
 {
-    public interface IRefreshTokenRepository
+    public interface ITokenRepository<TEntity> where TEntity : class, IEntity, IToken
     {
         Task CreateAsync(RefreshToken token);
         Task DeleteAsync(int id);

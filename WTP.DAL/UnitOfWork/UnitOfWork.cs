@@ -2,33 +2,37 @@
 using System.Threading.Tasks;
 using WTP.DAL.Entities;
 using WTP.DAL.Repositories.GenericRepository;
+using Microsoft.AspNetCore.Identity;
+using WTP.DAL.Repositories.ConcreteRepositories;
 
 namespace WTP.DAL.UnitOfWork
 {
     public class UnitOfWork : IUnitOfWork
     {
         private readonly ApplicationDbContext _context;
-        private IRepository<AppUser> _appUsers;
+        private readonly UserManager<AppUser> _identityService;
+        private IUserRepository<AppUser> _appUsers;
         private IRepository<Country> _countries;
         private IRepository<Gender> _genders;
         private IRepository<Language> _languages;
         private IRepository<Player> _players;
         private IRepository<Team> _teams;
-        private IRepository<RefreshToken> _tokens;
+        private ITokenRepository<RefreshToken> _tokens;
         private bool _disposed = false;
 
-        public UnitOfWork(ApplicationDbContext context)
+        public UnitOfWork(ApplicationDbContext context, UserManager<AppUser> userManager)
         {
             _context = context;
+            _identityService = userManager;
         }
 
-        public IRepository<AppUser> AppUsers => _appUsers ?? (_appUsers = new RepositoryBase<AppUser>(_context));
+        public IUserRepository<AppUser> AppUsers => _appUsers ?? (_appUsers = new AppUserRepository<AppUser>(_context, _identityService));
         public IRepository<Country> Countries => _countries ?? (_countries = new RepositoryBase<Country>(_context));
         public IRepository<Gender> Genders => _genders ?? (_genders = new RepositoryBase<Gender>(_context));
         public IRepository<Language> Languages => _languages ?? (_languages = new RepositoryBase<Language>(_context));
         public IRepository<Player> Players => _players ?? (_players = new RepositoryBase<Player>(_context));
         public IRepository<Team> Teams => _teams ?? (_teams = new RepositoryBase<Team>(_context));
-        public IRepository<RefreshToken> Tokens => _tokens ?? (_tokens = new RepositoryBase<RefreshToken>(_context));
+        public ITokenRepository<RefreshToken> Tokens => _tokens ?? (_tokens = new RefreshTokenRepository<RefreshToken>(_context));
 
         public void Commit()
         {
