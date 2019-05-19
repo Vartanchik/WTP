@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using WTP.DAL.Entities;
 
-namespace WTP.DAL.Repositories.ConcreteRepositories.AppUserExtended
+namespace WTP.DAL.Repositories.ConcreteRepositories
 {
-    public interface IAppUserRepository
+    public interface IUserRepository<TEntity> where TEntity : class, IEntity, IUser
     {
         Task<IdentityResult> CreateAsync(AppUser appUser, string password);
         Task<IdentityResult> UpdateAsync(AppUser appUser);

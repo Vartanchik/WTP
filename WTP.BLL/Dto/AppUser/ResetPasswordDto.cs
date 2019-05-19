@@ -5,12 +5,12 @@
         public ResetPasswordDto(int id, string token, string newPassword)
         {
             Id = id;
-            Token = token;
+            Code = token;
             NewPassword = newPassword;
         }
 
         public int Id { get; set; }
-        public string Token { get; set; }
+        public string Code { get; set; }
         public string NewPassword { get; set; }
     }
 }

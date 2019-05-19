@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Text;
 
 namespace WTP.DAL.Entities
 {
-    public class RefreshToken : IEntity
+    public class RefreshToken : IEntity, IToken
     {
         [Key]
         public int Id { get; set; }

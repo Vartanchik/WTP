@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Text;
-using AutoMapper;
-using Swashbuckle.AspNetCore.Swagger;
-using FluentValidation.AspNetCore;
+using System.Collections.Generic;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -12,26 +10,19 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using AutoMapper;
+using Swashbuckle.AspNetCore.Swagger;
+using FluentValidation.AspNetCore;
 using WTP.Logging;
 using WTP.BLL.Services.Concrete;
 using WTP.BLL.Services.Concrete.AppUserService;
-using WTP.BLL.Services.Concrete.CountryService;
-using WTP.BLL.Services.Concrete.GenderService;
-using WTP.BLL.Services.Concrete.LanguageService;
-using WTP.BLL.Services.Concrete.PlayerService;
-using WTP.BLL.Services.Concrete.TeamService;
 using WTP.BLL.Services.Concrete.RefreshTokenService;
 using WTP.BLL.Services.EmailService;
 using WTP.DAL;
 using WTP.DAL.Entities;
-using WTP.DAL.Repositories.ConcreteRepositories.AppUserExtended;
-using WTP.DAL.Repositories.GenericRepository;
 using WTP.DAL.UnitOfWork;
-using WTP.DAL.Repositories.UserCacheRepositories;
-using WTP.DAL.Repositories.ConcreteRepositories.RefreshTokenExtended;
 using WTP.WebAPI.Helpers;
 using WTP.WebAPI.Services;
-using System.Collections.Generic;
 using WTP.BLL.Services.AzureBlobStorageService;
 
 namespace WTP.WebAPI
@@ -56,8 +47,9 @@ namespace WTP.WebAPI
             services.AddAutoMapper();
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+            /*
             services.AddScoped<UserCachingRepository>();
-            services.AddScoped<AppUserRepository>();
 
             //injection depends on situation 
             services.AddScoped<Func<string, IAppUserRepository>>(ServiceProvider => _key => 
@@ -72,22 +64,9 @@ namespace WTP.WebAPI
                         throw new KeyNotFoundException();
                 }
             });
-
-            services.AddScoped<IRepository<AppUser>, RepositoryBase<AppUser>>();
-            services.AddScoped<IRepository<Country>, RepositoryBase<Country>>();
-            services.AddScoped<IRepository<Gender>, RepositoryBase<Gender>>();
-            services.AddScoped<IRepository<Language>, RepositoryBase<Language>>();
-            services.AddScoped<IRepository<Player>, RepositoryBase<Player>>();
-            services.AddScoped<IRepository<Team>, RepositoryBase<Team>>();
-            services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
-            services.AddScoped<IRepository<RefreshToken>, RepositoryBase<RefreshToken>>();
+            */
 
             services.AddScoped<IAppUserService, AppUserService>();
-            services.AddScoped<ICountryService, CountryService>();
-            services.AddScoped<IGenderService, GenderService>();
-            services.AddScoped<ILanguageService, LanguageService>();
-            services.AddScoped<IPlayerService, PlayerService>();
-            services.AddScoped<ITeamService, TeamService>();
             services.AddScoped<IRefreshTokenService, RefreshTokenService>();
 
             services.AddScoped(provider => new MapperConfiguration(config =>

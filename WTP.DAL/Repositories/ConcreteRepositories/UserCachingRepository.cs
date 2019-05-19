@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿/*
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Caching.Distributed;
 using Newtonsoft.Json;
 using System;
@@ -6,11 +7,19 @@ using System.Threading.Tasks;
 using WTP.DAL.Entities;
 using WTP.DAL.Repositories.ConcreteRepositories.AppUserExtended;
 using WTP.DAL.Repositories.GenericRepository;
-
-namespace WTP.DAL.Repositories.UserCacheRepositories
+*/
+namespace WTP.DAL.Repositories.ConcreteRepositories
 {
-    public class UserCachingRepository : AppUserRepository, IRepository<AppUser>, IAppUserRepository
+    /*
+     * MESSAGE FOR YOU !
+     * 
+     * Refactor this repository & its creating in UOW like UserRepository / RefreshTokenRepository or something like that ...
+     * 
+     */
+
+    public class UserCachingRepository// : AppUserRepository, IRepository<AppUser>, IAppUserRepository
     {
+        /*
         private readonly IDistributedCache _Cache;
         private readonly IAppUserRepository _baseRepositoryAccessor;
 
@@ -82,5 +91,6 @@ namespace WTP.DAL.Repositories.UserCacheRepositories
             return ResultOfBaseChangePasswordAsync;
 
         }
+        */
     }
 }

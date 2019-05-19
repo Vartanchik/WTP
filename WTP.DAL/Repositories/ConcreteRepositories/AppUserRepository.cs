@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 using WTP.DAL.Entities;
 using WTP.DAL.Repositories.GenericRepository;
 
-namespace WTP.DAL.Repositories.ConcreteRepositories.AppUserExtended
+namespace WTP.DAL.Repositories.ConcreteRepositories
 {
-    public class AppUserRepository : RepositoryBase<AppUser>, IRepository<AppUser>, IAppUserRepository
+    public class AppUserRepository<IUser> : RepositoryBase<AppUser>, IUserRepository<AppUser>
     {
         private readonly UserManager<AppUser> _userManager;
         private readonly ApplicationDbContext _context;
