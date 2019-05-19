@@ -1,14 +1,7 @@
-﻿namespace WTP.WebAPI.Dto
+﻿namespace WTP.BLL.DTOs.ServicesDTOs
 {
     public class ResponseDto
     {
-        public int StatusCode { get; set; }
-        public string Message { get; set; }
-        public string Info { get; set; }
-
-        public ResponseDto()
-        { }
-
         public ResponseDto(int statusCode, string message)
         {
             StatusCode = statusCode;
@@ -21,5 +14,11 @@
             Message = message;
             Info = info;
         }
+        public ResponseDto()
+        { }
+
+        public int StatusCode { get; set; }
+        public string Message { get; set; }
+        public string Info { get; set; }
     }
 }

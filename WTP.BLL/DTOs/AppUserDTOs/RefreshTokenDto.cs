@@ -1,15 +1,14 @@
 ﻿using System;
-using WTP.BLL.Models.AppUser;
 
-namespace WTP.BLL.Models.RefreshToken
+namespace WTP.BLL.DTOs.AppUserDTOs
 {
-    public class RefreshTokenModel
+    public class RefreshTokenDto
     {
         public int Id { get; set; }
         public string Value { get; set; }
         public DateTime CreatedDate { get; set; }
         public int UserId { get; set; }
-        public AppUserModel AppUser { get; set; }
+        public AppUserDto AppUser { get; set; }
         public DateTime ExpiryTime { get; set; }
     }
 }

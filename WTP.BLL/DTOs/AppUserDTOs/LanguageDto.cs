@@ -1,6 +1,6 @@
-﻿namespace WTP.BLL.Models.Country
+﻿namespace WTP.BLL.DTOs.AppUserDTOs
 {
-    public class CountryModel
+    public class LanguageDto
     {
         public int Id { get; set; }
         public string Name { get; set; }

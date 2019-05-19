@@ -7,12 +7,11 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using WTP.BLL.Models.AppUser;
-using WTP.BLL.Models.RefreshToken;
+using WTP.BLL.DTOs.AppUserDTOs;
+using WTP.BLL.DTOs.ServicesDTOs;
 using WTP.BLL.Services.Concrete.AppUserService;
 using WTP.BLL.Services.Concrete.RefreshTokenService;
 using WTP.WebAPI.Helpers;
-using WTP.WebAPI.Dto;
 
 namespace WTP.WebAPI.Controllers
 {
@@ -90,7 +89,7 @@ namespace WTP.WebAPI.Controllers
             return BadRequest(new ResponseDto(400, "Authentication failed.", "Incorrect email or password."));
         }
 
-        private async Task<AccessResponseDto> CreateAccessToken(AppUserModel user, string refreshToken)
+        private async Task<AccessResponseDto> CreateAccessToken(BLL.DTOs.AppUserDTOs.AppUserDto user, string refreshToken)
         {
             double tokenExpiryTime = Convert.ToDouble(_appSettings.ExpireTime);
 
@@ -133,9 +132,9 @@ namespace WTP.WebAPI.Controllers
             };
         }
 
-        private RefreshTokenModel CreateRefreshToken(int userId)
+        private RefreshTokenDto CreateRefreshToken(int userId)
         {
-            return new RefreshTokenModel()
+            return new RefreshTokenDto()
             {
                 Value = Guid.NewGuid().ToString("N"),
                 CreatedDate = DateTime.UtcNow,

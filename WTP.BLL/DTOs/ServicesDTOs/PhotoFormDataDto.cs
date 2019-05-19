@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 
-namespace WTP.WebAPI.Dto
+namespace WTP.BLL.DTOs.ServicesDTOs
 {
     public class PhotoFormDataDto
     {

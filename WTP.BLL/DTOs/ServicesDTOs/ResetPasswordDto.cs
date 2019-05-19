@@ -1,8 +1,8 @@
-﻿namespace WTP.BLL.Models.AppUser
+﻿namespace WTP.BLL.DTOs.ServicesDTOs
 {
-    public class ResetPasswordModel
+    public class ResetPasswordDto
     {
-        public ResetPasswordModel(int id, string token, string newPassword)
+        public ResetPasswordDto(int id, string token, string newPassword)
         {
             Id = id;
             Token = token;

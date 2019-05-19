@@ -1,6 +1,6 @@
-﻿namespace WTP.BLL.Models.Team
+﻿namespace WTP.BLL.DTOs.AppUserDTOs
 {
-    public class TeamModel
+    public class GenderDto
     {
         public int Id { get; set; }
         public string Name { get; set; }

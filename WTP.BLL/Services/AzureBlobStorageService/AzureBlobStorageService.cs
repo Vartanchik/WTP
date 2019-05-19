@@ -4,7 +4,7 @@ using Microsoft.WindowsAzure.Storage.Blob;
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using WTP.BLL.Models.Azure;
+using WTP.BLL.DTOs.AzureDTOs;
 using WTP.Logging;
 
 namespace WTP.BLL.Services.AzureBlobStorageService
@@ -18,7 +18,7 @@ namespace WTP.BLL.Services.AzureBlobStorageService
             _log = log;
         }
 
-        public async Task<string> UploadFileAsync(FileDataModel file, AzureBlobStorageConfigModel configuration)
+        public async Task<string> UploadFileAsync(FileDataDto file, AzureBlobStorageConfigDto configuration)
         {
             try
             {
@@ -45,7 +45,7 @@ namespace WTP.BLL.Services.AzureBlobStorageService
             }
         }
 
-        public async Task<FileDataModel> DownloadFileAsync(string blockBlobNamge, AzureBlobStorageConfigModel configuration)
+        public async Task<FileDataDto> DownloadFileAsync(string blockBlobNamge, AzureBlobStorageConfigDto configuration)
         {
             try
             {
@@ -59,7 +59,7 @@ namespace WTP.BLL.Services.AzureBlobStorageService
 
                 memoryStream.Seek(0, SeekOrigin.Begin);
 
-                return new FileDataModel(memoryStream, cloudBlockBlob.Properties.ContentType, Base64Decode(cloudBlockBlob.Metadata["Name"]));
+                return new FileDataDto(memoryStream, cloudBlockBlob.Properties.ContentType, Base64Decode(cloudBlockBlob.Metadata["Name"]));
             }
             // TODO: Add concrete exceptions
             catch (IOException ex)
@@ -70,7 +70,7 @@ namespace WTP.BLL.Services.AzureBlobStorageService
             }
         }
 
-        public async Task<bool> DeleteFileIfExistsAsync(string blockBlobNamge, AzureBlobStorageConfigModel configuration)
+        public async Task<bool> DeleteFileIfExistsAsync(string blockBlobNamge, AzureBlobStorageConfigDto configuration)
         {
             try
             {
@@ -89,7 +89,7 @@ namespace WTP.BLL.Services.AzureBlobStorageService
             }
         }
 
-        private CloudBlobContainer GetCloudBlobContainer(AzureBlobStorageConfigModel configuration)
+        private CloudBlobContainer GetCloudBlobContainer(AzureBlobStorageConfigDto configuration)
         {
             var accountName = configuration.AccountName;
 

@@ -22,7 +22,6 @@ using WTP.DAL;
 using WTP.DAL.Entities;
 using WTP.DAL.UnitOfWork;
 using WTP.WebAPI.Helpers;
-using WTP.WebAPI.Services;
 using WTP.BLL.Services.AzureBlobStorageService;
 
 namespace WTP.WebAPI
@@ -71,8 +70,7 @@ namespace WTP.WebAPI
 
             services.AddScoped(provider => new MapperConfiguration(config =>
             {
-                config.AddProfile(new ModelProfile(Configuration["Photo:DefaultPhoto"]));
-                config.AddProfile(new DtoProfile());
+                config.AddProfile(new DtoProfile(Configuration["Photo:DefaultPhoto"]));
             }).CreateMapper());
 
             //// In production, the Angular files will be served from this directory

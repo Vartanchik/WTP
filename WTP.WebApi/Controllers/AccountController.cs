@@ -6,13 +6,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using WTP.Logging;
-using WTP.BLL.Models.AppUser;
 using WTP.BLL.Services.Concrete.AppUserService;
 using WTP.BLL.Services.EmailService;
 using WTP.WebAPI.Utility.Extensions;
-using WTP.WebAPI.Dto;
-using AutoMapper;
-using WTP.BLL.Models.Email;
+using WTP.BLL.DTOs.AppUserDTOs;
+using WTP.BLL.DTOs.ServicesDTOs;
 
 namespace WTP.WebAPI.Controllers
 {
@@ -23,15 +21,13 @@ namespace WTP.WebAPI.Controllers
         private readonly IEmailService _emailService;
         private readonly ILog _log;
         private readonly IConfiguration _configuration;
-        private readonly IMapper _mapper;
 
-        public AccountController(IAppUserService appUserService, IEmailService emailService, ILog log, IConfiguration configuration, IMapper mapper)
+        public AccountController(IAppUserService appUserService, IEmailService emailService, ILog log, IConfiguration configuration)
         {
             _emailService = emailService;
             _log = log;
             _appUserService = appUserService;
             _configuration = configuration;
-            _mapper = mapper;
         }
 
         /// <summary>
@@ -51,7 +47,7 @@ namespace WTP.WebAPI.Controllers
                 return BadRequest(new ResponseDto(400, "Invalid value was entered! Please, redisplay form."));
             }
 
-            var user = new AppUserModel
+            var user = new BLL.DTOs.AppUserDTOs.AppUserDto
             {
                 Email = dot.Email,
                 UserName = dot.UserName,
@@ -167,10 +163,10 @@ namespace WTP.WebAPI.Controllers
                 return BadRequest(new ResponseDto(400, "Invalid value was entered! Please, redisplay form."));
             }
 
-            var token = HttpUtility.UrlDecode(dto.Code);
-            var result = await _appUserService.ResetPasswordAsync(new ResetPasswordModel(dto.Id,
-                                                                                         token,
-                                                                                         dto.NewPassword));
+            var token = HttpUtility.UrlDecode(dto.Token);
+            var result = await _appUserService.ResetPasswordAsync(new ResetPasswordDto(dto.Id,
+                                                                                       token,
+                                                                                       dto.NewPassword));
 
             return result.Succeeded
                 ? Ok(new ResponseDto(200, "Completed.", "Password reset is successful."))
@@ -197,9 +193,9 @@ namespace WTP.WebAPI.Controllers
 
             int userId = this.GetCurrentUserId();
 
-            var result = await _appUserService.ChangePasswordAsync(new ChangePasswordModel(userId,
-                                                                                           dto.CurrentPassword,
-                                                                                           dto.NewPassword));
+            var result = await _appUserService.ChangePasswordAsync(new ChangePasswordDto(userId,
+                                                                                         dto.CurrentPassword,
+                                                                                         dto.NewPassword));
 
             return result.Succeeded
                 ? Ok(new ResponseDto(200, "Completed.", "Password update successful."))
@@ -217,7 +213,10 @@ namespace WTP.WebAPI.Controllers
                 "Account",
                 new { userId = userForConfirmEmail.Id, token }, protocol: HttpContext.Request.Scheme);
 
-            var emailConfigDto = _mapper.Map<EmailConfigModel>(new EmailConfigDto(_configuration));
+            var emailConfigDto = new EmailConfigDto(_configuration["Email:Email"],
+                                                    _configuration["Email:Password"],
+                                                    _configuration["Email:Host"],
+                                                    _configuration["Email:Port"]);
 
             await _emailService.SendEmailAsync(
                 email,
@@ -228,14 +227,17 @@ namespace WTP.WebAPI.Controllers
                 );
         }
 
-        private async Task SendResetPasswordEmailAsync(AppUserModel user)
+        private async Task SendResetPasswordEmailAsync(AppUserDto user)
         {
             var token = await _appUserService.GeneratePasswordResetTokenAsync(user);
 
             var callbackUrl = Url.Action("ResetPassword", "Account",
                 new { userId = user.Id, code = token }, protocol: HttpContext.Request.Scheme);
 
-            var emailConfigDto = _mapper.Map<EmailConfigModel>(new EmailConfigDto(_configuration));
+            var emailConfigDto = new EmailConfigDto(_configuration["Email:Email"],
+                                                    _configuration["Email:Password"],
+                                                    _configuration["Email:Host"],
+                                                    _configuration["Email:Port"]);
 
             await _emailService.SendEmailAsync(
                 user.Email,

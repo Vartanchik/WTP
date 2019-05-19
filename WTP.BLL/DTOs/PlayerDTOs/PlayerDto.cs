@@ -1,4 +1,4 @@
-﻿namespace WTP.BLL.Models.Player
+﻿namespace WTP.BLL.DTOs.PlayerDTOs
 {
     public class PlayerModel
     {

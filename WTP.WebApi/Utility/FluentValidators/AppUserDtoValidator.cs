@@ -1,9 +1,7 @@
-﻿using FluentValidation;
-using System;
+﻿using System;
 using System.Globalization;
-using System.Net;
-using System.Text.RegularExpressions;
-using WTP.WebAPI.Dto;
+using FluentValidation;
+using WTP.BLL.DTOs.AppUserDTOs;
 
 namespace WTP.WebAPI.FluentValidators
 {

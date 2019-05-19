@@ -1,9 +1,9 @@
-﻿using FluentValidation;
-using System;
-using System.Linq;
-using WTP.WebAPI.Dto;
-using Microsoft.AspNetCore.Http;
+﻿using System;
 using System.IO;
+using System.Linq;
+using Microsoft.AspNetCore.Http;
+using FluentValidation;
+using WTP.BLL.DTOs.ServicesDTOs;
 
 namespace WTP.WebAPI.Utility.FluentValidators
 {
@@ -22,15 +22,9 @@ namespace WTP.WebAPI.Utility.FluentValidators
 
         private bool IsImage(IFormFile file)
         {
-
             var fileExt = Path.GetExtension(file.FileName).Substring(1);
 
-            if (_supportedTypes.Contains(fileExt))
-            {
-                return true;
-            }
-
-            return false;
+            return _supportedTypes.Contains(fileExt);
         }
     }
 }

@@ -1,18 +1,22 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace WTP.WebAPI.Dto
+namespace WTP.BLL.DTOs.ServicesDTOs
 {
-    public class ChangePasswordDto
+    public class RegisterDto
     {
         [Required]
-        [DataType(DataType.Password)]
+        [EmailAddress]
+        public string Email { get; set; }
+
+        [Required]
+        [Display(Name = "User Name")]
         [Column(TypeName = "nvarchar(16)")]
-        public string CurrentPassword { get; set; }
+        public string UserName { get; set; }
 
         [Required]
         [DataType(DataType.Password)]
         [Column(TypeName = "nvarchar(16)")]
-        public string NewPassword { get; set; }
+        public string Password { get; set; }
     }
 }

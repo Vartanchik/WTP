@@ -1,8 +1,8 @@
-﻿namespace WTP.WebAPI.Dto
+﻿namespace WTP.BLL.DTOs.ServicesDTOs
 {
     public class AccessRequestDto
     {
-        public string GrantType { get; set; } //password or refresh token
+        public string GrantType { get; set; }
         public string Email { get; set; }
         public string UserName { get; set; }
         public string RefreshToken { get; set; }

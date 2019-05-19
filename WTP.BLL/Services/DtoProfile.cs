@@ -1,48 +1,44 @@
 ﻿using AutoMapper;
 using System.Collections.Generic;
-using WTP.BLL.Models.AppUser;
-using WTP.BLL.Models.Country;
-using WTP.BLL.Models.Gender;
-using WTP.BLL.Models.Language;
-using WTP.BLL.Models.Player;
-using WTP.BLL.Models.RefreshToken;
-using WTP.BLL.Models.Team;
+using WTP.BLL.DTOs.AppUserDTOs;
+using WTP.BLL.DTOs.PlayerDTOs;
+using WTP.BLL.DTOs.TeamDTOs;
 using WTP.DAL.Entities;
 
 namespace WTP.BLL.Services.Concrete
 {
-    public class ModelProfile : Profile
+    public class DtoProfile : Profile
     {
         private readonly string _defaultPhoto;
 
-        public ModelProfile(string defaultPhoto)
+        public DtoProfile(string defaultPhoto)
         {
             this._defaultPhoto = defaultPhoto;
 
-            CreateMap<AppUser, AppUserModel>()
+            CreateMap<AppUser, AppUserDto>()
                 .ForMember(dest => dest.Photo,
                            config => config.MapFrom(src => PhotoToView(src)))
                 .ForMember(dest => dest.Languages,
                            config => config.MapFrom(src => GetLanguagesDto(src)));
 
-            CreateMap<AppUserModel, AppUser>()
+            CreateMap<AppUserDto, AppUser>()
                 .ForMember(dest => dest.Photo,
                            config => config.MapFrom(src => PhotoToSave(src)))
                 .ForMember(dest => dest.AppUserLanguages,
                            config => config.MapFrom(src => GetUserToLanguages(src)));
 
-            CreateMap<LanguageModel, Language>();
-            CreateMap<Language, LanguageModel>();
-            CreateMap<CountryModel, Country>();
-            CreateMap<Country, CountryModel>();
-            CreateMap<GenderModel, Gender>();
-            CreateMap<Gender, GenderModel>();
-            CreateMap<TeamModel, Team>();
-            CreateMap<Team, TeamModel>();
+            CreateMap<LanguageDto, Language>();
+            CreateMap<Language, LanguageDto>();
+            CreateMap<CountryDto, Country>();
+            CreateMap<Country, CountryDto>();
+            CreateMap<GenderDto, Gender>();
+            CreateMap<Gender, GenderDto>();
+            CreateMap<TeamDto, Team>();
+            CreateMap<Team, TeamDto>();
             CreateMap<PlayerModel, Player>();
             CreateMap<Player, PlayerModel>();
-            CreateMap<RefreshTokenModel, RefreshToken>();
-            CreateMap<RefreshToken, RefreshTokenModel>();
+            CreateMap<RefreshTokenDto, RefreshToken>();
+            CreateMap<RefreshToken, RefreshTokenDto>();
         }
 
         private string PhotoToView(AppUser user)
@@ -52,14 +48,14 @@ namespace WTP.BLL.Services.Concrete
                 : user.Photo;
         }
 
-        private string PhotoToSave(AppUserModel user)
+        private string PhotoToSave(AppUserDto user)
         {
             return user.Photo == _defaultPhoto
                 ? null
                 : user.Photo;
         }
 
-        private List<AppUserLanguage> GetUserToLanguages(AppUserModel user)
+        private List<AppUserLanguage> GetUserToLanguages(AppUserDto user)
         {
             var userToLanguage = new List<AppUserLanguage>();
             foreach (var item in user.Languages)
@@ -73,12 +69,12 @@ namespace WTP.BLL.Services.Concrete
             return userToLanguage;
         }
 
-        private List<LanguageModel> GetLanguagesDto(AppUser user)
+        private List<LanguageDto> GetLanguagesDto(AppUser user)
         {
-            var languagesList = new List<LanguageModel>();
+            var languagesList = new List<LanguageDto>();
             foreach (var item in user.AppUserLanguages)
             {
-                languagesList.Add(new LanguageModel
+                languagesList.Add(new LanguageDto
                 {
                     Id = item.LanguageId,
                     Name = item.Language.Name

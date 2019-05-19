@@ -1,8 +1,8 @@
-﻿namespace WTP.BLL.Models.AppUser
+﻿namespace WTP.BLL.DTOs.ServicesDTOs
 {
-    public class ChangePasswordModel
+    public class ChangePasswordDto
     {
-        public ChangePasswordModel(int userId, string currentPassword, string newPassword)
+        public ChangePasswordDto(int userId, string currentPassword, string newPassword)
         {
             UserId = userId;
             CurrentPassword = currentPassword;

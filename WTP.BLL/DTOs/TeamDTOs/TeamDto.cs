@@ -1,6 +1,6 @@
-﻿namespace WTP.BLL.Models.Gender
+﻿namespace WTP.BLL.DTOs.TeamDTOs
 {
-    public class GenderModel
+    public class TeamDto
     {
         public int Id { get; set; }
         public string Name { get; set; }

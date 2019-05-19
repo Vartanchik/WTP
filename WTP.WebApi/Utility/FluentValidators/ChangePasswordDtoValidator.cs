@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using WTP.WebAPI.Dto;
+using WTP.BLL.DTOs.ServicesDTOs;
 
 namespace WTP.WebAPI.FluentValidators
 {

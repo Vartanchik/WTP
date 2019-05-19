@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace WTP.WebAPI.Dto
+namespace WTP.BLL.DTOs.ServicesDTOs
 {
     public class ForgotPasswordDto
     {
