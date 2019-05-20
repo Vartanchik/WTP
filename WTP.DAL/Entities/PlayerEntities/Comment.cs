@@ -2,7 +2,7 @@
 
 namespace WTP.DAL.Entities
 {
-    public class Comment
+    public class Comment : IEntity
     {
         public int Id { get; set; }
         public DateTime? Date { get; set; }

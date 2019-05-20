@@ -19,6 +19,7 @@ namespace WTP.BLL.DTOs.AppUserDTOs
         public List<TeamDto> Teams { get; set; }
         public string SecurityStamp { get; set; }
         public virtual List<RefreshTokenDto> Tokens { get; set; }
-        public bool Enabled { get; set; }
+        public bool Deleted { get; set; }
+        public string DeletedTime { get; set; }
     }
 }

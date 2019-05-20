@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using WTP.BLL.DTOs.AppUserDTOs;
@@ -147,6 +148,16 @@ namespace WTP.BLL.Services.Concrete.AppUserService
             return _ouw.AppUsers.GetAsync(userId) == null || token == null
                 ? IdentityResult.Failed() 
                 : await _ouw.AppUsers.ConfirmEmailAsync(userId, token);
+        }
+
+        public async Task DeleteAsync(int userId)
+        {
+            var user = await _ouw.AppUsers.GetAsync(userId);
+
+            user.Deleted = true;
+            user.DeletedTime = DateTime.Today;
+
+            await _ouw.AppUsers.CreateOrUpdate(user);
         }
     }
 }

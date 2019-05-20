@@ -15,5 +15,7 @@
         public string About { get; set; }
         public Rank Rank { get; set; }
         public int Decency { get; set; }
+        public int TeamId { get; set; }
+        public Team Team { get; set; }
     }
 }

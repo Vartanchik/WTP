@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using System.Collections.Generic;
+using System.Linq;
 using WTP.BLL.DTOs.AppUserDTOs;
 using WTP.BLL.DTOs.PlayerDTOs;
 using WTP.BLL.DTOs.TeamDTOs;
@@ -45,6 +46,10 @@ namespace WTP.BLL.Services.Concrete
             CreateMap<Goal, GoalDto>();
             CreateMap<ServerDto, Server>();
             CreateMap<Server, ServerDto>();
+            CreateMap<CommentDto, Comment>();
+            CreateMap<Comment, CommentDto>();
+            CreateMap<MatchDto, Match>();
+            CreateMap<Match, MatchDto>();
 
         }
 
@@ -64,31 +69,24 @@ namespace WTP.BLL.Services.Concrete
 
         private List<AppUserLanguage> GetUserToLanguages(AppUserDto user)
         {
-            var userToLanguage = new List<AppUserLanguage>();
-            foreach (var item in user.Languages)
-            {
-                userToLanguage.Add(new AppUserLanguage
+            return new List<AppUserLanguage>(user.Languages.Select(x =>
+                new AppUserLanguage
                 {
-                    LanguageId = item.Id,
-                    AppUserId = user.Id
-                });
-            }
-            return userToLanguage;
+                    AppUserId = user.Id,
+                    LanguageId = x.Id
+                }));
+
         }
 
         private List<LanguageDto> GetLanguagesDto(AppUser user)
         {
-            var languagesList = new List<LanguageDto>();
-            foreach (var item in user.AppUserLanguages)
-            {
-                languagesList.Add(new LanguageDto
+            return new List<LanguageDto>(user.AppUserLanguages.Select(x =>
+                new LanguageDto
                 {
-                    Id = item.LanguageId,
-                    Name = item.Language.Name
-                });
-            }
+                    Id = x.LanguageId,
+                    Name = x.Language.Name
+                }));
 
-            return languagesList;
         }
     }
 }

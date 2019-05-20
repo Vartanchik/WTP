@@ -66,7 +66,7 @@ namespace WTP.DAL.Repositories.ConcreteRepositories
 
         public override async Task<AppUser> GetAsync(int userId)
         {
-            var user = await _context.AppUsers.Include("Country").Include("Gender")
+            var user = await _context.AppUsers.Include(x => x.Country).Include(x => x.Gender)
                 .Include(userInc => userInc.AppUserLanguages).ThenInclude(a => a.Language)
                 .FirstOrDefaultAsync(userInc => userInc.Id == userId);
 
