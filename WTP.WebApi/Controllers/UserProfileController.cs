@@ -88,10 +88,10 @@ namespace WTP.WebAPI.Dto.Controllers
         [ProducesResponseType(typeof(ResponseDto), 400)]
         public async Task<IActionResult> UpdatePhoto([FromForm]PhotoFormDataDto formData)
         {
-            var azureStorageConfig = new AzureBlobStorageConfigDto(_configuration[""],
-                                                                   _configuration[""],
-                                                                   _configuration[""],
-                                                                   _configuration[""]);
+            var azureStorageConfig = new AzureBlobStorageConfigDto(_configuration["AzureBlobStorage:AccountName"],
+                                                                   _configuration["AzureBlobStorage:AccountKey"],
+                                                                   _configuration["AzureBlobStorage:ContainerName"],
+                                                                   _configuration["Url:ImageStorageUrl"]);
 
             var fileDataDto = new FileDataDto(formData.File.OpenReadStream(), formData.File.ContentType, formData.File.FileName);
 
@@ -131,10 +131,10 @@ namespace WTP.WebAPI.Dto.Controllers
         {
             var requestUrl = UriHelper.GetDisplayUrl(Request);
 
-            var azureBlobStorageConfigModel = new AzureBlobStorageConfigDto(_configuration[""],
-                                                                            _configuration[""],
-                                                                            _configuration[""],
-                                                                            _configuration[""]);
+            var azureBlobStorageConfigModel = new AzureBlobStorageConfigDto(_configuration["AzureBlobStorage:AccountName"],
+                                                                            _configuration["AzureBlobStorage:AccountKey"],
+                                                                            _configuration["AzureBlobStorage:ContainerName"],
+                                                                            _configuration["Url:ImageStorageUrl"]);
 
             var fileDataModel =  await _azureBlobStorageService.DownloadFileAsync(requestUrl, azureBlobStorageConfigModel);
 
