@@ -17,6 +17,7 @@ namespace WTP.DAL.UnitOfWork
         ITokenRepository<RefreshToken> Tokens { get; }
         IRepository<Comment> Comments { get; }
         IRepository<Match> Matches { get; }
+        IRepository<Game> Games { get; }
 
         void Commit();
 

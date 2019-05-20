@@ -15,7 +15,7 @@ namespace WTP.DAL.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.2.3-servicing-35854")
+                .HasAnnotation("ProductVersion", "2.2.4-servicing-10062")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -162,13 +162,14 @@ namespace WTP.DAL.Migrations
 
                     b.Property<DateTime?>("DateOfBirth");
 
+                    b.Property<bool>("Deleted");
+
+                    b.Property<DateTime?>("DeletedTime");
+
                     b.Property<string>("Email")
                         .HasMaxLength(256);
 
                     b.Property<bool>("EmailConfirmed");
-
-                    b.Property<bool>("Enabled")
-                        .HasDefaultValue(true);
 
                     b.Property<int?>("GenderId");
 
@@ -279,7 +280,24 @@ namespace WTP.DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Game");
+                    b.ToTable("Games");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Dota 2"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "CS:GO"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "GTA V"
+                        });
                 });
 
             modelBuilder.Entity("WTP.DAL.Entities.Gender", b =>
@@ -413,7 +431,7 @@ namespace WTP.DAL.Migrations
 
                     b.Property<string>("Name");
 
-                    b.Property<int>("Rank");
+                    b.Property<int?>("RankId");
 
                     b.Property<int>("ServerId");
 
@@ -425,9 +443,30 @@ namespace WTP.DAL.Migrations
 
                     b.HasIndex("GoalId");
 
+                    b.HasIndex("RankId");
+
                     b.HasIndex("ServerId");
 
                     b.ToTable("Players");
+                });
+
+            modelBuilder.Entity("WTP.DAL.Entities.Rank", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("GameId");
+
+                    b.Property<string>("Name");
+
+                    b.Property<string>("Photo");
+
+                    b.Property<int>("Value");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Rank");
                 });
 
             modelBuilder.Entity("WTP.DAL.Entities.RefreshToken", b =>
@@ -567,6 +606,10 @@ namespace WTP.DAL.Migrations
                         .WithMany()
                         .HasForeignKey("GoalId")
                         .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("WTP.DAL.Entities.Rank", "Rank")
+                        .WithMany()
+                        .HasForeignKey("RankId");
 
                     b.HasOne("WTP.DAL.Entities.Server", "Server")
                         .WithMany()

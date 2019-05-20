@@ -18,6 +18,7 @@ namespace WTP.DAL
         public DbSet<Player> Players { get; set; }
         public DbSet<Team> Teams { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
+        public DbSet<Game> Games { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -55,6 +56,12 @@ namespace WTP.DAL
                     new Language { Id = 10, Name = "Czech" },
                     new Language { Id = 11, Name = "Swedish" },
                     new Language { Id = 12, Name = "Greek" }
+                );
+
+            builder.Entity<Game>().HasData(
+                    new Game { Id = 1, Name = "Dota 2" },
+                    new Game { Id = 2, Name = "CS:GO" },
+                    new Game { Id = 3, Name = "GTA V" }
                 );
 
             builder.Entity<AppUserLanguage>()
