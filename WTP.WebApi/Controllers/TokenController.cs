@@ -55,7 +55,9 @@ namespace WTP.WebAPI.Controllers
                 case "refresh_token":
                     return await UpdateAccessToken(model);
                 default:
-                    return Unauthorized(new ResponseDto(401, "Login failed.", "Something going wrong."));
+                    return Unauthorized(new ResponseDto(401,
+                                                        "Login failed.",
+                                                        "Something going wrong."));
             }
         }
 
@@ -63,11 +65,20 @@ namespace WTP.WebAPI.Controllers
         {
             var user = await _appUserService.GetByEmailAsync(model.Email);
 
+            if (user.Deleted)
+            {
+                return Unauthorized(new ResponseDto(401,
+                                                    "Login failed.",
+                                                    "Your account has been deleted. We have sent an email to reset your account"));
+            }
+
             if (user != null && await _appUserService.CheckPasswordAsync(user.Id, model.Password))
             {
                 if (!await _appUserService.IsEmailConfirmedAsync(user.Id))
                 {
-                    return Unauthorized(new ResponseDto(401, "Login failed.", "We sent you an confirmation email. Please confirm your registration."));
+                    return Unauthorized(new ResponseDto(401,
+                                                        "Login failed.",
+                                                        "We sent you an confirmation email. Please confirm your registration."));
                 }
 
                 var newRefreshToken = CreateRefreshToken(user.Id);
@@ -86,7 +97,9 @@ namespace WTP.WebAPI.Controllers
                 return Ok(new { accessToken, message = "Login successful." });
             }
 
-            return BadRequest(new ResponseDto(400, "Authentication failed.", "Incorrect email or password."));
+            return BadRequest(new ResponseDto(400,
+                                              "Authentication failed.",
+                                              "Incorrect email or password."));
         }
 
         private async Task<AccessResponseDto> CreateAccessToken(BLL.DTOs.AppUserDTOs.AppUserDto user, string refreshToken)

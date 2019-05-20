@@ -21,7 +21,7 @@ namespace WTP.WebAPI.Dto.Controllers
         private readonly IConfiguration _configuration;
         private readonly IAzureBlobStorageService _azureBlobStorageService;
 
-        public UserProfileController(IAppUserService appUserService, IMapper mapper, IConfiguration configuration, IAzureBlobStorageService azureBlobStorageService)
+        public UserProfileController(IAppUserService appUserService, IConfiguration configuration, IAzureBlobStorageService azureBlobStorageService)
         {
             _appUserService = appUserService;
             _configuration = configuration;
@@ -141,6 +141,18 @@ namespace WTP.WebAPI.Dto.Controllers
             return fileDataModel != null
                 ? File(fileDataModel.Stream, fileDataModel.Type, fileDataModel.Name)
                 : (IActionResult)BadRequest(new ResponseDto(404, "Photo not found."));
+        }
+
+        [HttpDelete("[action]")]
+        [Authorize(Policy = "RequireLoggedIn")]
+        [ProducesResponseType(typeof(ResponseDto), 200)]
+        public async Task<IActionResult> DeleteProfile()
+        {
+            var userId = this.GetCurrentUserId();
+
+            await _appUserService.DeleteAsync(userId);
+
+            return Ok(new ResponseDto(200, "Completed.", "Account has been successfully deleted."));
         }
     }
 }

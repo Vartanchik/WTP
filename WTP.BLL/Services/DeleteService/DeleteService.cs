@@ -20,7 +20,7 @@ namespace WTP.BLL.Services.DeleteService
         {
             var usersIdToDelete = _uof.AppUsers.AsQueryable()
                 .Where(x => x.Deleted == true 
-                    && x.DeletedTime.Value.Add(_interval) > DateTime.Today)
+                    && x.DeletedTime.Value.Add(_interval) >= DateTime.Today)
                 .Select(x => x.Id);
 
             foreach (var item in usersIdToDelete)
