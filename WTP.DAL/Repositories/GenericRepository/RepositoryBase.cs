@@ -15,16 +15,6 @@ namespace WTP.DAL.Repositories.GenericRepository
             _dbset = context.Set<TEntity>();
         }
 
-        public virtual async Task CreateAsync(TEntity item)
-        {
-            await _dbset.AddAsync(item);
-        }
-
-        public virtual async Task UpdateAsync(TEntity item)
-        {
-            _context.Entry(item).State = EntityState.Modified;
-        }
-
         public virtual async Task CreateOrUpdate(TEntity item)
         {
             if (item.Id == 0)

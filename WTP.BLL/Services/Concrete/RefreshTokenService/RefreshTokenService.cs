@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using WTP.BLL.DTOs.AppUserDTOs;
 using WTP.DAL.Entities;
@@ -22,7 +23,7 @@ namespace WTP.BLL.Services.Concrete.RefreshTokenService
         {
             var token = _mapper.Map<RefreshToken>(tokenDto);
 
-            await _uow.Tokens.CreateAsync(token);
+            await _uow.Tokens.CreateOrUpdate(token);
         }
 
         public async Task DeleteAsync(int id)
@@ -32,7 +33,7 @@ namespace WTP.BLL.Services.Concrete.RefreshTokenService
 
         public async Task DeleteRangeAsync(int userId)
         {
-            await _uow.Tokens.DeleteRangeAsync(userId);
+            await _uow.Tokens.DeleteUserTokensAsync(userId);
         }
 
         public async Task<RefreshTokenDto> GetAsync(int id)
@@ -42,11 +43,17 @@ namespace WTP.BLL.Services.Concrete.RefreshTokenService
             return _mapper.Map<RefreshTokenDto>(token);
         }
 
-        public async Task<IEnumerable<RefreshTokenDto>> GetRangeAsync(int id)
+        public IQueryable<RefreshTokenDto> GetRangeAsync(int id)
         {
-            var tokens = await _uow.Tokens.GetRangeAsync(id);
+            var tokens = _uow.Tokens.GetUserTokensAsync(id);
+            var dto = new List<RefreshTokenDto>();
 
-            return _mapper.Map<IEnumerable<RefreshTokenDto>>(tokens);
+            foreach (var item in tokens)
+            {
+                dto.Add(_mapper.Map<RefreshTokenDto>(item));
+            }
+
+            return dto.AsQueryable();
         }
 
         public async Task<RefreshTokenDto> GetByUserIdAsync(int userId, string refreshToken)

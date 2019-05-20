@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WTP.DAL.Entities
 {
-    public class RefreshToken : IEntity, IToken
+    public class RefreshToken : IEntity
     {
         [Key]
         public int Id { get; set; }

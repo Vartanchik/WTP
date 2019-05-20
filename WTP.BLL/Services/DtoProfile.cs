@@ -35,10 +35,17 @@ namespace WTP.BLL.Services.Concrete
             CreateMap<Gender, GenderDto>();
             CreateMap<TeamDto, Team>();
             CreateMap<Team, TeamDto>();
-            CreateMap<PlayerModel, Player>();
-            CreateMap<Player, PlayerModel>();
+            CreateMap<PlayerDto, Player>();
+            CreateMap<Player, PlayerDto>();
             CreateMap<RefreshTokenDto, RefreshToken>();
             CreateMap<RefreshToken, RefreshTokenDto>();
+            CreateMap<GameDto, Game>();
+            CreateMap<Game, GameDto>();
+            CreateMap<GoalDto, Goal>();
+            CreateMap<Goal, GoalDto>();
+            CreateMap<ServerDto, Server>();
+            CreateMap<Server, ServerDto>();
+
         }
 
         private string PhotoToView(AppUser user)

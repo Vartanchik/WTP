@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using WTP.DAL.Entities;
+using WTP.DAL.Repositories.GenericRepository;
 
 namespace WTP.DAL.Repositories.ConcreteRepositories
 {
-    public interface IUserRepository<TEntity> where TEntity : class, IEntity, IUser
+    public interface IUserRepository<TEntity> : IRepository<TEntity> where TEntity : class, IEntity
     {
         Task<IdentityResult> CreateAsync(AppUser appUser, string password);
         Task<IdentityResult> UpdateAsync(AppUser appUser);

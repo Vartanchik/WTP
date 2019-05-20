@@ -26,13 +26,13 @@ namespace WTP.DAL.UnitOfWork
             _identityService = userManager;
         }
 
-        public IUserRepository<AppUser> AppUsers => _appUsers ?? (_appUsers = new AppUserRepository<AppUser>(_context, _identityService));
+        public IUserRepository<AppUser> AppUsers => _appUsers ?? (_appUsers = new UserRepository<AppUser>(_context, _identityService));
         public IRepository<Country> Countries => _countries ?? (_countries = new RepositoryBase<Country>(_context));
         public IRepository<Gender> Genders => _genders ?? (_genders = new RepositoryBase<Gender>(_context));
         public IRepository<Language> Languages => _languages ?? (_languages = new RepositoryBase<Language>(_context));
         public IRepository<Player> Players => _players ?? (_players = new RepositoryBase<Player>(_context));
         public IRepository<Team> Teams => _teams ?? (_teams = new RepositoryBase<Team>(_context));
-        public ITokenRepository<RefreshToken> Tokens => _tokens ?? (_tokens = new RefreshTokenRepository<RefreshToken>(_context));
+        public ITokenRepository<RefreshToken> Tokens => _tokens ?? (_tokens = new TokenRepository<RefreshToken>(_context));
 
         public void Commit()
         {

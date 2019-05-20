@@ -13,7 +13,7 @@
         public int GoalId { get; set; }
         public Goal Goal { get; set; }
         public string About { get; set; }
-        public int Rank { get; set; }
+        public Rank Rank { get; set; }
         public int Decency { get; set; }
     }
 }

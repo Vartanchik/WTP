@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace WTP.DAL.Entities
 {
-    public class AppUser : IdentityUser<int>, IEntity, IUser
+    public class AppUser : IdentityUser<int>, IEntity
     {
         public override int Id { get { return base.Id; } set { base.Id = value; } }
         public override string UserName { get { return base.UserName; } set { base.UserName = value; } }
@@ -20,6 +20,7 @@ namespace WTP.DAL.Entities
         public List<Player> Players { get; set; }
         public List<Team> Teams { get; set; }
         public virtual List<RefreshToken> Tokens { get; set; }
-        public bool Enabled { get; set; }
+        public bool Deleted { get; set; }
+        public DateTime? DeletedTime { get; set; }
     }
 }

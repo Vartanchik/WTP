@@ -1,16 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using WTP.DAL.Entities;
+using WTP.DAL.Repositories.GenericRepository;
 
 namespace WTP.DAL.Repositories.ConcreteRepositories
 {
-    public interface ITokenRepository<TEntity> where TEntity : class, IEntity, IToken
+    public interface ITokenRepository<TEntity> : IRepository<TEntity> where TEntity : class, IEntity
     {
-        Task CreateAsync(RefreshToken token);
-        Task DeleteAsync(int id);
-        Task DeleteRangeAsync(int userId);
-        Task<RefreshToken> GetAsync(int id);
-        Task<IEnumerable<RefreshToken>> GetRangeAsync(int id);
+        Task DeleteUserTokensAsync(int userId);
+        IQueryable<TEntity> GetUserTokensAsync(int id);
         Task<RefreshToken> GetByUserIdAsync(int userId, string refreshToken);
     }
 }

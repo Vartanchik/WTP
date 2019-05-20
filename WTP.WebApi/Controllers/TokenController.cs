@@ -72,7 +72,7 @@ namespace WTP.WebAPI.Controllers
 
                 var newRefreshToken = CreateRefreshToken(user.Id);
 
-                var oldRefreshTokens = await _refreshTokenService.GetRangeAsync(user.Id);
+                var oldRefreshTokens = _refreshTokenService.GetRangeAsync(user.Id);
 
                 if (oldRefreshTokens != null)
                 {

@@ -15,7 +15,7 @@ namespace WTP.BLL.DTOs.AppUserDTOs
         public CountryDto Country { get; set; }
         public string Steam { get; set; }
         public ICollection<LanguageDto> Languages { get; set; }
-        public List<PlayerModel> Players { get; set; }
+        public List<PlayerDto> Players { get; set; }
         public List<TeamDto> Teams { get; set; }
         public string SecurityStamp { get; set; }
         public virtual List<RefreshTokenDto> Tokens { get; set; }

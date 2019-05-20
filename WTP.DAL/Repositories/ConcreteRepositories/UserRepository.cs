@@ -7,12 +7,12 @@ using WTP.DAL.Repositories.GenericRepository;
 
 namespace WTP.DAL.Repositories.ConcreteRepositories
 {
-    public class AppUserRepository<IUser> : RepositoryBase<AppUser>, IUserRepository<AppUser>
+    public class UserRepository<IEntity> : RepositoryBase<AppUser>, IUserRepository<AppUser>
     {
         private readonly UserManager<AppUser> _userManager;
         private readonly ApplicationDbContext _context;
 
-        public AppUserRepository(ApplicationDbContext context, UserManager<AppUser> userManager) : base(context)
+        public UserRepository(ApplicationDbContext context, UserManager<AppUser> userManager) : base(context)
         {
             _userManager = userManager;
             _context = context;
@@ -27,7 +27,7 @@ namespace WTP.DAL.Repositories.ConcreteRepositories
             return result;
         }
 
-        public new async Task<IdentityResult> UpdateAsync(AppUser appUser)
+        public async Task<IdentityResult> UpdateAsync(AppUser appUser)
         {
             var user = await GetAsync(appUser.Id);
 

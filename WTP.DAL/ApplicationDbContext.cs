@@ -23,16 +23,11 @@ namespace WTP.DAL
         {
             base.OnModelCreating(builder);
 
-            builder.Entity<AppUser>()
-                .Property(p => p.Enabled)
-                    .HasDefaultValue(true)
-                    .ValueGeneratedNever();
-
             builder.Entity<IdentityRole<int>>().HasData(
                     new { Id = 1, Name = "Admin", NormalizedName = "ADMIN" },
                     new { Id = 2, Name = "User", NormalizedName = "USER" },
                     new { Id = 3, Name = "Moderator", NormalizedName = "MODERATOR" }
-            );
+                );
 
             builder.Entity<Gender>().HasData(
                     new Gender { Id = 1, Name = "Male" },
