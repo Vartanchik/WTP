@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace WTP.DAL.Migrations
 {
-    public partial class WithDefaultData : Migration
+    public partial class InitialCreate : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -37,7 +37,7 @@ namespace WTP.DAL.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Game",
+                name: "Games",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
@@ -46,7 +46,7 @@ namespace WTP.DAL.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Game", x => x.Id);
+                    table.PrimaryKey("PK_Games", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -86,6 +86,22 @@ namespace WTP.DAL.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Languages", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Rank",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    GameId = table.Column<int>(nullable: false),
+                    Name = table.Column<string>(nullable: true),
+                    Value = table.Column<int>(nullable: false),
+                    Photo = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Rank", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -147,7 +163,8 @@ namespace WTP.DAL.Migrations
                     DateOfBirth = table.Column<DateTime>(nullable: true),
                     CountryId = table.Column<int>(nullable: true),
                     Steam = table.Column<string>(nullable: true),
-                    Enabled = table.Column<bool>(nullable: false, defaultValue: true)
+                    Deleted = table.Column<bool>(nullable: false),
+                    DeletedTime = table.Column<DateTime>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -287,7 +304,7 @@ namespace WTP.DAL.Migrations
                     ServerId = table.Column<int>(nullable: false),
                     GoalId = table.Column<int>(nullable: false),
                     About = table.Column<string>(nullable: true),
-                    Rank = table.Column<int>(nullable: false),
+                    RankId = table.Column<int>(nullable: true),
                     Decency = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
@@ -300,9 +317,9 @@ namespace WTP.DAL.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Players_Game_GameId",
+                        name: "FK_Players_Games_GameId",
                         column: x => x.GameId,
-                        principalTable: "Game",
+                        principalTable: "Games",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -311,6 +328,12 @@ namespace WTP.DAL.Migrations
                         principalTable: "Goal",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Players_Rank_RankId",
+                        column: x => x.RankId,
+                        principalTable: "Rank",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Players_Server_ServerId",
                         column: x => x.ServerId,
@@ -384,12 +407,22 @@ namespace WTP.DAL.Migrations
                 });
 
             migrationBuilder.InsertData(
+                table: "Games",
+                columns: new[] { "Id", "Name" },
+                values: new object[,]
+                {
+                    { 1, "Dota 2" },
+                    { 2, "CS:GO" },
+                    { 3, "GTA V" }
+                });
+
+            migrationBuilder.InsertData(
                 table: "Genders",
                 columns: new[] { "Id", "Name" },
                 values: new object[,]
                 {
-                    { 1, "Male" },
-                    { 2, "Female" }
+                    { 2, "Female" },
+                    { 1, "Male" }
                 });
 
             migrationBuilder.InsertData(
@@ -397,17 +430,17 @@ namespace WTP.DAL.Migrations
                 columns: new[] { "Id", "Name" },
                 values: new object[,]
                 {
-                    { 10, "Czech" },
-                    { 9, "Italian" },
-                    { 8, "French" },
-                    { 7, "Korean" },
-                    { 6, "Japanese" },
-                    { 1, "English" },
-                    { 4, "Spanish" },
-                    { 3, "Russian" },
-                    { 2, "German" },
                     { 11, "Swedish" },
+                    { 1, "English" },
+                    { 2, "German" },
+                    { 3, "Russian" },
+                    { 4, "Spanish" },
                     { 5, "Ukrainian" },
+                    { 6, "Japanese" },
+                    { 7, "Korean" },
+                    { 8, "French" },
+                    { 9, "Italian" },
+                    { 10, "Czech" },
                     { 12, "Greek" }
                 });
 
@@ -481,6 +514,11 @@ namespace WTP.DAL.Migrations
                 column: "GoalId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Players_RankId",
+                table: "Players",
+                column: "RankId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Players_ServerId",
                 table: "Players",
                 column: "ServerId");
@@ -532,10 +570,13 @@ namespace WTP.DAL.Migrations
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "Game");
+                name: "Games");
 
             migrationBuilder.DropTable(
                 name: "Goal");
+
+            migrationBuilder.DropTable(
+                name: "Rank");
 
             migrationBuilder.DropTable(
                 name: "Server");

@@ -18,6 +18,7 @@ namespace WTP.DAL.UnitOfWork
         private IRepository<Player> _players;
         private IRepository<Team> _teams;
         private ITokenRepository<RefreshToken> _tokens;
+        private IRepository<Game> _games;
         private bool _disposed = false;
 
         public UnitOfWork(ApplicationDbContext context, UserManager<AppUser> userManager)
@@ -33,6 +34,7 @@ namespace WTP.DAL.UnitOfWork
         public IRepository<Player> Players => _players ?? (_players = new RepositoryBase<Player>(_context));
         public IRepository<Team> Teams => _teams ?? (_teams = new RepositoryBase<Team>(_context));
         public ITokenRepository<RefreshToken> Tokens => _tokens ?? (_tokens = new TokenRepository<RefreshToken>(_context));
+        public IRepository<Game> Games => _games ?? (_games = new RepositoryBase<Game>(_context));
 
         public void Commit()
         {
