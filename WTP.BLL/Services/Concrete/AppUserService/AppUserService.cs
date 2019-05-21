@@ -154,7 +154,7 @@ namespace WTP.BLL.Services.Concrete.AppUserService
         {
             var user = await _ouw.AppUsers.GetAsync(userId);
 
-            user.Deleted = true;
+            user.IsDeleted = true;
             user.DeletedTime = DateTime.Today;
 
             await _ouw.Tokens.DeleteUserTokensAsync(user.Id);

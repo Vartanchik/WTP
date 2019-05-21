@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace WTP.BLL.Services.DeleteService
 {
-    interface IDeleteService
+    public interface IDeleteService
     {
         IQueryable<int> FindToDeletedAsync();
         IQueryable<int> FindToDeletedByIntervalAsync(TimeSpan intervalToDelete);

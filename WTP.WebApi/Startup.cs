@@ -23,6 +23,7 @@ using WTP.DAL.Entities;
 using WTP.DAL.UnitOfWork;
 using WTP.WebAPI.Helpers;
 using WTP.BLL.Services.AzureBlobStorageService;
+using WTP.BLL.Services.DeleteService;
 
 namespace WTP.WebAPI
 {
@@ -67,6 +68,7 @@ namespace WTP.WebAPI
 
             services.AddScoped<IAppUserService, AppUserService>();
             services.AddScoped<IRefreshTokenService, RefreshTokenService>();
+            services.AddScoped<IDeleteService, DeleteService>();
 
             services.AddScoped(provider => new MapperConfiguration(config =>
             {

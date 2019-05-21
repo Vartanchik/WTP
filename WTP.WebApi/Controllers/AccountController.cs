@@ -246,5 +246,22 @@ namespace WTP.WebAPI.Controllers
                 emailConfigDto
                 );
         }
+
+        /// <summary>
+        /// Delete current user account
+        /// </summary>
+        /// <returns></returns>
+        /// <response code="200">Successful performance</response>
+        [HttpDelete("[action]")]
+        [Authorize(Policy = "RequireLoggedIn")]
+        [ProducesResponseType(typeof(ResponseDto), 200)]
+        public async Task<IActionResult> DeleteAccount()
+        {
+            var userId = this.GetCurrentUserId();
+
+            await _appUserService.DeleteAsync(userId);
+
+            return Ok(new ResponseDto(200, "Completed.", "Account has been successfully deleted."));
+        }
     }
 }

@@ -20,7 +20,7 @@ namespace WTP.DAL.Entities
         public List<Player> Players { get; set; }
         public List<Team> Teams { get; set; }
         public virtual List<RefreshToken> Tokens { get; set; }
-        public bool Deleted { get; set; }
+        public bool IsDeleted { get; set; }
         public DateTime? DeletedTime { get; set; }
     }
 }

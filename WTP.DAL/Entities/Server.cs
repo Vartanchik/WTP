@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace WTP.DAL.Entities
+﻿namespace WTP.DAL.Entities
 {
     public class Server
     {

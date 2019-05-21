@@ -142,17 +142,5 @@ namespace WTP.WebAPI.Dto.Controllers
                 ? File(fileDataModel.Stream, fileDataModel.Type, fileDataModel.Name)
                 : (IActionResult)BadRequest(new ResponseDto(404, "Photo not found."));
         }
-
-        [HttpDelete("[action]")]
-        [Authorize(Policy = "RequireLoggedIn")]
-        [ProducesResponseType(typeof(ResponseDto), 200)]
-        public async Task<IActionResult> DeleteProfile()
-        {
-            var userId = this.GetCurrentUserId();
-
-            await _appUserService.DeleteAsync(userId);
-
-            return Ok(new ResponseDto(200, "Completed.", "Account has been successfully deleted."));
-        }
     }
 }

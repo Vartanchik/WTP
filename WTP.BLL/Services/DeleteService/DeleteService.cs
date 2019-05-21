@@ -19,7 +19,7 @@ namespace WTP.BLL.Services.DeleteService
         public async Task DeleteOverdue()
         {
             var usersIdToDelete = _uof.AppUsers.AsQueryable()
-                .Where(x => x.Deleted == true 
+                .Where(x => x.IsDeleted == true 
                     && x.DeletedTime.Value.Add(_interval) >= DateTime.Today)
                 .Select(x => x.Id);
 
@@ -33,7 +33,7 @@ namespace WTP.BLL.Services.DeleteService
         {
             var user = await _uof.AppUsers.GetAsync(id);
 
-            if (user.Deleted == true && user.DeletedTime.Value.Add(_interval) > DateTime.Today)
+            if (user.IsDeleted == true && user.DeletedTime.Value.Add(_interval) > DateTime.Today)
             {
                 await _uof.AppUsers.DeleteAsync(user.Id);
             }
@@ -42,14 +42,14 @@ namespace WTP.BLL.Services.DeleteService
         public IQueryable<int> FindToDeletedAsync()
         {
             return _uof.AppUsers.AsQueryable()
-                .Where(x => x.Deleted == true)
+                .Where(x => x.IsDeleted == true)
                 .Select(x => x.Id);
         }
 
         public IQueryable<int> FindToDeletedByIntervalAsync(TimeSpan intervalToDelete)
         {
             return _uof.AppUsers.AsQueryable()
-                .Where(x => x.Deleted == true 
+                .Where(x => x.IsDeleted == true 
                     && x.DeletedTime.Value.Add(_interval) == DateTime.Today.Add(intervalToDelete))
                 .Select(x => x.Id);
         }

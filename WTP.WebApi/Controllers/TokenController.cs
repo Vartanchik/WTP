@@ -40,7 +40,7 @@ namespace WTP.WebAPI.Controllers
         /// <response code="401">Unauthorized rsult</response>
         [HttpPost("[action]")]
         [ProducesResponseType(typeof(AccessResponseDto), 200)]
-        [ProducesResponseType(typeof(ResponseDto), 401)]
+        [ProducesResponseType(typeof(ResponseDto), 400)]
         public async Task<IActionResult> Auth([FromBody] AccessRequestDto model) // granttype = "refresh_token or password"
         {
             if (model == null)
@@ -65,20 +65,20 @@ namespace WTP.WebAPI.Controllers
         {
             var user = await _appUserService.GetByEmailAsync(model.Email);
 
-            if (user.Deleted)
-            {
-                return Unauthorized(new ResponseDto(401,
-                                                    "Login failed.",
-                                                    "Your account has been deleted. We have sent an email to reset your account"));
-            }
-
             if (user != null && await _appUserService.CheckPasswordAsync(user.Id, model.Password))
             {
                 if (!await _appUserService.IsEmailConfirmedAsync(user.Id))
                 {
-                    return Unauthorized(new ResponseDto(401,
+                    return BadRequest(new ResponseDto(400,
                                                         "Login failed.",
                                                         "We sent you an confirmation email. Please confirm your registration."));
+                }
+
+                if (user.IsDeleted)
+                {
+                    return BadRequest(new ResponseDto(400,
+                                                        "Login failed.",
+                                                        "Your account has been deleted. We have sent an email to reset your account"));
                 }
 
                 var newRefreshToken = CreateRefreshToken(user.Id);
