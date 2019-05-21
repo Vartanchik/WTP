@@ -80,7 +80,7 @@ namespace WTP.WebAPI.Controllers
         /// <param name="token"></param>
         /// <returns></returns>
         /// <response code="302">Successful performance</response>
-        [HttpGet]
+        [HttpGet("[action]")]
         [AllowAnonymous]
         [ProducesResponseType(302)]
         public async Task<IActionResult> ConfirmEmail(string userId, string token)
