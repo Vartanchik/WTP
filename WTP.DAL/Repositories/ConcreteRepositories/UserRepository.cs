@@ -166,6 +166,7 @@ namespace WTP.DAL.Repositories.ConcreteRepositories
 
         }
 
+        //TODO
         public async Task<bool> LockAsync(int id, int? days)
         {
             var user = await GetAsync(id);

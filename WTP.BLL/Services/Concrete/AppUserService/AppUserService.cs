@@ -32,12 +32,30 @@ namespace WTP.BLL.Services.Concrete.AppUserService
             _mapper = mapper;
         }
 
-        public async Task<IdentityResult> CreateAsync(AppUserDto dto, string password)
+        public async Task<IdentityResult> CreateAsync(AppUserDto dto, string password, int adminId = 1)
         {
             var user = _mapper.Map<AppUser>(dto);
 
             var result = await _uow.AppUsers.CreateAsync(user, password);
 
+            HistoryDto history = new HistoryDto
+            {
+                Id=0,
+                DateOfOperation = DateTime.Now,
+                Description = "Create new user account",
+                PreviousUserEmail = null,
+                PreviousUserName = null,
+                NewUserEmail = dto.Email,
+                NewUserName = dto.UserName,
+                AppUserId = user.Id,
+                OperationId = (int)OperationEnum.Create,
+                AdminId = adminId
+            };
+
+            //await _uow.Histories.CreateOrUpdate(history);
+            var record = _mapper.Map<History>(history);
+            await _uow.Histories.CreateOrUpdate(record);
+            await _uow.CommitAsync();
             return result;
         }
 
@@ -68,11 +86,27 @@ namespace WTP.BLL.Services.Concrete.AppUserService
             return appUserDto;
         }
                      
-        public async Task<IdentityResult> UpdateAsync(AppUserDto appUserDto)
+        public async Task<IdentityResult> UpdateAsync(AppUserDto appUserDto, int adminId=1)
         {
             if (await _uow.AppUsers.GetAsync(appUserDto.Id) != null)
             {
                 var appUser = _mapper.Map<AppUser>(appUserDto);
+
+                HistoryDto history = new HistoryDto
+                {
+                    DateOfOperation = DateTime.Now,
+                    Description = "Update user's account",
+                    PreviousUserEmail = appUser.Email,
+                    PreviousUserName = appUser.UserName,
+                    NewUserEmail = appUserDto.Email,
+                    NewUserName = appUserDto.UserName,
+                    AppUserId = appUserDto.Id,
+                    OperationId = (int)OperationEnum.Update,
+                    AdminId = adminId
+                };
+
+                var record = _mapper.Map<History>(history);
+                await _uow.Histories.CreateOrUpdate(record);
 
                 return await _uow.AppUsers.UpdateAsync(appUser);
             }
@@ -191,6 +225,26 @@ namespace WTP.BLL.Services.Concrete.AppUserService
             var allUsers = await _uow.AppUsers.GetAllUsersAsync();
             return _mapper.Map<IList<AppUserDto>>(allUsers);
         }
+
+        public async Task<IdentityResult> CreateAdminAsync(AppUserDto appUserDto, string password)
+        {
+            var appUser = _mapper.Map<AppUser>(appUserDto);
+
+            var result = await _uow.AppUsers.CreateAdminAsync(appUser, password);
+
+            return result;
+
+        }
+
+        public async Task<IdentityResult> CreateModeratorAsync(AppUserDto appUserDto, string password)
+        {
+            var appUser = _mapper.Map<AppUser>(appUserDto);
+
+            var result = await _uow.AppUsers.CreateModeratorAsync(appUser, password);
+
+            return result;
+        }
+
 
         public async Task<bool> LockAsync(int id, int? days, int adminId = 1)
         {
