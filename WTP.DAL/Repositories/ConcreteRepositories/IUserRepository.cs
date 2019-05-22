@@ -22,5 +22,12 @@ namespace WTP.DAL.Repositories.ConcreteRepositories
         Task<string> GenerateEmailConfirmationTokenAsync(AppUser appUser);
         Task<AppUser> FindByIdAsync(string userId);
         Task<IdentityResult> ConfirmEmailAsync(int userId, string token);
+        Task<IdentityResult> CreateAdminAsync(AppUser appUser, string password);
+        Task<IdentityResult> CreateModeratorAsync(AppUser appUser, string password);
+        Task<bool> DeleteAsync(int id);
+        Task<IList<AppUser>> GetAllUsersAsync();
+        Task<bool> LockAsync(int id, int? days);
+        Task<bool> UnLockAsync(int id);
+
     }
 }

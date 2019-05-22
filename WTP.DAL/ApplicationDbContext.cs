@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using WTP.DAL.Entities;
+using WTP.DAL.Entities.AppUserEntities;
 
 namespace WTP.DAL
 {
@@ -19,6 +20,9 @@ namespace WTP.DAL
         public DbSet<Team> Teams { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
         public DbSet<Game> Games { get; set; }
+        public DbSet<Operation> Operations { get; set; }
+        public DbSet<History> Histories { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -64,6 +68,14 @@ namespace WTP.DAL
                     new Game { Id = 3, Name = "GTA V" }
                 );
 
+            builder.Entity<Operation>().HasData(
+                    new { Id = 1, OperationName = OperationEnum.Create },
+                    new { Id = 2, OperationName = OperationEnum.Update },
+                    new { Id = 3, OperationName = OperationEnum.Delete },
+                    new { Id = 4, OperationName = OperationEnum.Lock },
+                    new { Id = 5, OperationName = OperationEnum.UnLock }
+            );
+
             builder.Entity<AppUserLanguage>()
                 .HasKey(_ => new { _.AppUserId, _.LanguageId });
             builder.Entity<AppUserLanguage>()
@@ -74,6 +86,18 @@ namespace WTP.DAL
                 .HasOne(_ => _.Language)
                 .WithMany(_ => _.AppUserLanguages)
                 .HasForeignKey(_ => _.LanguageId);
+
+            builder.Entity<History>()
+               .HasOne(p => p.AppUser)
+               .WithMany(b => b.Histories)
+               .HasForeignKey(p => p.AppUserId)
+               .HasForeignKey(p => p.AdminId);
+
+            builder.Entity<History>()
+                .HasOne(p => p.Operation)
+                .WithMany(b => b.Histories)
+                .HasForeignKey(p => p.OperationId);
+
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Identity;
+using WTP.DAL.Entities.AppUserEntities;
 
 namespace WTP.DAL.Entities
 {
@@ -16,11 +17,14 @@ namespace WTP.DAL.Entities
         public int? CountryId { get; set; }
         public Country Country { get; set; }
         public string Steam { get; set; }
+        public override bool LockoutEnabled { get { return base.LockoutEnabled; } set { base.LockoutEnabled = value; } }
+        public override DateTimeOffset? LockoutEnd { get { return base.LockoutEnd; } set { base.LockoutEnd = value; } }
         public ICollection<AppUserLanguage> AppUserLanguages { get; set; }
         public List<Player> Players { get; set; }
         public List<Team> Teams { get; set; }
         public virtual List<RefreshToken> Tokens { get; set; }
         public bool IsDeleted { get; set; }
         public DateTime? DeletedTime { get; set; }
+        public List<History> Histories { get; set; }
     }
 }

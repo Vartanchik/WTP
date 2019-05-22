@@ -4,6 +4,7 @@ using WTP.DAL.Entities;
 using WTP.DAL.Repositories.GenericRepository;
 using Microsoft.AspNetCore.Identity;
 using WTP.DAL.Repositories.ConcreteRepositories;
+using WTP.DAL.Entities.AppUserEntities;
 
 namespace WTP.DAL.UnitOfWork
 {
@@ -21,6 +22,8 @@ namespace WTP.DAL.UnitOfWork
         private IRepository<Comment> _comments;
         private IRepository<Match> _matches;
         private IRepository<Game> _games;
+        private IRepository<History> _histories;
+        private IRepository<Operation> _operations;
         private bool _disposed = false;
 
         public UnitOfWork(ApplicationDbContext context, UserManager<AppUser> userManager)
@@ -39,6 +42,8 @@ namespace WTP.DAL.UnitOfWork
         public IRepository<Comment> Comments => _comments ?? (_comments = new RepositoryBase<Comment>(_context));
         public IRepository<Match> Matches => _matches ?? (_matches = new RepositoryBase<Match>(_context));
         public IRepository<Game> Games => _games ?? (_games = new RepositoryBase<Game>(_context));
+        public IRepository<History> Histories => _histories ?? (_histories = new RepositoryBase<History>(_context));
+        public IRepository<Operation> Operations => _operations ?? (_operations = new RepositoryBase<Operation>(_context));
 
         public void Commit()
         {
