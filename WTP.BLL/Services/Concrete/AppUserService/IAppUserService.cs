@@ -9,7 +9,7 @@ namespace WTP.BLL.Services.Concrete.AppUserService
     public interface IAppUserService
     {
         Task<IdentityResult> CreateAsync(AppUserDto appUserDto, string password);
-        Task<AppUserDto> GetAsync(int userId);
+        Task<AppUserDto> GetByIdAsync(int userId);
         Task<AppUserDto> GetByEmailAsync(string email);
         Task<AppUserDto> GetByNameAsync(string userName);
         Task<IdentityResult> UpdateAsync(AppUserDto appUserDto);

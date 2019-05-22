@@ -43,7 +43,7 @@ namespace WTP.WebAPI.Dto.Controllers
         {
             int userId = this.GetCurrentUserId();
 
-            var user = await _appUserService.GetAsync(userId);
+            var user = await _appUserService.GetByIdAsync(userId);
 
             return user == null
                 ? NotFound(new ResponseDto(404, "Userprofile not found.", "Something going wrong.")) 
@@ -99,7 +99,7 @@ namespace WTP.WebAPI.Dto.Controllers
 
             var userId = this.GetCurrentUserId();
 
-            var appUserModel = await _appUserService.GetAsync(userId);
+            var appUserModel = await _appUserService.GetByIdAsync(userId);
 
             var appUserModelPhoto = appUserModel.Photo;
 

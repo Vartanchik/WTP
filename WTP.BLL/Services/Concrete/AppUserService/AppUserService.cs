@@ -38,7 +38,7 @@ namespace WTP.BLL.Services.Concrete.AppUserService
             return result;
         }
 
-        public async Task<AppUserDto> GetAsync(int userId)
+        public async Task<AppUserDto> GetByIdAsync(int userId)
         {
             var appUser = await _uow.AppUsers.GetByIdAsync(userId);
 
@@ -108,13 +108,13 @@ namespace WTP.BLL.Services.Concrete.AppUserService
             return appUser == null
                 ? IdentityResult.Failed()
                 : await _uow.AppUsers.ResetPasswordAsync(appUser.Result,
-                                                              dto.Token,
-                                                              dto.NewPassword);
+                                                         dto.Token,
+                                                         dto.NewPassword);
         }
 
         public async Task<IdentityResult> ChangePasswordAsync(ChangePasswordDto dto)
         {
-            if (await GetAsync(dto.UserId) == null)
+            if (await GetByIdAsync(dto.UserId) == null)
             {
                 return IdentityResult.Failed(new IdentityError { Description = "Something going wrong." });
             }

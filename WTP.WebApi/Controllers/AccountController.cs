@@ -99,13 +99,18 @@ namespace WTP.WebAPI.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(new ResponseDto(400, "Error", "Invalid value was entered! Please, redisplay form."));
+                return BadRequest(new ResponseDto(400, "Error.", "Invalid value was entered! Please, redisplay form."));
             }
 
             var user = await _appUserService.GetByEmailAsync(dto.Email);
 
             if (user != null && await _appUserService.IsEmailConfirmedAsync(user.Id))
             {
+                if (user.IsDeleted)
+                {
+                    return BadRequest(new ResponseDto(400, "Faild.", "Account is deleted."));
+                }
+
                 await SendResetPasswordEmailAsync(user);
             }
 
