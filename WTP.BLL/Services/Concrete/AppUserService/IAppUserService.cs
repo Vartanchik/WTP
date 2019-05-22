@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using WTP.BLL.DTOs.AppUserDTOs;
 using WTP.BLL.DTOs.ServicesDTOs;
+using WTP.BLL.Shared;
 
 namespace WTP.BLL.Services.Concrete.AppUserService
 {
@@ -23,5 +24,14 @@ namespace WTP.BLL.Services.Concrete.AppUserService
         Task<AppUserDto> FindByIdAsync(string userId);
         Task<IdentityResult> ConfirmEmailAsync(int userId, string token);
         Task DeleteAsync(int userId);
+
+        Task<bool> DeleteAsync(int id, int adminId = 1);
+        Task<IList<AppUserDto>> GetAllUsersAsync();
+        Task<bool> LockAsync(int id, int? days, int adminId = 1);
+        Task<bool> UnLockAsync(int id, int adminId = 1);
+
+        List<AppUserDto> Filter(List<AppUserDto> users, string name);
+        List<AppUserDto> Sort(List<AppUserDto> users, SortState sortOrder, bool enableDeleted, bool enableLocked);
+
     }
 }

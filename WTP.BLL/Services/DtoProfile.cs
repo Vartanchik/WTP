@@ -5,6 +5,7 @@ using WTP.BLL.DTOs.AppUserDTOs;
 using WTP.BLL.DTOs.PlayerDTOs;
 using WTP.BLL.DTOs.TeamDTOs;
 using WTP.DAL.Entities;
+using WTP.DAL.Entities.AppUserEntities;
 
 namespace WTP.BLL.Services.Concrete
 {
@@ -50,6 +51,8 @@ namespace WTP.BLL.Services.Concrete
             CreateMap<Comment, CommentDto>();
             CreateMap<MatchDto, Match>();
             CreateMap<Match, MatchDto>();
+            CreateMap<History, HistoryDto>();
+            CreateMap<HistoryDto, History>();
 
         }
 
