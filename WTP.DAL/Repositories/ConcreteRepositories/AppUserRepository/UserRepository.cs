@@ -2,17 +2,18 @@
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using WTP.DAL.Entities;
+using WTP.DAL.Entities.AppUserEntities;
 using WTP.DAL.Repositories.GenericRepository;
 
-namespace WTP.DAL.Repositories.ConcreteRepositories
+namespace WTP.DAL.Repositories.ConcreteRepositories.AppUserRepository
 {
     public class UserRepository<IEntity> : RepositoryBase<AppUser>, IUserRepository<AppUser>
     {
         private readonly UserManager<AppUser> _userManager;
         private readonly ApplicationDbContext _context;
 
-        public UserRepository(ApplicationDbContext context, UserManager<AppUser> userManager) : base(context)
+        public UserRepository(ApplicationDbContext context, UserManager<AppUser> userManager)
+            : base(context)
         {
             _userManager = userManager;
             _context = context;
@@ -29,7 +30,7 @@ namespace WTP.DAL.Repositories.ConcreteRepositories
 
         public async Task<IdentityResult> UpdateAsync(AppUser appUser)
         {
-            var user = await GetAsync(appUser.Id);
+            var user = await GetByIdAsync(appUser.Id);
 
             user.AppUserLanguages = appUser.AppUserLanguages;
             user.Photo = appUser.Photo;
@@ -64,18 +65,23 @@ namespace WTP.DAL.Repositories.ConcreteRepositories
             return await _userManager.CheckPasswordAsync(appUser, password);
         }
 
-        public override async Task<AppUser> GetAsync(int userId)
+        public override async Task<AppUser> GetByIdAsync(int userId)
         {
             var user = await _context.AppUsers.Include(x => x.Country).Include(x => x.Gender)
                 .Include(userInc => userInc.AppUserLanguages).ThenInclude(a => a.Language)
                 .FirstOrDefaultAsync(userInc => userInc.Id == userId);
-
+            /*
+            var user = await _context.AppUsers
+                .Include(x => x.Country)
+                .Include(g => g.Gender)
+                .Include(userInc => userInc.AppUserLanguages).ThenInclude(a => a.Language)
+                .FirstOrDefaultAsync(userInc => userInc.Id == userId);*/
             return user;
         }
 
         public async Task<bool> IsEmailConfirmedAsync(int userId)
         {
-            var user = await GetAsync(userId);
+            var user = await GetByIdAsync(userId);
 
             return await _userManager.IsEmailConfirmedAsync(user);
         }
@@ -87,7 +93,7 @@ namespace WTP.DAL.Repositories.ConcreteRepositories
 
         public async Task<IdentityResult> ResetPasswordAsync(AppUser appUser, string token, string newPassword)
         {
-            var user = await GetAsync(appUser.Id);
+            var user = await GetByIdAsync(appUser.Id);
 
             return await _userManager.ResetPasswordAsync(user,
                                                          token,
@@ -96,7 +102,7 @@ namespace WTP.DAL.Repositories.ConcreteRepositories
 
         public async Task<IdentityResult> ChangePasswordAsync(int userId, string currentPassword, string newPassword)
         {
-            var user = await GetAsync(userId);
+            var user = await GetByIdAsync(userId);
 
             return await _userManager.ChangePasswordAsync(user,
                                                           currentPassword,
@@ -108,14 +114,14 @@ namespace WTP.DAL.Repositories.ConcreteRepositories
             return await _userManager.GenerateEmailConfirmationTokenAsync(appUser);
         }
 
-        public async Task<AppUser> FindByIdAsync(string userId)
+        public async Task<AppUser> GetByIdAsync(string userId)
         {
             return await _userManager.FindByIdAsync(userId);
         }
 
         public async Task<IdentityResult> ConfirmEmailAsync(int userId, string token)
         {
-            var user = await GetAsync(userId);
+            var user = await GetByIdAsync(userId);
 
             return await _userManager.ConfirmEmailAsync(user, token);
         }

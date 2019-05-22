@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace WTP.DAL.Entities
+namespace WTP.DAL.Entities.AppUserEntities
 {
     public class Language : IEntity
     {

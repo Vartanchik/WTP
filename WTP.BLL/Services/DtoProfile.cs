@@ -5,6 +5,7 @@ using WTP.BLL.DTOs.AppUserDTOs;
 using WTP.BLL.DTOs.PlayerDTOs;
 using WTP.BLL.DTOs.TeamDTOs;
 using WTP.DAL.Entities;
+using WTP.DAL.Entities.AppUserEntities;
 
 namespace WTP.BLL.Services.Concrete
 {

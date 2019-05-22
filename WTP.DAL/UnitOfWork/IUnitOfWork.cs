@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Threading.Tasks;
 using WTP.DAL.Entities;
-using WTP.DAL.Repositories.ConcreteRepositories;
+using WTP.DAL.Entities.AppUserEntities;
+using WTP.DAL.Repositories.ConcreteRepositories.AppUserRepository;
+using WTP.DAL.Repositories.ConcreteRepositories.RefreshTokenRepository;
+using WTP.DAL.Repositories.ConcreteRepositories.RestoreTokenRepository;
 using WTP.DAL.Repositories.GenericRepository;
 
 namespace WTP.DAL.UnitOfWork
@@ -14,10 +17,11 @@ namespace WTP.DAL.UnitOfWork
         IRepository<Language> Languages { get; }
         IRepository<Player> Players { get; }
         IRepository<Team> Teams { get; }
-        ITokenRepository<RefreshToken> Tokens { get; }
+        IRefreshTokenRepository<RefreshToken> RefreshTokens { get; }
         IRepository<Comment> Comments { get; }
         IRepository<Match> Matches { get; }
         IRepository<Game> Games { get; }
+        IRestoreTokenRepository<RestoreToken> RestoreTokens { get; }
 
         void Commit();
 

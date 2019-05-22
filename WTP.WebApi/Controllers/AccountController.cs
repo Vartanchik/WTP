@@ -34,9 +34,6 @@ namespace WTP.WebAPI.Controllers
         /// Registration of new user
         /// </summary>
         /// <param name="dot"></param>
-        /// <returns></returns>
-        /// <response code="200">Successful performance</response>
-        /// <response code="400">The action failed</response>
         [HttpPost("[action]")]
         [ProducesResponseType(typeof(ResponseDto), 200)]
         [ProducesResponseType(typeof(ResponseDto), 400)]
@@ -78,8 +75,6 @@ namespace WTP.WebAPI.Controllers
         /// </summary>
         /// <param name="userId"></param>
         /// <param name="token"></param>
-        /// <returns></returns>
-        /// <response code="302">Successful performance</response>
         [HttpGet("[action]")]
         [AllowAnonymous]
         [ProducesResponseType(302)]
@@ -96,9 +91,6 @@ namespace WTP.WebAPI.Controllers
         /// Send email to reset password
         /// </summary>
         /// <param name="dto"></param>
-        /// <returns></returns>
-        /// <response code="200">Successful performance</response>
-        /// <response code="400">The action failed</response>
         [HttpPost("[action]")]
         [AllowAnonymous]
         [ProducesResponseType(typeof(ResponseDto), 200)]
@@ -128,8 +120,6 @@ namespace WTP.WebAPI.Controllers
         /// </summary>
         /// <param name="userId"></param>
         /// <param name="code"></param>
-        /// <returns></returns>
-        /// <response code="302">Successful performance</response>
         [HttpGet("[action]")]
         [AllowAnonymous]
         [ProducesResponseType(302)]
@@ -149,9 +139,6 @@ namespace WTP.WebAPI.Controllers
         /// Reset user password by email 
         /// </summary>
         /// <param name="dto"></param>
-        /// <returns></returns>
-        /// <response code="200">Successful performance</response>
-        /// <response code="400">The action failed</response>
         [HttpPost("[action]")]
         [AllowAnonymous]
         [ProducesResponseType(typeof(ResponseDto), 200)]
@@ -177,9 +164,6 @@ namespace WTP.WebAPI.Controllers
         /// Change password of current user
         /// </summary>
         /// <param name="dto"></param>
-        /// <returns></returns>
-        /// <response code="200">Successful performance</response>
-        /// <response code="400">The action failed</response>
         [HttpPost("[action]")]
         [Authorize(Policy = "RequireLoggedIn")]
         [ProducesResponseType(typeof(ResponseDto), 200)]
@@ -251,17 +235,74 @@ namespace WTP.WebAPI.Controllers
         /// Delete current user account
         /// </summary>
         /// <returns></returns>
-        /// <response code="200">Successful performance</response>
         [HttpDelete("[action]")]
         [Authorize(Policy = "RequireLoggedIn")]
         [ProducesResponseType(typeof(ResponseDto), 200)]
-        public async Task<IActionResult> DeleteAccount()
+        public async Task<IActionResult> Delete()
         {
             var userId = this.GetCurrentUserId();
 
-            await _appUserService.DeleteAsync(userId);
+            await _appUserService.DeleteAccountAsync(userId);
 
             return Ok(new ResponseDto(200, "Completed.", "Account has been successfully deleted."));
+        }
+
+        [HttpPost("[action]")]
+        [ProducesResponseType(typeof(ResponseDto), 200)]
+        [ProducesResponseType(typeof(ResponseDto), 400)]
+        public async Task<IActionResult> Restore(string email)
+        {
+            var userToRestore = await _appUserService.GetByEmailAsync(email);
+
+            if (userToRestore == null)
+            {
+                return BadRequest(new ResponseDto(400, "Faild.", "No user found by this mail."));
+            }
+
+            var token = await _appUserService.CreateRestoreAccountToken(userToRestore.Id);
+
+            var callbackUrl = Url.Action(
+                "Restore",
+                "Account",
+                new { userId = userToRestore.Id, token }, protocol: HttpContext.Request.Scheme);
+
+            var emailConfigDto = new EmailConfigDto(_configuration["Email:Email"],
+                                                    _configuration["Email:Password"],
+                                                    _configuration["Email:Host"],
+                                                    _configuration["Email:Port"]);
+
+            await _emailService.SendEmailAsync(
+                email,
+                "Just one click and you're on WTP",
+                $"You can restore your account. Just use this link to enjoy: " +
+                $"<a href='{callbackUrl}'>Account restore</a>.",
+                emailConfigDto);
+
+            return Ok(new ResponseDto(200, "Completed.", "Follow the instructions in the email."));
+        }
+
+        /// <summary>
+        /// Restore your account by id & restore token
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="token"></param>
+        [HttpGet("[action]")]
+        [ProducesResponseType(typeof(ResponseDto), 200)]
+        [ProducesResponseType(typeof(ResponseDto), 400)]
+        public async Task<IActionResult> Restore([FromQuery] string userId, [FromQuery] string token)
+        {
+            if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(token))
+            {
+                return BadRequest(new ResponseDto(400, "Faild.", "Account restore faild."));
+            }
+
+            var id = Convert.ToInt32(userId);
+
+            var result = await _appUserService.RestoreAccountAsync(id, token);
+
+            return result
+                ? Ok(new ResponseDto(200, "Completed.", "Account has been successfully restore."))
+                : (IActionResult)BadRequest(new ResponseDto(400, "Faild.", "Account restore faild."));
         }
     }
 }

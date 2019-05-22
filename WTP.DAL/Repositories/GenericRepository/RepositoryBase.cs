@@ -25,7 +25,7 @@ namespace WTP.DAL.Repositories.GenericRepository
 
         public virtual async Task DeleteAsync(int id)
         {
-            var entity = await GetAsync(id);
+            var entity = await GetByIdAsync(id);
 
             if (entity != null)
             {
@@ -33,7 +33,7 @@ namespace WTP.DAL.Repositories.GenericRepository
             }
         }
 
-        public virtual async Task<TEntity> GetAsync(int id)
+        public virtual async Task<TEntity> GetByIdAsync(int id)
         {
             return await _dbset.FindAsync(id);
         }

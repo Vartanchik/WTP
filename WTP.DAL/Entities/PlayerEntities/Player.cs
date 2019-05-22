@@ -1,4 +1,6 @@
-﻿namespace WTP.DAL.Entities
+﻿using WTP.DAL.Entities.AppUserEntities;
+
+namespace WTP.DAL.Entities
 {
     public class Player : IEntity
     {

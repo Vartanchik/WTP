@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Identity;
 
-namespace WTP.DAL.Entities
+namespace WTP.DAL.Entities.AppUserEntities
 {
     public class AppUser : IdentityUser<int>, IEntity
     {

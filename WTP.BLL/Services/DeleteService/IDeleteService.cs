@@ -6,9 +6,9 @@ namespace WTP.BLL.Services.DeleteService
 {
     public interface IDeleteService
     {
-        IQueryable<int> FindToDeletedAsync();
-        IQueryable<int> FindToDeletedByIntervalAsync(TimeSpan intervalToDelete);
-        Task DeleteOverdue();
-        Task DeleteOverdue(int id);
+        IQueryable<int> FindUsersToDeletedAsync();
+        IQueryable<int> FindUsersToDeletedByIntervalAsync(TimeSpan intervalToDelete);
+        Task DeleteOverdueUsers();
+        Task DeleteOverdueUser(int userId);
     }
 }
