@@ -19,6 +19,9 @@ namespace WTP.DAL
         public DbSet<Team> Teams { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
         public DbSet<Game> Games { get; set; }
+        public DbSet<Server> Servers { get; set; }
+        public DbSet<Goal> Goals { get; set; }
+        public DbSet<Rank> Ranks { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -62,6 +65,29 @@ namespace WTP.DAL
                     new Game { Id = 1, Name = "Dota 2" },
                     new Game { Id = 2, Name = "CS:GO" },
                     new Game { Id = 3, Name = "GTA V" }
+                );
+
+            builder.Entity<Server>().HasData(
+                    new Server { Id = 1, Name = "East" },
+                    new Server { Id = 2, Name = "West" },
+                    new Server { Id = 3, Name = "North" },
+                    new Server { Id = 4, Name = "South" }
+                );
+
+            builder.Entity<Goal>().HasData(
+                    new Goal { Id = 1, Name = "Fun" },
+                    new Goal { Id = 2, Name = "Profi" }
+                );
+
+            builder.Entity<Rank>().HasData(
+                    new Rank { Id = 1, Name = "Uncalibrated" },
+                    new Rank { Id = 3, Name = "Guardian" },
+                    new Rank { Id = 4, Name = "Crusader" },
+                    new Rank { Id = 5, Name = "Archon" },
+                    new Rank { Id = 6, Name = "Legend" },
+                    new Rank { Id = 7, Name = "Ancient" },
+                    new Rank { Id = 8, Name = "Divine" },
+                    new Rank { Id = 9, Name = "Immortal" }
                 );
 
             builder.Entity<AppUserLanguage>()

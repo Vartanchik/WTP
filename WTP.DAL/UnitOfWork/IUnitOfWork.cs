@@ -18,6 +18,9 @@ namespace WTP.DAL.UnitOfWork
         IRepository<Comment> Comments { get; }
         IRepository<Match> Matches { get; }
         IRepository<Game> Games { get; }
+        IRepository<Server> Servers { get; }
+        IRepository<Goal> Goals { get; }
+        IRepository<Rank> Ranks { get; }
 
         void Commit();
 

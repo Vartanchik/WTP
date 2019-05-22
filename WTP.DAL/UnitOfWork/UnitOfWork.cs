@@ -21,6 +21,9 @@ namespace WTP.DAL.UnitOfWork
         private IRepository<Comment> _comments;
         private IRepository<Match> _matches;
         private IRepository<Game> _games;
+        private IRepository<Server> _servers;
+        private IRepository<Goal> _goals;
+        private IRepository<Rank> _ranks;
         private bool _disposed = false;
 
         public UnitOfWork(ApplicationDbContext context, UserManager<AppUser> userManager)
@@ -39,6 +42,9 @@ namespace WTP.DAL.UnitOfWork
         public IRepository<Comment> Comments => _comments ?? (_comments = new RepositoryBase<Comment>(_context));
         public IRepository<Match> Matches => _matches ?? (_matches = new RepositoryBase<Match>(_context));
         public IRepository<Game> Games => _games ?? (_games = new RepositoryBase<Game>(_context));
+        public IRepository<Server> Servers => _servers ?? (_servers = new RepositoryBase<Server>(_context));
+        public IRepository<Goal> Goals => _goals ?? (_goals = new RepositoryBase<Goal>(_context));
+        public IRepository<Rank> Ranks => _ranks ?? (_ranks = new RepositoryBase<Rank>(_context));
 
         public void Commit()
         {
