@@ -252,6 +252,10 @@ namespace WTP.WebAPI.Controllers
             return Ok(new ResponseDto(200, "Completed.", "Account has been successfully deleted."));
         }
 
+        /// <summary>
+        /// Generate restore token and send it to user email
+        /// </summary>
+        /// <param name="email"></param>
         [HttpPost("[action]")]
         [ProducesResponseType(typeof(ResponseDto), 200)]
         [ProducesResponseType(typeof(ResponseDto), 400)]
@@ -298,7 +302,7 @@ namespace WTP.WebAPI.Controllers
         {
             if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(token))
             {
-                return BadRequest(new ResponseDto(400, "Faild.", "Account restore faild."));
+                return Redirect($"{_configuration["Url:BaseUrl"]}/account?restoreIsFailed=true");
             }
 
             var id = Convert.ToInt32(userId);
@@ -306,8 +310,8 @@ namespace WTP.WebAPI.Controllers
             var result = await _appUserService.RestoreAccountAsync(id, token);
 
             return result
-                ? Ok(new ResponseDto(200, "Completed.", "Account has been successfully restore."))
-                : (IActionResult)BadRequest(new ResponseDto(400, "Faild.", "Account restore faild."));
+                ? Redirect($"{_configuration["Url:BaseUrl"]}/account/login")
+                : Redirect($"{_configuration["Url:BaseUrl"]}/account?restoreIsFailed=true");
         }
     }
 }
