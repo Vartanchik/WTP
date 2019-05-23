@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using WTP.BLL.DTOs.AppUserDTOs;
@@ -51,6 +52,8 @@ namespace WTP.BLL.Services.Concrete
             CreateMap<Comment, CommentDto>();
             CreateMap<MatchDto, Match>();
             CreateMap<Match, MatchDto>();
+            CreateMap<Rank, RankDto>();
+            CreateMap<RankDto, Rank>();
 
         }
 

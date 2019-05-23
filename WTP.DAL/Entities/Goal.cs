@@ -1,6 +1,6 @@
 ﻿namespace WTP.DAL.Entities
 {
-    public class Goal
+    public class Goal : IEntity
     {
         public int Id { get; set; }
         public string Name { get; set; }

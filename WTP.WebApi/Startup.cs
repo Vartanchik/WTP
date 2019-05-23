@@ -24,6 +24,7 @@ using WTP.WebAPI.Helpers;
 using WTP.BLL.Services.AzureBlobStorageService;
 using WTP.BLL.Services.DeleteService;
 using WTP.BLL.Services.Concrete.GameService;
+using WTP.BLL.Services.Concrete.PlayerSrvice;
 using WTP.DAL.Entities.AppUserEntities;
 
 namespace WTP.WebAPI
@@ -71,6 +72,7 @@ namespace WTP.WebAPI
             services.AddScoped<IRefreshTokenService, RefreshTokenService>();
             services.AddScoped<IDeleteService, DeleteService>();
             services.AddScoped<IGameService, GameService>();
+            services.AddScoped<IPlayerService, PlayerService>();
 
             services.AddScoped(provider => new MapperConfiguration(config =>
             {

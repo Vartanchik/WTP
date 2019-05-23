@@ -12,7 +12,7 @@ namespace WTP.BLL.DTOs.PlayerDTOs
         public ServerDto Server { get; set; }
         public GoalDto Goal { get; set; }
         public string About { get; set; }
-        public int Rank { get; set; }
+        public RankDto Rank { get; set; }
         public int Decency { get; set; }
         public TeamDto Team { get; set; }
     }

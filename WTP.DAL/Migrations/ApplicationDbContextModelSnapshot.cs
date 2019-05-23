@@ -15,7 +15,7 @@ namespace WTP.DAL.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.2.3-servicing-35854")
+                .HasAnnotation("ProductVersion", "2.2.4-servicing-10062")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -423,7 +423,7 @@ namespace WTP.DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Game");
+                    b.ToTable("Games");
 
                     b.HasData(
                         new
@@ -453,7 +453,19 @@ namespace WTP.DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Goal");
+                    b.ToTable("Goals");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Fun"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Profi"
+                        });
                 });
 
             modelBuilder.Entity("WTP.DAL.Entities.Player", b =>
@@ -466,7 +478,7 @@ namespace WTP.DAL.Migrations
 
                     b.Property<int>("AppUserId");
 
-                    b.Property<int>("Decency");
+                    b.Property<int?>("Decency");
 
                     b.Property<int>("GameId");
 
@@ -474,11 +486,11 @@ namespace WTP.DAL.Migrations
 
                     b.Property<string>("Name");
 
-                    b.Property<int?>("RankId");
+                    b.Property<int>("RankId");
 
                     b.Property<int>("ServerId");
 
-                    b.Property<int>("TeamId");
+                    b.Property<int?>("TeamId");
 
                     b.HasKey("Id");
 
@@ -494,7 +506,7 @@ namespace WTP.DAL.Migrations
 
                     b.HasIndex("TeamId");
 
-                    b.ToTable("Player");
+                    b.ToTable("Players");
                 });
 
             modelBuilder.Entity("WTP.DAL.Entities.Rank", b =>
@@ -503,19 +515,53 @@ namespace WTP.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("GameId");
-
                     b.Property<string>("Name");
-
-                    b.Property<string>("Photo");
-
-                    b.Property<int>("Value");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("GameId");
+                    b.ToTable("Ranks");
 
-                    b.ToTable("Rank");
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Uncalibrated"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Guardian"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "Crusader"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Name = "Archon"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Name = "Legend"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Name = "Ancient"
+                        },
+                        new
+                        {
+                            Id = 7,
+                            Name = "Divine"
+                        },
+                        new
+                        {
+                            Id = 8,
+                            Name = "Immortal"
+                        });
                 });
 
             modelBuilder.Entity("WTP.DAL.Entities.Server", b =>
@@ -528,7 +574,29 @@ namespace WTP.DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Server");
+                    b.ToTable("Servers");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "East"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "West"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "North"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Name = "South"
+                        });
                 });
 
             modelBuilder.Entity("WTP.DAL.Entities.Team", b =>
@@ -652,7 +720,8 @@ namespace WTP.DAL.Migrations
 
                     b.HasOne("WTP.DAL.Entities.Rank", "Rank")
                         .WithMany()
-                        .HasForeignKey("RankId");
+                        .HasForeignKey("RankId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("WTP.DAL.Entities.Server", "Server")
                         .WithMany()
@@ -661,16 +730,7 @@ namespace WTP.DAL.Migrations
 
                     b.HasOne("WTP.DAL.Entities.Team", "Team")
                         .WithMany()
-                        .HasForeignKey("TeamId")
-                        .OnDelete(DeleteBehavior.Cascade);
-                });
-
-            modelBuilder.Entity("WTP.DAL.Entities.Rank", b =>
-                {
-                    b.HasOne("WTP.DAL.Entities.Game", "Game")
-                        .WithMany()
-                        .HasForeignKey("GameId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("TeamId");
                 });
 
             modelBuilder.Entity("WTP.DAL.Entities.Team", b =>

@@ -1,8 +1,9 @@
 ﻿using AutoMapper;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using WTP.BLL.DTOs.AppUserDTOs;
 using WTP.BLL.DTOs.PlayerDTOs;
-using WTP.BLL.Services.Concrete.PlayerSrvices;
 using WTP.DAL.Entities;
 using WTP.DAL.UnitOfWork;
 
@@ -48,6 +49,13 @@ namespace WTP.BLL.Services.Concrete.PlayerSrvice
         {
             return from m in _uof.Matches.AsQueryable()
                    select _mapper.Map<MatchDto>(m);
+        }
+
+        public IList<PlayerDto> GetPlayersByUserId(int userId)
+        {
+            var listOfPlayers = _uof.Players.GetPlayersByUserId(userId);
+
+            return  _mapper.Map<IList<PlayerDto>>(listOfPlayers);
         }
     }
 }

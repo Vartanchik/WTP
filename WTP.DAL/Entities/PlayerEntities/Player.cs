@@ -15,9 +15,10 @@ namespace WTP.DAL.Entities
         public int GoalId { get; set; }
         public Goal Goal { get; set; }
         public string About { get; set; }
+        public int RankId { get; set; }
         public Rank Rank { get; set; }
-        public int Decency { get; set; }
-        public int TeamId { get; set; }
+        public int? Decency { get; set; }
+        public int? TeamId { get; set; }
         public Team Team { get; set; }
     }
 }
