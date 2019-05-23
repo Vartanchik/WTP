@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using WTP.BLL.DTOs.PlayerDTOs;
@@ -19,14 +20,14 @@ namespace WTP.BLL.Services.Concrete.PlayerSrvice
             _mapper = mapper;
         }
 
-        public async Task CreateOrUpdateAsync(PlayerDto dto)
+        public async Task CreateOrUpdateAsync(PlayerDto dto, int adminId=1)
         {
             var player = _mapper.Map<Player>(dto);
 
             await _uof.Players.CreateOrUpdate(player);
         }
 
-        public async Task DeleteAsync(int playerId)
+        public async Task DeleteAsync(int playerId, int adminId=1)
         {
             await _uof.Players.DeleteAsync(playerId);
         }
@@ -48,6 +49,12 @@ namespace WTP.BLL.Services.Concrete.PlayerSrvice
         {
             return from m in _uof.Matches.AsQueryable()
                    select _mapper.Map<MatchDto>(m);
+        }
+
+        public async Task<IList<PlayerDto>> GetAllPlayersAsync()
+        {
+            var players = await _uof.Players.GetAllPlayersAsync();
+            return _mapper.Map<IList<PlayerDto>>(players);
         }
     }
 }

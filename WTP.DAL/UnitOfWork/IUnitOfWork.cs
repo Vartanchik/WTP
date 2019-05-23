@@ -13,7 +13,7 @@ namespace WTP.DAL.UnitOfWork
         IRepository<Country> Countries { get; }
         IRepository<Gender> Genders { get; }
         IRepository<Language> Languages { get; }
-        IRepository<Player> Players { get; }
+        IPlayerRepository<Player> Players { get; }
         IRepository<Team> Teams { get; }
         ITokenRepository<RefreshToken> Tokens { get; }
         IRepository<Comment> Comments { get; }
