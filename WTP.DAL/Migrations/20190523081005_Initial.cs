@@ -24,7 +24,7 @@ namespace WTP.DAL.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Countries",
+                name: "Country",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
@@ -33,7 +33,7 @@ namespace WTP.DAL.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Countries", x => x.Id);
+                    table.PrimaryKey("PK_Country", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -50,7 +50,7 @@ namespace WTP.DAL.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Genders",
+                name: "Gender",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
@@ -59,7 +59,7 @@ namespace WTP.DAL.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Genders", x => x.Id);
+                    table.PrimaryKey("PK_Gender", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -76,7 +76,7 @@ namespace WTP.DAL.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Languages",
+                name: "Language",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
@@ -85,7 +85,7 @@ namespace WTP.DAL.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Languages", x => x.Id);
+                    table.PrimaryKey("PK_Language", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -167,15 +167,15 @@ namespace WTP.DAL.Migrations
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_AspNetUsers_Countries_CountryId",
+                        name: "FK_AspNetUsers_Country_CountryId",
                         column: x => x.CountryId,
-                        principalTable: "Countries",
+                        principalTable: "Country",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_AspNetUsers_Genders_GenderId",
+                        name: "FK_AspNetUsers_Gender_GenderId",
                         column: x => x.GenderId,
-                        principalTable: "Genders",
+                        principalTable: "Gender",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -197,9 +197,9 @@ namespace WTP.DAL.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_AppUserLanguage_Languages_LanguageId",
+                        name: "FK_AppUserLanguage_Language_LanguageId",
                         column: x => x.LanguageId,
-                        principalTable: "Languages",
+                        principalTable: "Language",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -312,7 +312,29 @@ namespace WTP.DAL.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Teams",
+                name: "RestoreTokens",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    AppUserId = table.Column<int>(nullable: false),
+                    Value = table.Column<string>(nullable: true),
+                    CreateDate = table.Column<DateTime>(nullable: false),
+                    ExpiryDate = table.Column<DateTime>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RestoreTokens", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_RestoreTokens_AspNetUsers_AppUserId",
+                        column: x => x.AppUserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Team",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
@@ -322,9 +344,9 @@ namespace WTP.DAL.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Teams", x => x.Id);
+                    table.PrimaryKey("PK_Team", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Teams_AspNetUsers_AppUserId",
+                        name: "FK_Team_AspNetUsers_AppUserId",
                         column: x => x.AppUserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
@@ -343,7 +365,7 @@ namespace WTP.DAL.Migrations
                     ServerId = table.Column<int>(nullable: false),
                     GoalId = table.Column<int>(nullable: false),
                     About = table.Column<string>(nullable: true),
-                    RankId = table.Column<int>(nullable: true),
+                    RankId = table.Column<int>(nullable: false),
                     Decency = table.Column<int>(nullable: true),
                     TeamId = table.Column<int>(nullable: true)
                 },
@@ -373,7 +395,7 @@ namespace WTP.DAL.Migrations
                         column: x => x.RankId,
                         principalTable: "Ranks",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Players_Servers_ServerId",
                         column: x => x.ServerId,
@@ -381,9 +403,9 @@ namespace WTP.DAL.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Players_Teams_TeamId",
+                        name: "FK_Players_Team_TeamId",
                         column: x => x.TeamId,
-                        principalTable: "Teams",
+                        principalTable: "Team",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -399,7 +421,7 @@ namespace WTP.DAL.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "Countries",
+                table: "Country",
                 columns: new[] { "Id", "Name" },
                 values: new object[,]
                 {
@@ -415,13 +437,13 @@ namespace WTP.DAL.Migrations
                 columns: new[] { "Id", "Name" },
                 values: new object[,]
                 {
+                    { 1, "Dota 2" },
                     { 2, "CS:GO" },
-                    { 3, "GTA V" },
-                    { 1, "Dota 2" }
+                    { 3, "GTA V" }
                 });
 
             migrationBuilder.InsertData(
-                table: "Genders",
+                table: "Gender",
                 columns: new[] { "Id", "Name" },
                 values: new object[,]
                 {
@@ -434,27 +456,27 @@ namespace WTP.DAL.Migrations
                 columns: new[] { "Id", "Name" },
                 values: new object[,]
                 {
-                    { 1, "Fun" },
-                    { 2, "Profi" }
+                    { 2, "Profi" },
+                    { 1, "Fun" }
                 });
 
             migrationBuilder.InsertData(
-                table: "Languages",
+                table: "Language",
                 columns: new[] { "Id", "Name" },
                 values: new object[,]
                 {
-                    { 8, "French" },
-                    { 12, "Greek" },
                     { 11, "Swedish" },
-                    { 10, "Czech" },
+                    { 12, "Greek" },
                     { 9, "Italian" },
+                    { 10, "Czech" },
                     { 7, "Korean" },
+                    { 6, "Japanese" },
                     { 5, "Ukrainian" },
                     { 4, "Spanish" },
                     { 3, "Russian" },
                     { 2, "German" },
                     { 1, "English" },
-                    { 6, "Japanese" }
+                    { 8, "French" }
                 });
 
             migrationBuilder.InsertData(
@@ -462,14 +484,14 @@ namespace WTP.DAL.Migrations
                 columns: new[] { "Id", "Name" },
                 values: new object[,]
                 {
-                    { 4, "Archon" },
-                    { 1, "Uncalibrated" },
                     { 2, "Guardian" },
-                    { 3, "Crusader" },
-                    { 5, "Legend" },
-                    { 6, "Ancient" },
                     { 7, "Divine" },
-                    { 8, "Immortal" }
+                    { 6, "Ancient" },
+                    { 5, "Legend" },
+                    { 1, "Uncalibrated" },
+                    { 3, "Crusader" },
+                    { 8, "Immortal" },
+                    { 4, "Archon" }
                 });
 
             migrationBuilder.InsertData(
@@ -573,8 +595,13 @@ namespace WTP.DAL.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Teams_AppUserId",
-                table: "Teams",
+                name: "IX_RestoreTokens_AppUserId",
+                table: "RestoreTokens",
+                column: "AppUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Team_AppUserId",
+                table: "Team",
                 column: "AppUserId");
         }
 
@@ -605,7 +632,10 @@ namespace WTP.DAL.Migrations
                 name: "RefreshTokens");
 
             migrationBuilder.DropTable(
-                name: "Languages");
+                name: "RestoreTokens");
+
+            migrationBuilder.DropTable(
+                name: "Language");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
@@ -623,16 +653,16 @@ namespace WTP.DAL.Migrations
                 name: "Servers");
 
             migrationBuilder.DropTable(
-                name: "Teams");
+                name: "Team");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
 
             migrationBuilder.DropTable(
-                name: "Countries");
+                name: "Country");
 
             migrationBuilder.DropTable(
-                name: "Genders");
+                name: "Gender");
         }
     }
 }

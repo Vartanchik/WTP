@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoMapper.Configuration;
+﻿using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using WTP.BLL.DTOs.PlayerDTOs;
 using WTP.BLL.DTOs.ServicesDTOs;
-using WTP.BLL.Services.Concrete.AppUserService;
 using WTP.BLL.Services.Concrete.GameService;
 
 namespace WTP.WebAPI.Controllers

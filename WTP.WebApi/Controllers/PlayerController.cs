@@ -43,7 +43,7 @@ namespace WTP.WebAPI.Controllers
             // TODO: Fix GetPlayersByUserId that it return parsable to json data
             var listOfPlayers = _playerService.GetPlayersByUserId(userId);
 
-            var user = await _appUserService.GetAsync(userId);
+            var user = await _appUserService.GetByIdAsync(userId);
 
             foreach (var item in listOfPlayers)
             {

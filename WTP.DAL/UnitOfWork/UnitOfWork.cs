@@ -3,8 +3,11 @@ using System.Threading.Tasks;
 using WTP.DAL.Entities;
 using WTP.DAL.Repositories.GenericRepository;
 using Microsoft.AspNetCore.Identity;
-using WTP.DAL.Repositories.ConcreteRepositories;
 using WTP.DAL.Repositories.ConcreteRepositories.PlayerRepository;
+using WTP.DAL.Entities.AppUserEntities;
+using WTP.DAL.Repositories.ConcreteRepositories.AppUserRepository;
+using WTP.DAL.Repositories.ConcreteRepositories.RefreshTokenRepository;
+using WTP.DAL.Repositories.ConcreteRepositories.RestoreTokenRepository;
 
 namespace WTP.DAL.UnitOfWork
 {
@@ -18,13 +21,14 @@ namespace WTP.DAL.UnitOfWork
         private IRepository<Language> _languages;
         private IPlayerRepository<Player> _players;
         private IRepository<Team> _teams;
-        private ITokenRepository<RefreshToken> _tokens;
+        private IRefreshTokenRepository<RefreshToken> _refreshTokens;
         private IRepository<Comment> _comments;
         private IRepository<Match> _matches;
         private IRepository<Game> _games;
         private IRepository<Server> _servers;
         private IRepository<Goal> _goals;
         private IRepository<Rank> _ranks;
+        private IRestoreTokenRepository<RestoreToken> _restoreAccountTokens;
         private bool _disposed = false;
 
         public UnitOfWork(ApplicationDbContext context, UserManager<AppUser> userManager)
@@ -39,13 +43,14 @@ namespace WTP.DAL.UnitOfWork
         public IRepository<Language> Languages => _languages ?? (_languages = new RepositoryBase<Language>(_context));
         public IPlayerRepository<Player> Players => _players ?? (_players = new PlayerRepository<Player>(_context));
         public IRepository<Team> Teams => _teams ?? (_teams = new RepositoryBase<Team>(_context));
-        public ITokenRepository<RefreshToken> Tokens => _tokens ?? (_tokens = new TokenRepository<RefreshToken>(_context));
+        public IRefreshTokenRepository<RefreshToken> RefreshTokens => _refreshTokens ?? (_refreshTokens = new RefreshTokenRepository<RefreshToken>(_context));
         public IRepository<Comment> Comments => _comments ?? (_comments = new RepositoryBase<Comment>(_context));
         public IRepository<Match> Matches => _matches ?? (_matches = new RepositoryBase<Match>(_context));
         public IRepository<Game> Games => _games ?? (_games = new RepositoryBase<Game>(_context));
         public IRepository<Server> Servers => _servers ?? (_servers = new RepositoryBase<Server>(_context));
         public IRepository<Goal> Goals => _goals ?? (_goals = new RepositoryBase<Goal>(_context));
         public IRepository<Rank> Ranks => _ranks ?? (_ranks = new RepositoryBase<Rank>(_context));
+        public IRestoreTokenRepository<RestoreToken> RestoreTokens => _restoreAccountTokens ?? (_restoreAccountTokens = new RestoreTokenRepository<RestoreToken>(_context));
 
         public void Commit()
         {

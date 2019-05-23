@@ -19,13 +19,13 @@ using WTP.BLL.Services.Concrete.AppUserService;
 using WTP.BLL.Services.Concrete.RefreshTokenService;
 using WTP.BLL.Services.EmailService;
 using WTP.DAL;
-using WTP.DAL.Entities;
 using WTP.DAL.UnitOfWork;
 using WTP.WebAPI.Helpers;
 using WTP.BLL.Services.AzureBlobStorageService;
 using WTP.BLL.Services.DeleteService;
 using WTP.BLL.Services.Concrete.GameService;
 using WTP.BLL.Services.Concrete.PlayerSrvice;
+using WTP.DAL.Entities.AppUserEntities;
 
 namespace WTP.WebAPI
 {

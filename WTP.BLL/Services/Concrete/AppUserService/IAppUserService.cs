@@ -9,7 +9,7 @@ namespace WTP.BLL.Services.Concrete.AppUserService
     public interface IAppUserService
     {
         Task<IdentityResult> CreateAsync(AppUserDto appUserDto, string password);
-        Task<AppUserDto> GetAsync(int userId);
+        Task<AppUserDto> GetByIdAsync(int userId);
         Task<AppUserDto> GetByEmailAsync(string email);
         Task<AppUserDto> GetByNameAsync(string userName);
         Task<IdentityResult> UpdateAsync(AppUserDto appUserDto);
@@ -22,6 +22,8 @@ namespace WTP.BLL.Services.Concrete.AppUserService
         Task<string> GenerateEmailConfirmationTokenAsync(AppUserDto appUserDto);
         Task<AppUserDto> FindByIdAsync(string userId);
         Task<IdentityResult> ConfirmEmailAsync(int userId, string token);
-        Task DeleteAsync(int userId);
+        Task DeleteAccountAsync(int userId);
+        Task<string> CreateRestoreAccountToken(int userId);
+        Task<bool> RestoreAccountAsync(int userId, string token);
     }
 }

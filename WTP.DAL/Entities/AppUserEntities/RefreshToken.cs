@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace WTP.DAL.Entities
+namespace WTP.DAL.Entities.AppUserEntities
 {
     public class RefreshToken : IEntity
     {

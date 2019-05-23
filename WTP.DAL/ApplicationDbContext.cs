@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using WTP.DAL.Entities;
+using WTP.DAL.Entities.AppUserEntities;
 
 namespace WTP.DAL
 {
@@ -12,16 +13,13 @@ namespace WTP.DAL
         }
 
         public DbSet<AppUser> AppUsers { get; set; }
-        public DbSet<Language> Languages { get; set; }
-        public DbSet<Gender> Genders { get; set; }
-        public DbSet<Country> Countries { get; set; }
-        public DbSet<Player> Players { get; set; }
-        public DbSet<Team> Teams { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
+        public DbSet<Player> Players { get; set; }
         public DbSet<Game> Games { get; set; }
         public DbSet<Server> Servers { get; set; }
         public DbSet<Goal> Goals { get; set; }
         public DbSet<Rank> Ranks { get; set; }
+        public DbSet<RestoreToken> RestoreTokens { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

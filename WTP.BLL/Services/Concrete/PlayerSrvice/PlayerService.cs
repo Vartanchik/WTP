@@ -34,7 +34,7 @@ namespace WTP.BLL.Services.Concrete.PlayerSrvice
 
         public async Task<PlayerDto> FindAsync(int playerId)
         {
-            var dto = _mapper.Map<PlayerDto>(await _uof.Players.GetAsync(playerId));
+            var dto = _mapper.Map<PlayerDto>(await _uof.Players.GetByIdAsync(playerId));
 
             return dto;
         }

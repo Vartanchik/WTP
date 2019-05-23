@@ -2,11 +2,10 @@
 using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using WTP.BLL.DTOs.AppUserDTOs;
 using WTP.BLL.DTOs.ServicesDTOs;
-using WTP.DAL.Entities;
+using WTP.DAL.Entities.AppUserEntities;
 using WTP.DAL.UnitOfWork;
 
 namespace WTP.BLL.Services.Concrete.AppUserService
@@ -14,7 +13,7 @@ namespace WTP.BLL.Services.Concrete.AppUserService
     public class AppUserService : IAppUserService
     {
         private readonly IMapper _mapper;
-        private readonly IUnitOfWork _ouw;
+        private readonly IUnitOfWork _uow;
 
         /*
         public AppUserService(IMapper mapper, Func<string, IAppUserRepository> appUserRepository)
@@ -26,7 +25,7 @@ namespace WTP.BLL.Services.Concrete.AppUserService
 
         public AppUserService(IUnitOfWork unitOfWork, IMapper mapper)
         {
-            _ouw = unitOfWork;
+            _uow = unitOfWork;
             _mapper = mapper;
         }
 
@@ -34,14 +33,14 @@ namespace WTP.BLL.Services.Concrete.AppUserService
         {
             var user = _mapper.Map<AppUser>(dto);
 
-            var result = await _ouw.AppUsers.CreateAsync(user, password);
+            var result = await _uow.AppUsers.CreateAsync(user, password);
 
             return result;
         }
 
-        public async Task<AppUserDto> GetAsync(int userId)
+        public async Task<AppUserDto> GetByIdAsync(int userId)
         {
-            var appUser = await _ouw.AppUsers.GetAsync(userId);
+            var appUser = await _uow.AppUsers.GetByIdAsync(userId);
 
             var appUserDto = _mapper.Map<AppUserDto>(appUser);
 
@@ -50,7 +49,7 @@ namespace WTP.BLL.Services.Concrete.AppUserService
 
         public async Task<AppUserDto> GetByEmailAsync(string email)
         {
-            var appUser = await _ouw.AppUsers.GetByEmailAsync(email);
+            var appUser = await _uow.AppUsers.GetByEmailAsync(email);
 
             var appUserDto = _mapper.Map<AppUserDto>(appUser);
 
@@ -59,7 +58,7 @@ namespace WTP.BLL.Services.Concrete.AppUserService
 
         public async Task<AppUserDto> GetByNameAsync(string userName)
         {
-            var appUser = await _ouw.AppUsers.GetByNameAsync(userName);
+            var appUser = await _uow.AppUsers.GetByNameAsync(userName);
 
             var appUserDto = _mapper.Map<AppUserDto>(appUser);
 
@@ -68,11 +67,11 @@ namespace WTP.BLL.Services.Concrete.AppUserService
                      
         public async Task<IdentityResult> UpdateAsync(AppUserDto appUserDto)
         {
-            if (await _ouw.AppUsers.GetAsync(appUserDto.Id) != null)
+            if (await _uow.AppUsers.GetByIdAsync(appUserDto.Id) != null)
             {
                 var appUser = _mapper.Map<AppUser>(appUserDto);
 
-                return await _ouw.AppUsers.UpdateAsync(appUser);
+                return await _uow.AppUsers.UpdateAsync(appUser);
             }
 
             return IdentityResult.Failed();
@@ -82,40 +81,40 @@ namespace WTP.BLL.Services.Concrete.AppUserService
         {
             var appUser = _mapper.Map<AppUser>(appUserDto);
 
-            return await _ouw.AppUsers.GetRolesAsync(appUser);
+            return await _uow.AppUsers.GetRolesAsync(appUser);
         }
 
         public async Task<bool> CheckPasswordAsync(int userId, string password)
         {
-            return await _ouw.AppUsers.CheckPasswordAsync(userId, password);
+            return await _uow.AppUsers.CheckPasswordAsync(userId, password);
         }
 
         public async Task<bool> IsEmailConfirmedAsync(int userId)
         {
-            return await _ouw.AppUsers.IsEmailConfirmedAsync(userId);
+            return await _uow.AppUsers.IsEmailConfirmedAsync(userId);
         }
 
         public async Task<string> GeneratePasswordResetTokenAsync(AppUserDto appUserDto)
         {
             var appUser = _mapper.Map<AppUser>(appUserDto);
 
-            return await _ouw.AppUsers.GeneratePasswordResetTokenAsync(appUser);
+            return await _uow.AppUsers.GeneratePasswordResetTokenAsync(appUser);
         }
 
         public async Task<IdentityResult> ResetPasswordAsync(ResetPasswordDto dto)
         {
-            var appUser = _ouw.AppUsers.GetAsync(dto.Id);
+            var appUser = _uow.AppUsers.GetByIdAsync(dto.Id);
 
             return appUser == null
                 ? IdentityResult.Failed()
-                : await _ouw.AppUsers.ResetPasswordAsync(appUser.Result,
-                                                              dto.Token,
-                                                              dto.NewPassword);
+                : await _uow.AppUsers.ResetPasswordAsync(appUser.Result,
+                                                         dto.Token,
+                                                         dto.NewPassword);
         }
 
         public async Task<IdentityResult> ChangePasswordAsync(ChangePasswordDto dto)
         {
-            if (await GetAsync(dto.UserId) == null)
+            if (await GetByIdAsync(dto.UserId) == null)
             {
                 return IdentityResult.Failed(new IdentityError { Description = "Something going wrong." });
             }
@@ -125,7 +124,7 @@ namespace WTP.BLL.Services.Concrete.AppUserService
                 return IdentityResult.Failed(new IdentityError { Description = "Invalid current password." });
             }
 
-            return await _ouw.AppUsers.ChangePasswordAsync(dto.UserId,
+            return await _uow.AppUsers.ChangePasswordAsync(dto.UserId,
                                                                 dto.CurrentPassword,
                                                                 dto.NewPassword);
         }
@@ -134,32 +133,91 @@ namespace WTP.BLL.Services.Concrete.AppUserService
         {
             var appUser = _mapper.Map<AppUser>(appUserDto);
 
-            return await _ouw.AppUsers.GenerateEmailConfirmationTokenAsync(appUser);
+            return await _uow.AppUsers.GenerateEmailConfirmationTokenAsync(appUser);
         }
 
         public async Task<AppUserDto> FindByIdAsync(string userId)
         {
-            var appUser = await _ouw.AppUsers.FindByIdAsync(userId);
+            var appUser = await _uow.AppUsers.GetByIdAsync(userId);
 
             return _mapper.Map<AppUserDto>(appUser);
         }
 
         public async Task<IdentityResult> ConfirmEmailAsync(int userId, string token)
         {
-            return _ouw.AppUsers.GetAsync(userId) == null || token == null
+            return _uow.AppUsers.GetByIdAsync(userId) == null || token == null
                 ? IdentityResult.Failed() 
-                : await _ouw.AppUsers.ConfirmEmailAsync(userId, token);
+                : await _uow.AppUsers.ConfirmEmailAsync(userId, token);
         }
 
-        public async Task DeleteAsync(int userId)
+        public async Task DeleteAccountAsync(int userId)
         {
-            var user = await _ouw.AppUsers.GetAsync(userId);
+            var user = await _uow.AppUsers.GetByIdAsync(userId);
 
-            user.IsDeleted = true;
-            user.DeletedTime = DateTime.Today;
+            if (user != null)
+            {
+                user.IsDeleted = true;
+                user.DeletedTime = DateTime.Today;
 
-            await _ouw.Tokens.DeleteUserTokensAsync(user.Id);
-            await _ouw.AppUsers.CreateOrUpdate(user);
+                await _uow.AppUsers.CreateOrUpdate(user);
+                await _uow.CommitAsync();
+            }
+        }
+
+        public async Task<string> CreateRestoreAccountToken(int userId)
+        {
+            var user = await _uow.AppUsers.GetByIdAsync(userId);
+
+            if (user == null)
+            {
+                return string.Empty;
+            }
+
+            var token = await _uow.RestoreTokens.GetByUserId(userId);
+
+            if (token == null)
+            {
+                token = new RestoreToken { AppUserId = userId, AppUser = user };
+            }
+
+            token.Value = Guid.NewGuid().ToString();
+            token.CreateDate = DateTime.Now;
+            token.ExpiryDate = DateTime.Now.AddDays(1);
+
+            await _uow.RestoreTokens.CreateOrUpdate(token);
+            await _uow.CommitAsync();
+
+            return token.Value;
+        }
+
+        public async Task<bool> RestoreAccountAsync(int userId, string token)
+        {
+            var user = await _uow.AppUsers.GetByIdAsync(userId);
+
+            if (user == null)
+            {
+                return false;
+            }
+
+            var currentToken = await _uow.RestoreTokens.GetByUserId(userId);
+
+            if (currentToken != null && token != currentToken.Value)
+            {
+                return false;
+            }
+
+            if (currentToken.ExpiryDate < DateTime.Now)
+            {
+                return false;
+            }
+
+            user.IsDeleted = false;
+
+            await _uow.AppUsers.CreateOrUpdate(user);
+            await _uow.RestoreTokens.DeleteAsync(currentToken.Id);
+            await _uow.CommitAsync();
+
+            return true;
         }
     }
 }
