@@ -33,6 +33,12 @@ namespace WTP.DAL.Repositories.GenericRepository
             }
         }
 
+        public virtual void Delete(TEntity entity)
+        {
+            _dbset.Remove(entity);
+        }
+
+
         public virtual async Task<TEntity> GetByIdAsync(int id)
         {
             return await _dbset.FindAsync(id);

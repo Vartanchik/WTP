@@ -7,7 +7,9 @@ namespace WTP.DAL.Repositories.GenericRepository
     {
         Task CreateOrUpdate(TEntity item);
         Task DeleteAsync(int id);
+        void Delete(TEntity entity);
+
         Task<TEntity> GetByIdAsync(int id);
-        IQueryable<TEntity> AsQueryable();      
+        IQueryable<TEntity> AsQueryable();
     }
 }

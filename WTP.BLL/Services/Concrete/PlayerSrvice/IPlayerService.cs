@@ -8,10 +8,10 @@ namespace WTP.BLL.Services.Concrete.PlayerSrvice
     public interface IPlayerService
     {
         Task CreateOrUpdateAsync(PlayerDto dto);
-        Task DeleteAsync(int playerId);
+        Task DeleteAsync(int userId, int playerId);
         Task<PlayerDto> FindAsync(int playerId);
         IQueryable<CommentDto> FindCommentsAsync(int playerId);
         IQueryable<MatchDto> FindMatchesAsync(int playerId);
-        IList<PlayerDto> GetPlayersByUserId(int userId);
+        Task<IList<PlayerListItemDto>> GetListByUserIdAsync(int userId);
     }
 }

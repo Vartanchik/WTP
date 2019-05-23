@@ -6,12 +6,8 @@ using WTP.BLL.Services.Concrete.GameService;
 
 namespace WTP.WebAPI.Controllers
 {
-<<<<<<< HEAD
     [Produces("application/json")]
-    [Route("api/[controller]")]
-=======
     [Route("api/Info")]
->>>>>>> 7db22e311b95720d3a96cc64b031053416ad437f
     [ApiController]
     public class InfoController : Controller
     {

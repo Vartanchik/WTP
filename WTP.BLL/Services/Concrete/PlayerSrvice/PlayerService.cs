@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,12 +13,12 @@ namespace WTP.BLL.Services.Concrete.PlayerSrvice
 {
     public class PlayerService : IPlayerService
     {
-        private readonly IUnitOfWork _uof;
+        private readonly IUnitOfWork _uow;
         private readonly IMapper _mapper;
-        
+
         public PlayerService(IUnitOfWork unitOfWork, IMapper mapper)
         {
-            _uof = unitOfWork;
+            _uow = unitOfWork;
             _mapper = mapper;
         }
 
@@ -24,38 +26,44 @@ namespace WTP.BLL.Services.Concrete.PlayerSrvice
         {
             var player = _mapper.Map<Player>(dto);
 
-            await _uof.Players.CreateOrUpdate(player);
+            await _uow.Players.CreateOrUpdate(player);
         }
 
-        public async Task DeleteAsync(int playerId)
+        public async Task DeleteAsync(int userId, int playerId)
         {
-            await _uof.Players.DeleteAsync(playerId);
+            var existedUser = await _uow.Players.AsQueryable().SingleOrDefaultAsync(p => p.Id == playerId);
+
+            if (userId != existedUser.Id) throw new AccessViolationException("Operation failed");
+
+            _uow.Players.Delete(existedUser);
+
+            await _uow.CommitAsync();
         }
 
         public async Task<PlayerDto> FindAsync(int playerId)
         {
-            var dto = _mapper.Map<PlayerDto>(await _uof.Players.GetByIdAsync(playerId));
+            var dto = _mapper.Map<PlayerDto>(await _uow.Players.GetByIdAsync(playerId));
 
             return dto;
         }
 
         public IQueryable<CommentDto> FindCommentsAsync(int playerId)
         {
-            return from c in _uof.Comments.AsQueryable()
+            return from c in _uow.Comments.AsQueryable()
                    select _mapper.Map<CommentDto>(c);
         }
 
         public IQueryable<MatchDto> FindMatchesAsync(int playerId)
         {
-            return from m in _uof.Matches.AsQueryable()
+            return from m in _uow.Matches.AsQueryable()
                    select _mapper.Map<MatchDto>(m);
         }
 
-        public IList<PlayerDto> GetPlayersByUserId(int userId)
+        public async Task<IList<PlayerListItemDto>> GetListByUserIdAsync(int userId)
         {
-            var listOfPlayers = _uof.Players.GetPlayersByUserId(userId);
+            var listOfPlayers = await _uow.Players.AsQueryable().Where(p => p.AppUserId == userId).ToListAsync();
 
-            return  _mapper.Map<IList<PlayerDto>>(listOfPlayers);
+            return _mapper.Map<IList<PlayerListItemDto>>(listOfPlayers);
         }
     }
 }
