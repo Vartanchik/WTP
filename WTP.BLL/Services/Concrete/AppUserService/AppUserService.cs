@@ -56,6 +56,7 @@ namespace WTP.BLL.Services.Concrete.AppUserService
             var record = _mapper.Map<History>(history);
             await _uow.Histories.CreateOrUpdate(record);
             await _uow.CommitAsync();
+
             return result;
         }
 
@@ -107,6 +108,7 @@ namespace WTP.BLL.Services.Concrete.AppUserService
 
                 var record = _mapper.Map<History>(history);
                 await _uow.Histories.CreateOrUpdate(record);
+                await _uow.CommitAsync();
 
                 return await _uow.AppUsers.UpdateAsync(appUser);
             }
@@ -222,6 +224,7 @@ namespace WTP.BLL.Services.Concrete.AppUserService
 
         public async Task<IList<AppUserDto>> GetAllUsersAsync()
         {
+            //var allUsers = _uow.AppUsers.GetAllUsersAsync();//.AsQueryable();
             var allUsers = await _uow.AppUsers.GetAllUsersAsync();
             return _mapper.Map<IList<AppUserDto>>(allUsers);
         }

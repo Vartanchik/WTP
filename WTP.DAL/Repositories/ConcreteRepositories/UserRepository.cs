@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using WTP.DAL.Entities;
 using WTP.DAL.Repositories.GenericRepository;
@@ -192,7 +193,5 @@ namespace WTP.DAL.Repositories.ConcreteRepositories
         {
             return await LockAsync(id, null);
         }
-
-
     }
 }
