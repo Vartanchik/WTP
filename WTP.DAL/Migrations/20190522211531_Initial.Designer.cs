@@ -10,7 +10,7 @@ using WTP.DAL;
 namespace WTP.DAL.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20190522180945_Initial")]
+    [Migration("20190522211531_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -437,6 +437,8 @@ namespace WTP.DAL.Migrations
 
                     b.Property<int>("AppUserId");
 
+                    b.Property<int?>("Decency");
+
                     b.Property<int>("GameId");
 
                     b.Property<int>("GoalId");
@@ -446,6 +448,8 @@ namespace WTP.DAL.Migrations
                     b.Property<int?>("RankId");
 
                     b.Property<int>("ServerId");
+
+                    b.Property<int?>("TeamId");
 
                     b.HasKey("Id");
 
@@ -458,6 +462,8 @@ namespace WTP.DAL.Migrations
                     b.HasIndex("RankId");
 
                     b.HasIndex("ServerId");
+
+                    b.HasIndex("TeamId");
 
                     b.ToTable("Players");
                 });
@@ -482,37 +488,37 @@ namespace WTP.DAL.Migrations
                         },
                         new
                         {
-                            Id = 3,
+                            Id = 2,
                             Name = "Guardian"
                         },
                         new
                         {
-                            Id = 4,
+                            Id = 3,
                             Name = "Crusader"
                         },
                         new
                         {
-                            Id = 5,
+                            Id = 4,
                             Name = "Archon"
                         },
                         new
                         {
-                            Id = 6,
+                            Id = 5,
                             Name = "Legend"
                         },
                         new
                         {
-                            Id = 7,
+                            Id = 6,
                             Name = "Ancient"
                         },
                         new
                         {
-                            Id = 8,
+                            Id = 7,
                             Name = "Divine"
                         },
                         new
                         {
-                            Id = 9,
+                            Id = 8,
                             Name = "Immortal"
                         });
                 });
@@ -685,6 +691,10 @@ namespace WTP.DAL.Migrations
                         .WithMany()
                         .HasForeignKey("ServerId")
                         .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("WTP.DAL.Entities.Team", "Team")
+                        .WithMany()
+                        .HasForeignKey("TeamId");
                 });
 
             modelBuilder.Entity("WTP.DAL.Entities.RefreshToken", b =>

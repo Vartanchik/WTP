@@ -81,13 +81,13 @@ namespace WTP.DAL
 
             builder.Entity<Rank>().HasData(
                     new Rank { Id = 1, Name = "Uncalibrated" },
-                    new Rank { Id = 3, Name = "Guardian" },
-                    new Rank { Id = 4, Name = "Crusader" },
-                    new Rank { Id = 5, Name = "Archon" },
-                    new Rank { Id = 6, Name = "Legend" },
-                    new Rank { Id = 7, Name = "Ancient" },
-                    new Rank { Id = 8, Name = "Divine" },
-                    new Rank { Id = 9, Name = "Immortal" }
+                    new Rank { Id = 2, Name = "Guardian" },
+                    new Rank { Id = 3, Name = "Crusader" },
+                    new Rank { Id = 4, Name = "Archon" },
+                    new Rank { Id = 5, Name = "Legend" },
+                    new Rank { Id = 6, Name = "Ancient" },
+                    new Rank { Id = 7, Name = "Divine" },
+                    new Rank { Id = 8, Name = "Immortal" }
                 );
 
             builder.Entity<AppUserLanguage>()

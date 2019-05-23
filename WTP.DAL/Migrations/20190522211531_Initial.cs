@@ -290,55 +290,6 @@ namespace WTP.DAL.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Players",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    Name = table.Column<string>(nullable: true),
-                    AppUserId = table.Column<int>(nullable: false),
-                    GameId = table.Column<int>(nullable: false),
-                    ServerId = table.Column<int>(nullable: false),
-                    GoalId = table.Column<int>(nullable: false),
-                    About = table.Column<string>(nullable: true),
-                    RankId = table.Column<int>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Players", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Players_AspNetUsers_AppUserId",
-                        column: x => x.AppUserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Players_Games_GameId",
-                        column: x => x.GameId,
-                        principalTable: "Games",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Players_Goals_GoalId",
-                        column: x => x.GoalId,
-                        principalTable: "Goals",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Players_Ranks_RankId",
-                        column: x => x.RankId,
-                        principalTable: "Ranks",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Players_Servers_ServerId",
-                        column: x => x.ServerId,
-                        principalTable: "Servers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "RefreshTokens",
                 columns: table => new
                 {
@@ -376,6 +327,63 @@ namespace WTP.DAL.Migrations
                         name: "FK_Teams_AspNetUsers_AppUserId",
                         column: x => x.AppUserId,
                         principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Players",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    Name = table.Column<string>(nullable: true),
+                    AppUserId = table.Column<int>(nullable: false),
+                    GameId = table.Column<int>(nullable: false),
+                    ServerId = table.Column<int>(nullable: false),
+                    GoalId = table.Column<int>(nullable: false),
+                    About = table.Column<string>(nullable: true),
+                    RankId = table.Column<int>(nullable: true),
+                    Decency = table.Column<int>(nullable: true),
+                    TeamId = table.Column<int>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Players", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Players_AspNetUsers_AppUserId",
+                        column: x => x.AppUserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Players_Games_GameId",
+                        column: x => x.GameId,
+                        principalTable: "Games",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Players_Goals_GoalId",
+                        column: x => x.GoalId,
+                        principalTable: "Goals",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Players_Ranks_RankId",
+                        column: x => x.RankId,
+                        principalTable: "Ranks",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Players_Servers_ServerId",
+                        column: x => x.ServerId,
+                        principalTable: "Servers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Players_Teams_TeamId",
+                        column: x => x.TeamId,
+                        principalTable: "Teams",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -454,14 +462,14 @@ namespace WTP.DAL.Migrations
                 columns: new[] { "Id", "Name" },
                 values: new object[,]
                 {
-                    { 5, "Archon" },
+                    { 4, "Archon" },
                     { 1, "Uncalibrated" },
-                    { 3, "Guardian" },
-                    { 4, "Crusader" },
-                    { 6, "Legend" },
-                    { 7, "Ancient" },
-                    { 8, "Divine" },
-                    { 9, "Immortal" }
+                    { 2, "Guardian" },
+                    { 3, "Crusader" },
+                    { 5, "Legend" },
+                    { 6, "Ancient" },
+                    { 7, "Divine" },
+                    { 8, "Immortal" }
                 });
 
             migrationBuilder.InsertData(
@@ -555,6 +563,11 @@ namespace WTP.DAL.Migrations
                 column: "ServerId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Players_TeamId",
+                table: "Players",
+                column: "TeamId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_RefreshTokens_UserId",
                 table: "RefreshTokens",
                 column: "UserId");
@@ -592,9 +605,6 @@ namespace WTP.DAL.Migrations
                 name: "RefreshTokens");
 
             migrationBuilder.DropTable(
-                name: "Teams");
-
-            migrationBuilder.DropTable(
                 name: "Languages");
 
             migrationBuilder.DropTable(
@@ -611,6 +621,9 @@ namespace WTP.DAL.Migrations
 
             migrationBuilder.DropTable(
                 name: "Servers");
+
+            migrationBuilder.DropTable(
+                name: "Teams");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");

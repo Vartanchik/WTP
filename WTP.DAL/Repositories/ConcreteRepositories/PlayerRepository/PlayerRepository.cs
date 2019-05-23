@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using WTP.DAL.Entities;
 using WTP.DAL.Repositories.GenericRepository;
@@ -19,8 +20,21 @@ namespace WTP.DAL.Repositories.ConcreteRepositories.PlayerRepository
 
         public IList<Player> GetPlayersByUserId(int userId)
         {
-            _context.Players.Include(x => x.AppUser).Include(x => x.Game).Include(x => x.Server).Include(x => x.Goal).Include(x => x.Rank);
-            return null;
+            return _context.Players
+                .Include(player => player.AppUser)
+                    .ThenInclude(appUser => appUser.Country)
+                .Include(player => player.AppUser)
+                    .ThenInclude(appUser => appUser.Gender)
+                .Include(player => player.AppUser)
+                    .ThenInclude(appUser => appUser.AppUserLanguages)
+                        .ThenInclude(appUserLanguages => appUserLanguages.Language)
+                .Include(player => player.Game)
+                .Include(player => player.Server)
+                .Include(player => player.Goal)
+                .Include(player => player.Rank)
+                .AsNoTracking()
+                .Where(player => player.AppUserId == userId)
+                .ToList();
         }
     }
 }

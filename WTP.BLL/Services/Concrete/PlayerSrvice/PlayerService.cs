@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using WTP.BLL.DTOs.AppUserDTOs;
 using WTP.BLL.DTOs.PlayerDTOs;
 using WTP.DAL.Entities;
 using WTP.DAL.UnitOfWork;
@@ -52,10 +53,9 @@ namespace WTP.BLL.Services.Concrete.PlayerSrvice
 
         public IList<PlayerDto> GetPlayersByUserId(int userId)
         {
+            var listOfPlayers = _uof.Players.GetPlayersByUserId(userId);
 
-            var listOfPlayers = _uof.Players.AsQueryable().Where(p => p.AppUserId == userId);
-
-            return _mapper.Map<IList<PlayerDto>>(listOfPlayers);
+            return  _mapper.Map<IList<PlayerDto>>(listOfPlayers);
         }
     }
 }
