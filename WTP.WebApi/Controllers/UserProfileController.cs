@@ -13,6 +13,7 @@ using WTP.WebAPI.Utility.Extensions;
 
 namespace WTP.WebAPI.Dto.Controllers
 {
+    [Produces("application/json")]
     [Route("api/[controller]")]
     [ApiController]
     public class UserProfileController : ControllerBase

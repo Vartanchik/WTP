@@ -15,7 +15,9 @@ using WTP.WebAPI.Helpers;
 
 namespace WTP.WebAPI.Controllers
 {
+    [Produces("application/json")]
     [Route("api/[controller]")]
+    [ApiController]
     public class TokenController : Controller
     {
         private readonly IRefreshTokenService _refreshTokenService;

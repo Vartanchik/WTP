@@ -14,7 +14,9 @@ using WTP.BLL.DTOs.ServicesDTOs;
 
 namespace WTP.WebAPI.Controllers
 {
+    [Produces("application/json")]
     [Route("api/[controller]")]
+    [ApiController]
     public class AccountController : Controller
     {
         private readonly IAppUserService _appUserService;
