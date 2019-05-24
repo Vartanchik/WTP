@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using WTP.DAL.Entities;
 using WTP.DAL.Repositories.GenericRepository;
 
@@ -18,23 +19,16 @@ namespace WTP.DAL.Repositories.ConcreteRepositories.PlayerRepository
             _context = context;
         }
 
-        public IList<Player> GetPlayersByUserId(int userId)
+        public async Task<IList<Player>> GetListByUserIdAsync(int userId)
         {
-            return _context.Players
-                .Include(player => player.AppUser)
-                    .ThenInclude(appUser => appUser.Country)
-                .Include(player => player.AppUser)
-                    .ThenInclude(appUser => appUser.Gender)
-                .Include(player => player.AppUser)
-                    .ThenInclude(appUser => appUser.AppUserLanguages)
-                        .ThenInclude(appUserLanguages => appUserLanguages.Language)
-                .Include(player => player.Game)
-                .Include(player => player.Server)
-                .Include(player => player.Goal)
-                .Include(player => player.Rank)
+            return await _context.Players
+                .Include(p => p.Game)
+                .Include(p => p.Server)
+                .Include(p => p.Goal)
+                .Include(p => p.Rank)
                 .AsNoTracking()
-                .Where(player => player.AppUserId == userId)
-                .ToList();
+                .Where(p => p.AppUserId == userId)
+                .ToListAsync();
         }
     }
 }

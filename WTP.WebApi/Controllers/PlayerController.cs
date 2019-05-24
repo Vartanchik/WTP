@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -71,14 +72,15 @@ namespace WTP.WebAPI.Controllers
         /// Get all user's players 
         /// </summary>
         /// <returns>List of players</returns>
-        [HttpGet]
+        /// <returns>Response DTO</returns>
+        /// <response code="200">Returns list of players</response>
+        /// <response code="400">Get players failed</response>
+        [HttpGet("[action]/{userId:int}")]
         [Authorize(Policy = "RequireLoggedIn")]
-        [ProducesResponseType(typeof(IList<PlayerDto>), 200)]
+        [ProducesResponseType(typeof(IList<PlayerListItemDto>), 200)]
         [ProducesResponseType(typeof(ResponseDto), 400)]
-        public async Task<IList<PlayerListItemDto>> GetPlayersOfUser()
+        public async Task<IList<PlayerListItemDto>> GetPlayersOfUser(int userId)
         {
-            int userId = this.GetCurrentUserId();
-
             return await _playerService.GetListByUserIdAsync(userId);
         }
 
