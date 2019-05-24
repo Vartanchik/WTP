@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using WTP.BLL.DTOs.AppUserDTOs;
 using WTP.BLL.DTOs.PlayerDTOs;
+using WTP.BLL.DTOs.ServicesDTOs;
 using WTP.DAL.Entities;
 using WTP.DAL.UnitOfWork;
 
@@ -20,16 +22,68 @@ namespace WTP.BLL.Services.Concrete.PlayerSrvice
             _mapper = mapper;
         }
 
-        public async Task CreateOrUpdateAsync(PlayerDto dto)
+        public async Task<ServiceResult> CreateOrUpdateAsync(CreateUpdatePlayerDto dto, int userId)
         {
-            var player = _mapper.Map<Player>(dto);
+            var bookedPlayer = _uof.Players.AsQueryable()
+                .Where(p => p.Name == dto.Name && p.GameId == dto.GameId && p.AppUserId != userId)
+                .FirstOrDefault();
 
-            await _uof.Players.CreateOrUpdate(player);
+            if (bookedPlayer != null)
+            {
+                return new ServiceResult("Player with such name already exists.");
+            }
+
+            try
+            {
+                var player = _uof.Players.AsQueryable()
+                    .Where(p => p.AppUserId == userId && p.GameId == dto.GameId)
+                    .FirstOrDefault();
+
+                if (player == null)
+                {
+                    // create
+                    player = _mapper.Map<Player>(dto);
+                    player.AppUserId = userId;
+                }
+                else
+                {
+                    // update
+                    player.About = dto.About;
+                    player.Decency = dto.Decency;
+                    player.GameId = dto.GameId;
+                    player.GoalId = dto.GoalId;
+                    player.Name = dto.Name;
+                    player.RankId = dto.RankId;
+                    player.ServerId = dto.ServerId;
+                }
+
+                await _uof.Players.CreateOrUpdate(player);
+                await _uof.CommitAsync();
+
+                return new ServiceResult();
+            }
+            catch
+            {
+                // log error
+                return new ServiceResult("Server error.");
+            }
         }
 
-        public async Task DeleteAsync(int playerId)
+        public async Task<ServiceResult> DeleteAsync(int userId, int playerGameId)
         {
-            await _uof.Players.DeleteAsync(playerId);
+            var player = _uof.Players.AsQueryable()
+                .Where(p => p.AppUserId == userId && p.GameId == playerGameId)
+                .FirstOrDefault();
+
+            if (player != null)
+            {
+                await _uof.Players.DeleteAsync(player.Id);
+                await _uof.CommitAsync();
+
+                return new ServiceResult();
+            }
+
+            return new ServiceResult("Player not found.");
         }
 
         public async Task<PlayerDto> FindAsync(int playerId)

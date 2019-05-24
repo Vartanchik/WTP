@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -11,7 +10,7 @@ using WTP.WebAPI.Utility.Extensions;
 
 namespace WTP.WebAPI.Controllers
 {
-    [Route("api/Player")]
+    [Route("api/[controller]")]
     [ApiController]
     public class PlayerController : Controller
     {
@@ -26,13 +25,49 @@ namespace WTP.WebAPI.Controllers
         }
 
         /// <summary>
+        /// Create new player
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns>Response DTO</returns>
+        [HttpPost]
+        [Authorize(Policy = "RequireLoggedIn")]
+        [ProducesResponseType(typeof(ResponseDto), 200)]
+        [ProducesResponseType(typeof(ResponseDto), 400)]
+        public async Task<IActionResult> PostUser([FromBody] CreateUpdatePlayerDto dto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new ResponseDto(400, "Failed.", "Redisplay form."));
+            }
+
+            var userId = this.GetCurrentUserId();
+            var result = await _playerService.CreateOrUpdateAsync(dto, userId);
+
+            return result.Succeeded
+                ? Ok(new ResponseDto(200, "Completed.", "Player created."))
+                : (IActionResult)BadRequest(new ResponseDto(400, "Failed.", result.Error));
+        }
+
+        [HttpDelete]
+        [Authorize(Policy = "RequireLoggedIn")]
+        [ProducesResponseType(typeof(ResponseDto), 200)]
+        [ProducesResponseType(typeof(ResponseDto), 400)]
+        public async Task<IActionResult> Delete(int playerGameId)
+        {
+            var userId = this.GetCurrentUserId();
+
+            var result = await _playerService.DeleteAsync(userId, playerGameId);
+
+            return result.Succeeded
+                ? Ok(new ResponseDto(200, "Completed.", "Player deleted."))
+                : (IActionResult)BadRequest(new ResponseDto(400, "Failed.", result.Error));
+        }
+
+        /// <summary>
         /// Get all user's players 
         /// </summary>
         /// <returns>List of players</returns>
-        /// <returns>Response DTO</returns>
-        /// <response code="200">Returns list of players</response>
-        /// <response code="400">Get players failed</response>
-        [HttpGet("[action]")]
+        [HttpGet]
         [Authorize(Policy = "RequireLoggedIn")]
         [ProducesResponseType(typeof(IList<PlayerDto>), 200)]
         [ProducesResponseType(typeof(ResponseDto), 400)]

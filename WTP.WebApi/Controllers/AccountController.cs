@@ -46,7 +46,7 @@ namespace WTP.WebAPI.Controllers
                 return BadRequest(new ResponseDto(400, "Invalid value was entered! Please, redisplay form."));
             }
 
-            var user = new BLL.DTOs.AppUserDTOs.AppUserDto
+            var user = new AppUserDto
             {
                 Email = dot.Email,
                 UserName = dot.UserName,
