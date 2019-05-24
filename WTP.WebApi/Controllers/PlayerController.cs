@@ -48,6 +48,10 @@ namespace WTP.WebAPI.Controllers
                 : (IActionResult)BadRequest(new ResponseDto(400, "Failed.", result.Error));
         }
 
+        /// <summary>
+        /// Delete player
+        /// </summary>
+        /// <param name="playerGameId"></param>
         [HttpDelete]
         [Authorize(Policy = "RequireLoggedIn")]
         [ProducesResponseType(typeof(ResponseDto), 200)]
