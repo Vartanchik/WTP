@@ -7,17 +7,19 @@ namespace WTP.BLL.DTOs.PlayerDTOs
 {
     public class PlayerListItemDto
     {
-        [JsonProperty("id")]
+        //[JsonProperty("id")]
         public int Id { get; set; }
-        [JsonProperty("n")]
+        //[JsonProperty("n")]
         public string Name { get; set; }
-        [JsonProperty("g")]
+        //[JsonProperty("g")]
         public string Game { get; set; }
-        [JsonProperty("r")]
+        //[JsonProperty("r")]
         public string Rank { get; set; }
-        [JsonProperty("s")]
+        //[JsonProperty("s")]
         public string Server { get; set; }
-        [JsonProperty("g")]
+        //[JsonProperty("go")]
         public string Goal { get; set; }
+        //[JsonProperty("a")]
+        public string About { get; set; }
     }
 }

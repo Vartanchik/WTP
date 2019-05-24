@@ -61,7 +61,7 @@ namespace WTP.BLL.Services.Concrete.PlayerSrvice
 
         public async Task<IList<PlayerListItemDto>> GetListByUserIdAsync(int userId)
         {
-            var listOfPlayers = await _uow.Players.AsQueryable().Where(p => p.AppUserId == userId).ToListAsync();
+            var listOfPlayers = await _uow.Players.GetListByUserIdAsync(userId);
 
             return _mapper.Map<IList<PlayerListItemDto>>(listOfPlayers);
         }
