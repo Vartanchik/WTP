@@ -11,7 +11,7 @@ namespace WTP.BLL.DTOs.PlayerDTOs
         public int Id { get; set; }
         [JsonProperty("n")]
         public string Name { get; set; }
-        [JsonProperty("g")]
+        [JsonProperty("ga")]
         public string Game { get; set; }
         [JsonProperty("r")]
         public string Rank { get; set; }
