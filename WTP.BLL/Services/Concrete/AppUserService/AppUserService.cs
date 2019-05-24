@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,7 +33,7 @@ namespace WTP.BLL.Services.Concrete.AppUserService
             _mapper = mapper;
         }
 
-        public async Task<IdentityResult> CreateAsync(AppUserDto dto, string password, int adminId = 1)
+        public async Task<IdentityResult> CreateAsync(AppUserDto dto, string password, int? adminId = null)
         {
             var user = _mapper.Map<AppUser>(dto);
 
@@ -55,7 +56,8 @@ namespace WTP.BLL.Services.Concrete.AppUserService
             //await _uow.Histories.CreateOrUpdate(history);
             var record = _mapper.Map<History>(history);
             await _uow.Histories.CreateOrUpdate(record);
-            await _uow.CommitAsync();
+            if(result.Succeeded)
+                await _uow.CommitAsync();
 
             return result;
         }
@@ -87,7 +89,7 @@ namespace WTP.BLL.Services.Concrete.AppUserService
             return appUserDto;
         }
                      
-        public async Task<IdentityResult> UpdateAsync(AppUserDto appUserDto, int adminId=1)
+        public async Task<IdentityResult> UpdateAsync(AppUserDto appUserDto, int? adminId=null)
         {
             if (await _uow.AppUsers.GetAsync(appUserDto.Id) != null)
             {
@@ -200,7 +202,7 @@ namespace WTP.BLL.Services.Concrete.AppUserService
             await _uow.AppUsers.CreateOrUpdate(user);
         }
 
-        public async Task<bool> DeleteAsync(int id, int adminId = 1)
+        public async Task<bool> DeleteAsync(int id, int? adminId = null)
         {
             var user = await _uow.AppUsers.GetAsync(id);
             HistoryDto history = new HistoryDto
@@ -222,10 +224,9 @@ namespace WTP.BLL.Services.Concrete.AppUserService
             return await _uow.AppUsers.DeleteAsync(id);
         }
 
-        public async Task<IList<AppUserDto>> GetAllUsersAsync()
+        public async Task<IList<AppUserDto>> GetUsersList()
         {
-            //var allUsers = _uow.AppUsers.GetAllUsersAsync();//.AsQueryable();
-            var allUsers = await _uow.AppUsers.GetAllUsersAsync();
+            var allUsers = await _uow.AppUsers.AsQueryable().ToListAsync();
             return _mapper.Map<IList<AppUserDto>>(allUsers);
         }
 
@@ -249,7 +250,7 @@ namespace WTP.BLL.Services.Concrete.AppUserService
         }
 
 
-        public async Task<bool> LockAsync(int id, int? days, int adminId = 1)
+        public async Task<bool> LockAsync(int id, int? days, int? adminId = null)
         {
             var user = await _uow.AppUsers.GetAsync(id);
 
@@ -272,7 +273,7 @@ namespace WTP.BLL.Services.Concrete.AppUserService
             return await _uow.AppUsers.LockAsync(id, days);
         }
 
-        public async Task<bool> UnLockAsync(int id, int adminId = 1)
+        public async Task<bool> UnLockAsync(int id, int? adminId = null)
         {
             var user = await _uow.AppUsers.GetAsync(id);
 
@@ -295,7 +296,7 @@ namespace WTP.BLL.Services.Concrete.AppUserService
             return await _uow.AppUsers.UnLockAsync(id);
         }
 
-        public List<AppUserDto> Filter(List<AppUserDto> users, string name)
+        public List<AppUserDto> FilterByName(List<AppUserDto> users, string name)
         {
             if (users == null)
                 return null;
@@ -309,7 +310,7 @@ namespace WTP.BLL.Services.Concrete.AppUserService
             return users;
         }
 
-        public List<AppUserDto> Sort(List<AppUserDto> users, SortState sortOrder, bool enableDeleted, bool enableLocked)
+        public List<AppUserDto> SortByParam(List<AppUserDto> users, SortState sortOrder, bool enableDeleted, bool enableLocked)
         {
             if (users == null)
                 return null;

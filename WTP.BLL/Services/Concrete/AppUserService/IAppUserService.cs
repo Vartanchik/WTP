@@ -10,11 +10,11 @@ namespace WTP.BLL.Services.Concrete.AppUserService
 {
     public interface IAppUserService
     {
-        Task<IdentityResult> CreateAsync(AppUserDto appUserDto, string password, int adminId=1);
+        Task<IdentityResult> CreateAsync(AppUserDto appUserDto, string password, int? adminId=null);
         Task<AppUserDto> GetAsync(int userId);
         Task<AppUserDto> GetByEmailAsync(string email);
         Task<AppUserDto> GetByNameAsync(string userName);
-        Task<IdentityResult> UpdateAsync(AppUserDto appUserDto, int adminId=1);
+        Task<IdentityResult> UpdateAsync(AppUserDto appUserDto, int? adminId=null);
         Task<IList<string>> GetRolesAsync(AppUserDto appUserDto);
         Task<bool> CheckPasswordAsync(int userId, string password);
         Task<bool> IsEmailConfirmedAsync(int userId);
@@ -28,13 +28,13 @@ namespace WTP.BLL.Services.Concrete.AppUserService
         
         Task<IdentityResult> CreateAdminAsync(AppUserDto appUserDto, string password);
         Task<IdentityResult> CreateModeratorAsync(AppUserDto appUserDto, string password);
-        Task<bool> DeleteAsync(int id, int adminId = 1);
-        Task<IList<AppUserDto>> GetAllUsersAsync();
-        Task<bool> LockAsync(int id, int? days, int adminId = 1);
-        Task<bool> UnLockAsync(int id, int adminId = 1);
+        Task<bool> DeleteAsync(int id, int? adminId = null);
+        Task<IList<AppUserDto>> GetUsersList();
+        Task<bool> LockAsync(int id, int? days, int? adminId = null);
+        Task<bool> UnLockAsync(int id, int? adminId = null);
 
-        List<AppUserDto> Filter(List<AppUserDto> users, string name);
-        List<AppUserDto> Sort(List<AppUserDto> users, SortState sortOrder, bool enableDeleted, bool enableLocked);
+        List<AppUserDto> FilterByName(List<AppUserDto> users, string name);
+        List<AppUserDto> SortByParam(List<AppUserDto> users, SortState sortOrder, bool enableDeleted, bool enableLocked);
 
     }
 }

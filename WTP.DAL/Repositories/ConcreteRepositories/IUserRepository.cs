@@ -26,8 +26,6 @@ namespace WTP.DAL.Repositories.ConcreteRepositories
         Task<IdentityResult> CreateAdminAsync(AppUser appUser, string password);
         Task<IdentityResult> CreateModeratorAsync(AppUser appUser, string password);
         Task<bool> DeleteAsync(int id);
-        //Task<IList<AppUser>> GetAllUsersAsync();
-        Task<IList<AppUser>> GetAllUsersAsync();
         Task<bool> LockAsync(int id, int? days);
         Task<bool> UnLockAsync(int id);
 

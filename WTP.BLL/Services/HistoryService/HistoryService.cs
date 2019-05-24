@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -43,19 +44,19 @@ namespace WTP.BLL.Services.HistoryService
 
         public async Task<HistoryDto> GetAsync(int id)
         {
-            var record = await _uow.Histories.GetAsync(id);
+            var record = await _uow.Histories.GetAsync(id); 
 
             return _mapper.Map<HistoryDto>(record);
         }
 
-        public async Task<IEnumerable<HistoryDto>> GetAllAsync()
+        public async Task<IList<HistoryDto>> GetHistoryList()
         {
-            var records = _uow.Histories.AsQueryable();
+            var records = await _uow.Histories.AsQueryable().ToListAsync();
 
-            return _mapper.Map<IEnumerable<HistoryDto>>(records);
+            return _mapper.Map<IList<HistoryDto>>(records);
         }
 
-        public List<HistoryDto> Filter(List<HistoryDto> histories, string name)
+        public IList<HistoryDto> FilterByUserName(List<HistoryDto> histories, string name)
         {
             if (histories == null)
                 return null;
@@ -68,7 +69,7 @@ namespace WTP.BLL.Services.HistoryService
             return histories;
         }
 
-        public List<HistoryDto> Sort(List<HistoryDto> histories, HistorySortState sortOrder)
+        public IList<HistoryDto> SortByParam(List<HistoryDto> histories, HistorySortState sortOrder)
         {
             if (histories == null)
                 return null;

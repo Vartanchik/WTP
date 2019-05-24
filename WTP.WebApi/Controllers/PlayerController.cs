@@ -30,7 +30,7 @@ namespace WTP.WebAPI.Controllers
         //[Authorize(Policy = "RequireAdministratorRole")]
         public async Task<PlayerDto[]> GetPlayersProfile()
         {
-            var players = await _playerService.GetAllPlayersAsync();
+            var players = await _playerService.GetPlayersList();
 
             if (players == null)
                 return null;

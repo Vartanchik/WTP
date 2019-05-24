@@ -15,7 +15,7 @@ namespace WTP.DAL.Entities.AppUserEntities
         public string NewUserEmail { get; set; }
         public string NewUserName { get; set; }
 
-        public int AppUserId { get; set; }
+        public int? AppUserId { get; set; }
         public AppUser AppUser { get; set; }
 
         public int AdminId { get; set; }

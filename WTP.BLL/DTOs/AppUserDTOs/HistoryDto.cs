@@ -18,7 +18,7 @@ namespace WTP.BLL.DTOs.AppUserDTOs
         public int AppUserId { get; set; }
         public AppUserDto AppUser { get; set; }
 
-        public int AdminId { get; set; }
+        public int? AdminId { get; set; }
 
         public int? OperationId { get; set; }
         public OperationDto Operation { get; set; }

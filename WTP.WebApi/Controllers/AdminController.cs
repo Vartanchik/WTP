@@ -31,7 +31,6 @@ namespace WTP.WebAPI.Controllers
         //[Authorize(Policy = "RequireAdministratorRole")]
         public async Task<IActionResult> CreateAdminAccount([FromBody] RegisterDto formdata)
         {
-            // Will hold all the errors related to registration
             List<string> errorList = new List<string>();
 
             var user = new AppUserDto
@@ -46,6 +45,7 @@ namespace WTP.WebAPI.Controllers
             if (result.Succeeded)
             {
                 //Confirmation Email
+
                 return Ok(result);
             }
             else
@@ -60,7 +60,7 @@ namespace WTP.WebAPI.Controllers
             foreach (var t in errorList)
                 errorResult += t;
 
-            return BadRequest(new ResponseDto(400, "Creating admin is faild.", errorResult));
+            return BadRequest(new ResponseDto(400, "Creating admin is failed.", errorResult));
         }
 
         //Create User account
@@ -72,7 +72,6 @@ namespace WTP.WebAPI.Controllers
             //int userId = Convert.ToInt32(User.Claims.First(c => c.Type == "UserID").Value);
             int adminId = 1;
 
-            // Will hold all the errors related to registration
             List<string> errorList = new List<string>();
 
             var user = new AppUserDto
@@ -102,7 +101,7 @@ namespace WTP.WebAPI.Controllers
             foreach (var t in errorList)
                 errorResult += t;
 
-            return BadRequest(new ResponseDto(400, "Creating user account is faild.", errorResult));
+            return BadRequest(new ResponseDto(400, "Creating user account is failed.", errorResult));
         }
 
         //Create User account
@@ -111,7 +110,6 @@ namespace WTP.WebAPI.Controllers
         //[Authorize(Policy = "RequireAdministratorRole")]
         public async Task<IActionResult> CreateModeratorProfile([FromBody] RegisterDto formdata)
         {
-            // Will hold all the errors related to registration
             List<string> errorList = new List<string>();
 
             var user = new AppUserDto
@@ -141,7 +139,7 @@ namespace WTP.WebAPI.Controllers
             foreach (var t in errorList)
                 errorResult += t;
 
-            return BadRequest(new ResponseDto(400, "Creating moderator account is faild.", errorResult));
+            return BadRequest(new ResponseDto(400, "Creating moderator account is failed.", errorResult));
         }
 
 
@@ -152,7 +150,7 @@ namespace WTP.WebAPI.Controllers
         public async Task<AppUserDto[]> GetUsersProfile()
         {
             List<AppUserDto> result = new List<AppUserDto>();
-            var users = await _appUserService.GetAllUsersAsync();
+            var users = await _appUserService.GetUsersList();
 
             if (users.Count() == 0)
                 return result.ToArray();
@@ -182,8 +180,6 @@ namespace WTP.WebAPI.Controllers
                     result.Add(appUserDtoViewModel);
             }
             return result.ToArray();
-            //return Ok(new JsonResult(result.ToArray()));
-            //return Ok();
         }
 
         //Update user's account
@@ -229,7 +225,7 @@ namespace WTP.WebAPI.Controllers
             {
                 return Ok(new ResponseDto
                 {
-                    StatusCode = 202,
+                    StatusCode = 200,
                     Message = "User's profile with id " + id + " was updated."
                 });
             }
@@ -241,7 +237,16 @@ namespace WTP.WebAPI.Controllers
                 }
             }
 
-            return BadRequest(new ResponseDto { Message = errorList.FirstOrDefault() });
+            string errorResult = "";
+            foreach (var t in errorList)
+                errorResult += t;
+
+            return BadRequest(new ResponseDto
+            {
+                StatusCode = 404,
+                Message = "User with id:" + id + " wasnt found.",
+                Info = errorResult
+            });
         }
 
         //Delete user's account by id
@@ -257,7 +262,7 @@ namespace WTP.WebAPI.Controllers
             if (success)
                 return Ok(new ResponseDto
                 {
-                    StatusCode = 202,
+                    StatusCode = 200,
                     Message = "User's profile with id " + id + " was deleted."
                 });
 
@@ -283,7 +288,7 @@ namespace WTP.WebAPI.Controllers
             if (success)
                 return Ok(new ResponseDto
                 {
-                    StatusCode = 202,
+                    StatusCode = 200,
                     Message = "User's profile with id " + id + " was locked."
                 });
 
@@ -309,7 +314,7 @@ namespace WTP.WebAPI.Controllers
             if (success)
                 return Ok(new ResponseDto
                 {
-                    StatusCode = 202,
+                    StatusCode = 200,
                     Message = "User's profile with id " + id + " was unlocked."
                 });
 
@@ -325,20 +330,21 @@ namespace WTP.WebAPI.Controllers
         [HttpGet]
         //[Authorize(Policy = "RequireAdministratorRole")]
         [Route("users/pagination")]
-        public async Task<IActionResult> UserIndex(string name, int page = 1,
+        public async Task<UserIndexDto> UserIndex(string name, int page = 1,
             SortState sortOrder = SortState.NameAsc, bool enableDeleted = true, bool enableLocked = true)
         {
             int pageSize = 3;
 
-            List<AppUserDto> users = new List<AppUserDto>(await _appUserService.GetAllUsersAsync());
+            List<AppUserDto> users = new List<AppUserDto>(await _appUserService.GetUsersList());
             if (users == null)
-                return NoContent();
+                return null;
+                //return NoContent();
 
             //Filtration
-            users = _appUserService.Filter(users, name);
+            users = _appUserService.FilterByName(users, name);
 
             // Sorting
-            users = _appUserService.Sort(users, sortOrder, enableDeleted, enableLocked);
+            users = _appUserService.SortByParam(users, sortOrder, enableDeleted, enableLocked);
 
             // Pagination
             var count = users.Count();
@@ -352,26 +358,27 @@ namespace WTP.WebAPI.Controllers
                 //FilterViewModel = new UserFilterViewModel(users/*(List<AppUserDto>)await _appUserService.GetAllUsersAsync()*/, name),
                 Users = items
             };
-            return Ok(viewModel);
+            return viewModel;
         }
 
         [HttpGet]
         //[Authorize(Policy = "RequireAdministratorRole")]
         [Route("history")]
-        public async Task<IActionResult> HistoryIndex(string name, int page = 1,
+        public async Task<HistoryIndexDto> HistoryIndex(string name, int page = 1,
             HistorySortState sortOrder = HistorySortState.DateDesc)
         {
             int pageSize = 3;
-            List<HistoryDto> histories = new List<HistoryDto>(await _historyService.GetAllAsync());
+            List<HistoryDto> histories = new List<HistoryDto>(await _historyService.GetHistoryList());
 
             if (histories == null)
-                return NoContent();
+                return null;
+                //return NoContent();
 
             //Filtration
-            histories = _historyService.Filter(histories, name);
+            histories = _historyService.FilterByUserName(histories, name).ToList();
 
             // Sorting
-            histories = _historyService.Sort(histories, sortOrder);
+            histories = _historyService.SortByParam(histories, sortOrder).ToList();
 
 
             // Pagination
@@ -386,7 +393,7 @@ namespace WTP.WebAPI.Controllers
                 //FilterViewModel = new UserFilterViewModel(users/*(List<AppUserDto>)await _appUserService.GetAllUsersAsync()*/, name),
                 Histories = items
             };
-            return Ok(viewModel);
+            return viewModel;
         }
 
 

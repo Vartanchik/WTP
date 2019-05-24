@@ -153,21 +153,6 @@ namespace WTP.DAL.Repositories.ConcreteRepositories
             return true;
         }
 
-        public async Task<IList<AppUser>> GetAllUsersAsync()
-        {
-            var users = await _userManager.Users.ToListAsync();
-            List<AppUser> result = new List<AppUser>();
-            foreach (var t in users)
-            {
-                var role = await _userManager.GetRolesAsync(t);
-                if (role.Contains("User"))
-                    result.Add(t);
-            }
-            return result;
-
-        }
-
-        //TODO
         public async Task<bool> LockAsync(int id, int? days)
         {
             var user = await GetAsync(id);
