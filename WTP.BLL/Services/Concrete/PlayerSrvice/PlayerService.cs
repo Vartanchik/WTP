@@ -3,7 +3,9 @@ using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using WTP.BLL.DTOs.AppUserDTOs;
 using WTP.BLL.DTOs.PlayerDTOs;
+using WTP.BLL.DTOs.ServicesDTOs;
 using WTP.BLL.Services.Concrete.PlayerSrvices;
 using WTP.DAL.Entities;
 using WTP.DAL.UnitOfWork;
@@ -52,10 +54,18 @@ namespace WTP.BLL.Services.Concrete.PlayerSrvice
                    select _mapper.Map<MatchDto>(m);
         }
 
-        public async Task<IList<PlayerDto>> GetPlayersList()
+        public async Task<IList<PlayerJoinedDto>> GetPlayersList()
         {
-            var allPlayers = await _uow.Players.AsQueryable().ToListAsync();
-            return _mapper.Map<IList<PlayerDto>>(allPlayers);
+            var allPlayers = from player in await _uow.Players.AsQueryable().ToListAsync()
+                join game in await _uow.Games.AsQueryable().ToListAsync() on player.GameId equals game.Id
+                join team in await _uow.Teams.AsQueryable().ToListAsync() on player.TeamId equals team.Id
+                join rank in await _uow.Ranks.AsQueryable().ToListAsync() on player.Rank.Id equals rank.GameId
+                join goal in await _uow.Goals.AsQueryable().ToListAsync() on player.GoalId equals goal.Id
+                join server in await _uow.Servers.AsQueryable().ToListAsync() on player.ServerId equals server.Id
+                join user in await _uow.AppUsers.AsQueryable().ToListAsync() on player.AppUserId equals user.Id
+                    select _mapper.Map<PlayerJoinedDto>(player);
+            
+            return allPlayers.ToList();
         }
     }
 }

@@ -24,6 +24,9 @@ namespace WTP.DAL.UnitOfWork
         private IRepository<Game> _games;
         private IRepository<History> _histories;
         private IRepository<Operation> _operations;
+        private IRepository<Goal> _goals;
+        private IRepository<Rank> _ranks;
+        private IRepository<Server> _servers;
         private bool _disposed = false;
 
         public UnitOfWork(ApplicationDbContext context, UserManager<AppUser> userManager)
@@ -44,6 +47,9 @@ namespace WTP.DAL.UnitOfWork
         public IRepository<Game> Games => _games ?? (_games = new RepositoryBase<Game>(_context));
         public IRepository<History> Histories => _histories ?? (_histories = new RepositoryBase<History>(_context));
         public IRepository<Operation> Operations => _operations ?? (_operations = new RepositoryBase<Operation>(_context));
+        public IRepository<Goal> Goals => _goals ?? (_goals = new RepositoryBase<Goal>(_context));
+        public IRepository<Rank> Ranks => _ranks ?? (_ranks = new RepositoryBase<Rank>(_context));
+        public IRepository<Server> Servers => _servers ?? (_servers = new RepositoryBase<Server>(_context));
 
         public void Commit()
         {

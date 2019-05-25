@@ -21,6 +21,9 @@ namespace WTP.DAL.UnitOfWork
         IRepository<Game> Games { get; }
         IRepository<History> Histories { get; }
         IRepository<Operation> Operations { get; }
+        IRepository<Goal> Goals { get; }
+        IRepository<Rank> Ranks { get; }
+        IRepository<Server> Servers { get; }
 
         void Commit();
 

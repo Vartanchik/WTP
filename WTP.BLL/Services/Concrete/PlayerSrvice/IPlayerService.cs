@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using WTP.BLL.DTOs.PlayerDTOs;
+using WTP.BLL.DTOs.ServicesDTOs;
 
 namespace WTP.BLL.Services.Concrete.PlayerSrvices
 {
@@ -12,6 +13,6 @@ namespace WTP.BLL.Services.Concrete.PlayerSrvices
         Task<PlayerDto> FindAsync(int playerId);
         IQueryable<CommentDto> FindCommentsAsync(int playerId);
         IQueryable<MatchDto> FindMatchesAsync(int playerId);
-        Task<IList<PlayerDto>> GetPlayersList();
+        Task<IList<PlayerJoinedDto>> GetPlayersList();
     }
 }

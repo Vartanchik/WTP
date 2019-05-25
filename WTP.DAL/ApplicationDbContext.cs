@@ -22,6 +22,8 @@ namespace WTP.DAL
         public DbSet<Game> Games { get; set; }
         public DbSet<Operation> Operations { get; set; }
         public DbSet<History> Histories { get; set; }
+        //public DbSet<Rank> Ranks { get; set; }
+        //public DbSet<Goal> Goals { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder builder)
@@ -98,6 +100,15 @@ namespace WTP.DAL
                 .WithMany(b => b.Histories)
                 .HasForeignKey(p => p.OperationId);
 
+            builder.Entity<Player>()
+                .HasOne(p => p.AppUser)
+                .WithMany(b => b.Players)
+                .HasForeignKey(p => p.AppUserId);
+
+            builder.Entity<AppUser>()
+               .HasMany(p => p.Players)
+               .WithOne(b => b.AppUser)
+               .HasForeignKey(p => p.AppUserId);
         }
     }
 }

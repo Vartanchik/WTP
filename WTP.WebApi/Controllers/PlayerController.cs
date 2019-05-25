@@ -28,7 +28,7 @@ namespace WTP.WebAPI.Controllers
         [HttpGet]
         [Route("profile")]
         //[Authorize(Policy = "RequireAdministratorRole")]
-        public async Task<PlayerDto[]> GetPlayersProfile()
+        public async Task<PlayerJoinedDto[]> GetPlayersProfile()
         {
             var players = await _playerService.GetPlayersList();
 
