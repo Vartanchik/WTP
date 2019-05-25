@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -55,5 +56,20 @@ namespace WTP.WebAPI.Controllers
 
             return Ok();
         }
+
+        //Get List of all players
+        [HttpGet]
+        [Route("globalSearch")]
+        //[Authorize(Policy = "RequireAdministratorRole")]
+        public async Task<PlayerDto[]> GetPlayersProfile()
+        {
+            var players = await _playerService.GetPlayersList();
+
+            if (players == null)
+                return null;
+
+            return players.ToArray();
+        }
+
     }
 }

@@ -65,5 +65,12 @@ namespace WTP.BLL.Services.Concrete.PlayerSrvice
 
             return _mapper.Map<IList<PlayerListItemDto>>(listOfPlayers);
         }
+
+        public async Task<IList<PlayerDto>> GetPlayersList()
+        {
+            var allPlayers = await _uow.Players.AsQueryable().ToListAsync();
+            return _mapper.Map<IList<PlayerDto>>(allPlayers);
+        }
+
     }
 }
