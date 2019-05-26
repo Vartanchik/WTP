@@ -5,6 +5,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using WTP.BLL.DTOs.AppUserDTOs;
@@ -23,13 +24,15 @@ namespace WTP.WebAPI.Controllers
         private readonly IRefreshTokenService _refreshTokenService;
         private readonly IAppUserService _appUserService;
         private readonly AppSettings _appSettings;
+        private readonly IConfiguration _configuration;
 
         public TokenController(IRefreshTokenService refreshTokenService, IAppUserService appUserService,
-            IOptions<AppSettings> appSettings)
+            IOptions<AppSettings> appSettings, IConfiguration configuration)
         {
             _refreshTokenService = refreshTokenService;
             _appUserService = appUserService;
             _appSettings = appSettings.Value;
+            _configuration = configuration;
         }
 
         /// <summary>
@@ -78,9 +81,7 @@ namespace WTP.WebAPI.Controllers
 
                 if (user.IsDeleted)
                 {
-                    return BadRequest(new ResponseDto(400,
-                                                        "Login failed.",
-                                                        "Your account has been deleted. We have sent an email to reset your account"));
+                    return BadRequest(new ResponseDto(302, user.Email));
                 }
 
                 var newRefreshToken = CreateRefreshToken(user.Id);
