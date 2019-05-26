@@ -81,7 +81,7 @@ namespace WTP.WebAPI.Controllers
 
                 if (user.IsDeleted)
                 {
-                    return Redirect($"{_configuration["Url:BaseUrl"]}/account/restore?email={user.Email}");
+                    return BadRequest(new ResponseDto(302, user.Email));
                 }
 
                 var newRefreshToken = CreateRefreshToken(user.Id);
