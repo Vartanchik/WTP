@@ -98,18 +98,28 @@ namespace WTP.WebAPI.Controllers
             return Ok();
         }
 
-        //Get List of all players
-        [HttpGet]
-        [Route("players")]
-        //[Authorize(Policy = "RequireAdministratorRole")]
-        public async Task<PlayerListItemDto[]> GetPlayersProfilesByGame(int idGame)
+        //Get List of all players by game
+        [Route("players/pagination")]
+        public async Task<PlayerIndexDto> PlayerIndex(int idGame, int page = 1)
         {
-            var players = await _playerService.GetListByGameIdAsync(idGame);
+            int pageSize = 5;
 
+            List<PlayerListItemDto> players = new List<PlayerListItemDto>(await _playerService.GetListByGameIdAsync(idGame));
             if (players == null)
                 return null;
 
-            return players.ToArray();
+            // Pagination
+            var count = players.Count();
+            var items = players.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+
+            // representation model
+            PlayerIndexDto viewModel = new PlayerIndexDto
+            {
+                PageViewModel = new PageDto(count, page, pageSize),
+                Players = items
+            };
+
+            return viewModel;
         }
 
     }
