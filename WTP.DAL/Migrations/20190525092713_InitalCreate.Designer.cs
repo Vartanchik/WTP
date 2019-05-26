@@ -10,8 +10,8 @@ using WTP.DAL;
 namespace WTP.DAL.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20190524123054_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20190525092713_InitalCreate")]
+    partial class InitalCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

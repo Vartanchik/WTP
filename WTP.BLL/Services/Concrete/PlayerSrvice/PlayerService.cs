@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using WTP.BLL.DTOs.AppUserDTOs;
 using WTP.BLL.DTOs.PlayerDTOs;
+using WTP.BLL.DTOs.ServicesDTOs;
 using WTP.DAL.Entities;
 using WTP.DAL.UnitOfWork;
 
@@ -15,29 +16,75 @@ namespace WTP.BLL.Services.Concrete.PlayerSrvice
     {
         private readonly IUnitOfWork _uow;
         private readonly IMapper _mapper;
-
+        
         public PlayerService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _uow = unitOfWork;
             _mapper = mapper;
         }
 
-        public async Task CreateOrUpdateAsync(PlayerDto dto)
+        public async Task<ServiceResult> CreateOrUpdateAsync(CreateUpdatePlayerDto dto, int userId)
         {
-            var player = _mapper.Map<Player>(dto);
+            var bookedPlayer = _uow.Players.AsQueryable()
+                .Where(p => p.Name == dto.Name && p.GameId == dto.GameId && p.AppUserId != userId)
+                .FirstOrDefault();
 
-            await _uow.Players.CreateOrUpdate(player);
+            if (bookedPlayer != null)
+            {
+                return new ServiceResult("Player with such name already exists.");
+            }
+
+            try
+            {
+                var player = _uow.Players.AsQueryable()
+                    .Where(p => p.AppUserId == userId && p.GameId == dto.GameId)
+                    .FirstOrDefault();
+
+                if (player == null)
+                {
+                    // create
+                    player = _mapper.Map<Player>(dto);
+                    player.AppUserId = userId;
+                }
+                else
+                {
+                    // update
+                    player.About = dto.About;
+                    player.Decency = dto.Decency;
+                    player.GameId = dto.GameId;
+                    player.GoalId = dto.GoalId;
+                    player.Name = dto.Name;
+                    player.RankId = dto.RankId;
+                    player.ServerId = dto.ServerId;
+                }
+
+                await _uow.Players.CreateOrUpdate(player);
+                await _uow.CommitAsync();
+
+                return new ServiceResult();
+            }
+            catch
+            {
+                // log error
+                return new ServiceResult("Server error.");
+            }
         }
 
-        public async Task DeleteAsync(int userId, int playerId)
+        public async Task<ServiceResult> DeleteAsync(int userId, int playerGameId)
         {
-            var existedUser = await _uow.Players.AsQueryable().SingleOrDefaultAsync(p => p.Id == playerId);
+            var player = _uow.Players.AsQueryable()
+                .Where(p => p.AppUserId == userId && p.GameId == playerGameId)
+                .FirstOrDefault();
 
-            if (userId != existedUser.Id) throw new AccessViolationException("Operation failed");
+            if (player != null)
+            {
+                await _uow.Players.DeleteAsync(player.Id);
+                await _uow.CommitAsync();
 
-            _uow.Players.Delete(existedUser);
+                return new ServiceResult();
+            }
 
-            await _uow.CommitAsync();
+            return new ServiceResult("Player not found.");
         }
 
         public async Task<PlayerDto> FindAsync(int playerId)
@@ -61,15 +108,25 @@ namespace WTP.BLL.Services.Concrete.PlayerSrvice
 
         public async Task<IList<PlayerListItemDto>> GetListByUserIdAsync(int userId)
         {
-            var listOfPlayers = await _uow.Players.AsQueryable().Where(p => p.AppUserId == userId).ToListAsync();
+            var listOfPlayers = await _uow.Players.GetListByUserIdAsync(userId);
 
             return _mapper.Map<IList<PlayerListItemDto>>(listOfPlayers);
         }
 
-        public async Task<IList<PlayerDto>> GetPlayersList()
+        public async Task<IList<PlayerListItemDto>> GetPlayersList()
         {
+            List<PlayerListItemDto> result = new List<PlayerListItemDto>();
+
             var allPlayers = await _uow.Players.AsQueryable().ToListAsync();
-            return _mapper.Map<IList<PlayerDto>>(allPlayers);
+
+            return _mapper.Map<IList<PlayerListItemDto>>(allPlayers);
+        }
+
+        public async Task<IList<PlayerListItemDto>> GetListByGameIdAsync(int gameId)
+        {
+            var listOfPlayers = await _uow.Players.GetListByGameIdAsync(gameId);
+
+            return _mapper.Map<IList<PlayerListItemDto>>(listOfPlayers);
         }
 
     }
