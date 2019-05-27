@@ -7,7 +7,7 @@ using WTP.DAL.Repositories.GenericRepository;
 
 namespace WTP.DAL.Repositories.ConcreteRepositories.AppUserRepository
 {
-    public class UserRepository<IEntity> : RepositoryBase<AppUser>, IUserRepository<AppUser>
+    public class UserRepository : RepositoryBase<AppUser>, IUserRepository<AppUser>
     {
         private readonly UserManager<AppUser> _userManager;
         private readonly ApplicationDbContext _context;
@@ -28,7 +28,7 @@ namespace WTP.DAL.Repositories.ConcreteRepositories.AppUserRepository
             return result;
         }
 
-        public async Task<IdentityResult> UpdateAsync(AppUser appUser)
+        public virtual async Task<IdentityResult> UpdateAsync(AppUser appUser)
         {
             var user = await GetByIdAsync(appUser.Id);
 
@@ -91,7 +91,7 @@ namespace WTP.DAL.Repositories.ConcreteRepositories.AppUserRepository
             return await _userManager.GeneratePasswordResetTokenAsync(appUser);
         }
 
-        public async Task<IdentityResult> ResetPasswordAsync(AppUser appUser, string token, string newPassword)
+        public virtual async Task<IdentityResult> ResetPasswordAsync(AppUser appUser, string token, string newPassword)
         {
             var user = await GetByIdAsync(appUser.Id);
 
@@ -100,7 +100,7 @@ namespace WTP.DAL.Repositories.ConcreteRepositories.AppUserRepository
                                                          newPassword);
         }
 
-        public async Task<IdentityResult> ChangePasswordAsync(int userId, string currentPassword, string newPassword)
+        public virtual async Task<IdentityResult> ChangePasswordAsync(int userId, string currentPassword, string newPassword)
         {
             var user = await GetByIdAsync(userId);
 

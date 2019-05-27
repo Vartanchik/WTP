@@ -1,13 +1,12 @@
-﻿/*
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Caching.Distributed;
 using Newtonsoft.Json;
 using System;
 using System.Threading.Tasks;
-using WTP.DAL.Entities;
-using WTP.DAL.Repositories.ConcreteRepositories.AppUserExtended;
-using WTP.DAL.Repositories.GenericRepository;
-*/
+using WTP.DAL.Entities.AppUserEntities;
+using WTP.DAL.Repositories.ConcreteRepositories.AppUserRepository;
+using WTP.DAL.UnitOfWork;
+
 namespace WTP.DAL.Repositories.ConcreteRepositories
 {
     /*
@@ -17,17 +16,17 @@ namespace WTP.DAL.Repositories.ConcreteRepositories
      * 
      */
 
-    public class UserCachingRepository// : AppUserRepository, IRepository<AppUser>, IAppUserRepository
+    public class UserCachingRepository : UserRepository
     {
-        /*
+        
         private readonly IDistributedCache _Cache;
-        private readonly IAppUserRepository _baseRepositoryAccessor;
+        private readonly UserRepository _baseRepository;
 
-        public UserCachingRepository(IDistributedCache distributedCache, ApplicationDbContext context, UserManager<AppUser> userManager, Func<string, IAppUserRepository> baseRepositoryAccessor)
+        public UserCachingRepository(UserRepository baseRepository, IDistributedCache distributedCache, ApplicationDbContext context, UserManager<AppUser> userManager)
         :base (context, userManager)
         {
             _Cache = distributedCache;
-            _baseRepositoryAccessor = baseRepositoryAccessor("BASE");
+            _baseRepository = baseRepository;
         }
 
         private async void RemoveUserFromCacheAsync(int id)
@@ -35,7 +34,7 @@ namespace WTP.DAL.Repositories.ConcreteRepositories
             await _Cache.RemoveAsync(id.ToString());
         }
 
-        public override async Task<AppUser> GetAsync(int id)
+        public override async Task<AppUser> GetByIdAsync(int id)
         {
             string value = await _Cache.GetStringAsync(id.ToString());
 
@@ -46,7 +45,7 @@ namespace WTP.DAL.Repositories.ConcreteRepositories
                 
             else
             {
-                AppUser currentUser = await _baseRepositoryAccessor.GetAsync(id);
+                AppUser currentUser = await _baseRepository.GetByIdAsync(id);
 
                 if (currentUser.EmailConfirmed)
                 {
@@ -64,33 +63,33 @@ namespace WTP.DAL.Repositories.ConcreteRepositories
             }
         }
 
-        public new async Task<IdentityResult> UpdateAsync(AppUser appUser)
+        public override async Task<IdentityResult> UpdateAsync(AppUser appUser)
         {
-            var resultOfBaseUpdate = await _baseRepositoryAccessor.UpdateAsync(appUser);
+            var resultOfBaseUpdate = await _baseRepository.UpdateAsync(appUser);
 
             RemoveUserFromCacheAsync(appUser.Id);
 
             return resultOfBaseUpdate;
         }
 
-        public new async Task<IdentityResult> ResetPasswordAsync(AppUser appUser, string token, string newPassword)
+        public override async Task<IdentityResult> ResetPasswordAsync(AppUser appUser, string token, string newPassword)
         {
-            var resultOfBaseResetPasswordAsync = await _baseRepositoryAccessor.ResetPasswordAsync(appUser, token, newPassword);
+            var resultOfBaseResetPasswordAsync = await _baseRepository.ResetPasswordAsync(appUser, token, newPassword);
 
             RemoveUserFromCacheAsync(appUser.Id);
 
             return resultOfBaseResetPasswordAsync;
         }
 
-        public new async Task<IdentityResult> ChangePasswordAsync(int userId, string currentPassword, string newPassword)
+        public override async Task<IdentityResult> ChangePasswordAsync(int userId, string currentPassword, string newPassword)
         {
-            var ResultOfBaseChangePasswordAsync = await _baseRepositoryAccessor.ChangePasswordAsync(userId, currentPassword, newPassword);
+            var ResultOfBaseChangePasswordAsync = await _baseRepository.ChangePasswordAsync(userId, currentPassword, newPassword);
 
             RemoveUserFromCacheAsync(userId);
 
             return ResultOfBaseChangePasswordAsync;
 
         }
-        */
+        
     }
 }

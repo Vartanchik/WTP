@@ -8,6 +8,8 @@ using WTP.DAL.Entities.AppUserEntities;
 using WTP.DAL.Repositories.ConcreteRepositories.AppUserRepository;
 using WTP.DAL.Repositories.ConcreteRepositories.RefreshTokenRepository;
 using WTP.DAL.Repositories.ConcreteRepositories.RestoreTokenRepository;
+using WTP.DAL.Repositories.ConcreteRepositories;
+using Microsoft.Extensions.Caching.Distributed;
 
 namespace WTP.DAL.UnitOfWork
 {
@@ -15,6 +17,7 @@ namespace WTP.DAL.UnitOfWork
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<AppUser> _identityService;
+        private readonly IDistributedCache _distributedCache;
         private IUserRepository<AppUser> _appUsers;
         private IRepository<Country> _countries;
         private IRepository<Gender> _genders;
@@ -31,13 +34,14 @@ namespace WTP.DAL.UnitOfWork
         private IRestoreTokenRepository<RestoreToken> _restoreAccountTokens;
         private bool _disposed = false;
 
-        public UnitOfWork(ApplicationDbContext context, UserManager<AppUser> userManager)
+        public UnitOfWork(ApplicationDbContext context, UserManager<AppUser> userManager, IDistributedCache distributedCache)
         {
             _context = context;
             _identityService = userManager;
+            _distributedCache = distributedCache;
         }
 
-        public IUserRepository<AppUser> AppUsers => _appUsers ?? (_appUsers = new UserRepository<AppUser>(_context, _identityService));
+        public IUserRepository<AppUser> AppUsers => _appUsers ?? (_appUsers = new UserCachingRepository(new UserRepository(_context, _identityService), _distributedCache ,_context, _identityService));
         public IRepository<Country> Countries => _countries ?? (_countries = new RepositoryBase<Country>(_context));
         public IRepository<Gender> Genders => _genders ?? (_genders = new RepositoryBase<Gender>(_context));
         public IRepository<Language> Languages => _languages ?? (_languages = new RepositoryBase<Language>(_context));
