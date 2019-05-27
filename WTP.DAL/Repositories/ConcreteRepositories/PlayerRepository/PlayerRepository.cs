@@ -30,5 +30,17 @@ namespace WTP.DAL.Repositories.ConcreteRepositories.PlayerRepository
                 .Where(p => p.AppUserId == userId)
                 .ToListAsync();
         }
+
+        public async Task<IList<Player>> GetListByGameIdAsync(int gameId)
+        {
+            return await _context.Players
+                .Include(p => p.Game)
+                .Include(p => p.Server)
+                .Include(p => p.Goal)
+                .Include(p => p.Rank)
+                .AsNoTracking()
+                .Where(p => p.GameId == gameId)
+                .ToListAsync();
+        }
     }
 }
