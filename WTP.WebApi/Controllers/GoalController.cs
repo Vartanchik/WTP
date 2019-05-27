@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using WTP.BLL.DTOs.PlayerDTOs;
@@ -22,6 +23,7 @@ namespace WTP.WebAPI.Controllers
         }
 
         [HttpGet("list")]
+        [Authorize(Policy = "RequireLoggedIn")]
         public async Task<GoalDto[]> GetAllGoals()
         {
             var listOfGoals = await _goalService.GetGoalsListAsync();
@@ -31,6 +33,7 @@ namespace WTP.WebAPI.Controllers
 
 
         [HttpPost("item")]
+        [Authorize(Policy = "RequireLoggedIn")]
         public async Task<IActionResult> CreateTeam([FromBody]GoalDto goalDto)
         {
             if (!ModelState.IsValid)
@@ -52,6 +55,7 @@ namespace WTP.WebAPI.Controllers
         }
 
         [HttpPut("item/{goalId}")]
+        [Authorize(Policy = "RequireLoggedIn")]
         public async Task<IActionResult> EditTeam([FromBody]GoalDto goalDto, [FromRoute]int goalId)
         {
             if (!ModelState.IsValid)
@@ -80,6 +84,7 @@ namespace WTP.WebAPI.Controllers
         }
 
         [HttpDelete("item/{goalId}")]
+        [Authorize(Policy = "RequireLoggedIn")]
         public async Task<IActionResult> DeleteGame([FromRoute]int goalId)
         {
             var goal = await _goalService.FindAsync(goalId);

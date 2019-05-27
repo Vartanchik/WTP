@@ -16,7 +16,7 @@ namespace WTP.DAL.UnitOfWork
         private IRepository<Country> _countries;
         private IRepository<Gender> _genders;
         private IRepository<Language> _languages;
-        private IRepository<Player> _players;
+        private IPlayerRepository<Player> _players;
         private IRepository<Team> _teams;
         private ITokenRepository<RefreshToken> _tokens;
         private IRepository<Comment> _comments;
@@ -39,7 +39,7 @@ namespace WTP.DAL.UnitOfWork
         public IRepository<Country> Countries => _countries ?? (_countries = new RepositoryBase<Country>(_context));
         public IRepository<Gender> Genders => _genders ?? (_genders = new RepositoryBase<Gender>(_context));
         public IRepository<Language> Languages => _languages ?? (_languages = new RepositoryBase<Language>(_context));
-        public IRepository<Player> Players => _players ?? (_players = new RepositoryBase<Player>(_context));
+        public IPlayerRepository<Player> Players => _players ?? (_players = new PlayerRepository<Player>(_context));
         public IRepository<Team> Teams => _teams ?? (_teams = new RepositoryBase<Team>(_context));
         public ITokenRepository<RefreshToken> Tokens => _tokens ?? (_tokens = new TokenRepository<RefreshToken>(_context));
         public IRepository<Comment> Comments => _comments ?? (_comments = new RepositoryBase<Comment>(_context));

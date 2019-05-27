@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using WTP.BLL.DTOs.AppUserDTOs;
@@ -31,10 +32,10 @@ namespace WTP.WebAPI.Controllers
         ////Get List of all players
         [HttpGet]
         [Route("list")]
-        //[Authorize(Policy = "RequireAdministratorRole")]
-        public async Task<PlayerJoinedDto[]> GetPlayersProfile()
+        [Authorize(Policy = "RequireAdministratorRole")]
+        public async Task<PlayerDto[]> GetPlayersProfile()
         {
-            var players = await _playerService.GetAllPlayersList();
+            var players = await _playerService.GetPlayers();//GetAllPlayersList();
 
             if (players == null)
                 return null;
@@ -45,7 +46,7 @@ namespace WTP.WebAPI.Controllers
 
         //Create players profile
         [HttpPost]
-        //[Authorize(Policy = "RequireAdministratorRole")]
+        [Authorize(Policy = "RequireAdministratorRole")]
         [Route("item")]
         public async Task<IActionResult> CreateProfile([FromBody] PlayerShortDto formdata)
         {
@@ -81,7 +82,7 @@ namespace WTP.WebAPI.Controllers
 
         //Update players profile
         [HttpPut]
-        //[Authorize(Policy = "RequireAdministratorRole")]
+        [Authorize(Policy = "RequireAdministratorRole")]
         [Route("item/{id}")]
         public async Task<IActionResult> UpdateProfile([FromBody] PlayerJoinedDto formdata, [FromRoute]int id)
         {
@@ -135,7 +136,7 @@ namespace WTP.WebAPI.Controllers
 
         //Delete players account by id
         [HttpDelete]
-        //[Authorize(Policy = "RequireAdministratorRole")]
+        [Authorize(Policy = "RequireAdministratorRole")]
         [Route("item/{id}")]
         public async Task<IActionResult> DeleteProfile([FromRoute]int id)
         {

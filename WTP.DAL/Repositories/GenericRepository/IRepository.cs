@@ -9,6 +9,5 @@ namespace WTP.DAL.Repositories.GenericRepository
         Task DeleteAsync(int id);
         Task<TEntity> GetAsync(int id);
         IQueryable<TEntity> AsQueryable();
-        Task Update(TEntity entity);
     }
 }

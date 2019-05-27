@@ -18,7 +18,9 @@ namespace WTP.DAL.Repositories.GenericRepository
         public virtual async Task CreateOrUpdate(TEntity item)
         {
             if (item.Id == 0)
+            {
                 await _dbset.AddAsync(item);
+            }
             else
             {
                 //  _context.Entry(item).State = EntityState.Modified;
@@ -47,25 +49,6 @@ namespace WTP.DAL.Repositories.GenericRepository
         {
             return _dbset.AsQueryable<TEntity>();
         }
-
-        public async virtual Task Update(TEntity entity)
-        {
-            _context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
-            var allItems = _context.Games.AsNoTracking().Where(t => t.Id == entity.Id).FirstOrDefault();//FirstOrDefaultAsync(p => p.Id == entity.Id)/*.LastOrDefaultAsync()*/.ConfigureAwait(false);
-            if (allItems == null)
-            {
-                await _context.Entry(entity).Context.AddAsync(entity).ConfigureAwait(false);
-                await _context.SaveChangesAsync().ConfigureAwait(false);
-            }
-            else
-            {
-                //entity.Id = allItems.Id;
-                //_context.Entry(entity).Context.Set<TEntity>().Update(entity);
-                _context.Entry(entity).State = EntityState.Modified;
-                await _context.SaveChangesAsync().ConfigureAwait(false);
-            }
-            //var t = await _context.AsNoTracking().LastOrDefault();
-            //_context.Entry(entity).State = EntityState.Detached;
-        }
+        
     }
 }

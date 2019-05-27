@@ -68,38 +68,27 @@ namespace WTP.BLL.Services.Concrete.PlayerSrvice
                 join user in await _uow.AppUsers.AsQueryable().ToListAsync() on player.AppUserId equals user.Id
                     select _mapper.Map<PlayerJoinedDto>(player);
 
-            return allPlayers.AsQueryable();//.ToList();
+            return allPlayers.AsQueryable();
         }
 
         public async Task<IList<PlayerJoinedDto>> GetAllPlayersList()
         {
             var allPlayers = from user in await _uow.AppUsers.AsQueryable().ToListAsync()
-            join player in await _uow.Players.AsQueryable().ToListAsync() on user.Id equals player.AppUserId
-            join team in await _uow.Teams.AsQueryable().ToListAsync() on player.TeamId equals team.Id
-                             join rank in await _uow.Ranks.AsQueryable().ToListAsync() on player.Rank.Id equals rank.GameId
-                             join game in await _uow.Games.AsQueryable().ToListAsync() on rank.GameId/*player.GameId*/ equals game.Id
-                             join server in await _uow.Servers.AsQueryable().ToListAsync() on player.ServerId equals server.Id
-                             join goal in await _uow.Goals.AsQueryable().ToListAsync() on player.GoalId equals goal.Id
-//                             group player by player.Id into res
-                             select _mapper.Map<PlayerJoinedDto>(player);
-            //var allPlayers = from player in await _uow.Players.AsQueryable().ToListAsync()
-            //                 join user in await _uow.AppUsers.AsQueryable().ToListAsync() on  player.AppUserId/*user.Players.SingleOrDefault(p=>p.AppUserId==user.Id)*/ equals user.Id
-            //                 join team in await _uow.Teams.AsQueryable().ToListAsync() on player.TeamId equals team.Id
-            //                 join game in await _uow.Games.AsQueryable().ToListAsync() on player.GameId equals game.Id
-            //                 join rank in await _uow.Ranks.AsQueryable().ToListAsync() on player.Game.Id equals rank.GameId
-            //                 join goal in await _uow.Goals.AsQueryable().ToListAsync() on player.GoalId equals goal.Id
-            //                 join server in await _uow.Servers.AsQueryable().ToListAsync() on player.ServerId equals server.Id
-            //                 select _mapper.Map<PlayerJoinedDto>(player);
+                join player in await _uow.Players.AsQueryable().ToListAsync() on user.Id equals player.AppUserId
+                    join team in await _uow.Teams.AsQueryable().ToListAsync() on player.TeamId equals team.Id
+                        join rank in await _uow.Ranks.AsQueryable().ToListAsync() on player.Rank.Id equals rank.GameId
+                            join game in await _uow.Games.AsQueryable().ToListAsync() on rank.GameId/*player.GameId*/ equals game.Id
+                                 join server in await _uow.Servers.AsQueryable().ToListAsync() on player.ServerId equals server.Id
+                                     join goal in await _uow.Goals.AsQueryable().ToListAsync() on player.GoalId equals goal.Id
+                                        select _mapper.Map<PlayerJoinedDto>(player);
 
             return allPlayers.GroupBy(x => x.Id).Select(x => x.FirstOrDefault()).ToList();
         }
 
         public async Task<IList<PlayerDto>> GetPlayers()
         {
-            var allPlayers = await _uow.Players.AsQueryable().Include(p=>p).Include(p=>p.Server).Include(p=>p.Rank).Include(p=>p.Team)
-                .ToListAsync();
-
-            return _mapper.Map<PlayerDto[]>(allPlayers);//.ToList();
+            var allPlayers = await _uow.Players.AsQueryable().ToListAsync();
+            return _mapper.Map<IList<PlayerDto>>(allPlayers);
         }
 
         public async Task<PlayerJoinedDto> GetPlayerInfo(int playerId)

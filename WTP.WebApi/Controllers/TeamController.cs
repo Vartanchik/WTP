@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using WTP.BLL.DTOs.ServicesDTOs;
@@ -22,6 +23,7 @@ namespace WTP.WebAPI.Controllers
         }
 
         [HttpGet("list")]
+        [Authorize(Policy = "RequireLoggedIn")]
         public async Task<TeamDto[]> GetAllTeams()
         {
             var listOfTeams = await _teamService.GetTeamsListAsync();
@@ -31,6 +33,7 @@ namespace WTP.WebAPI.Controllers
 
 
         [HttpPost("item")]
+        [Authorize(Policy = "RequireLoggedIn")]
         public async Task<IActionResult> CreateTeam([FromBody]TeamDto teamDto)
         {
             if (!ModelState.IsValid)
@@ -52,6 +55,7 @@ namespace WTP.WebAPI.Controllers
         }
 
         [HttpPut("item/{teamId}")]
+        [Authorize(Policy = "RequireLoggedIn")]
         public async Task<IActionResult> EditTeam([FromBody]TeamDto teamDto, [FromRoute]int teamId)
         {
             if (!ModelState.IsValid)
@@ -80,6 +84,7 @@ namespace WTP.WebAPI.Controllers
         }
 
         [HttpDelete("item/{teamId}")]
+        [Authorize(Policy = "RequireLoggedIn")]
         public async Task<IActionResult> DeleteGame([FromRoute]int teamId)
         {
             var rank = await _teamService.FindAsync(teamId);
