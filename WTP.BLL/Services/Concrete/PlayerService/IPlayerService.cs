@@ -13,6 +13,9 @@ namespace WTP.BLL.Services.Concrete.PlayerSrvices
         Task<PlayerDto> FindAsync(int playerId);
         IQueryable<CommentDto> FindCommentsAsync(int playerId);
         IQueryable<MatchDto> FindMatchesAsync(int playerId);
-        Task<IList<PlayerJoinedDto>> GetPlayersList();
+        Task<IQueryable<PlayerJoinedDto>> GetPlayersList();
+        Task<IList<PlayerDto>> GetPlayers();
+        Task<IList<PlayerJoinedDto>> GetAllPlayersList();
+        Task<PlayerJoinedDto> GetPlayerInfo(int playerId);
     }
 }

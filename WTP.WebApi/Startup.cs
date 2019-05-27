@@ -28,6 +28,9 @@ using WTP.BLL.Services.Concrete.GameService;
 using WTP.BLL.Services.HistoryService;
 using WTP.BLL.Services.Concrete.PlayerSrvices;
 using WTP.BLL.Services.Concrete.PlayerSrvice;
+using WTP.BLL.Services.Concrete.RankService;
+using WTP.BLL.Services.Concrete.TeamService;
+using WTP.BLL.Services.Concrete.GoalService;
 
 namespace WTP.WebAPI
 {
@@ -69,6 +72,8 @@ namespace WTP.WebAPI
                 }
             });
             */
+            //DbContextOptions<DbContext> contextOptions = new DbContextOptionsBuilder<DbContext>().UseInMemoryDatabase("Context").Options;
+            //services.AddSingleton(contextOptions);
 
             services.AddScoped<IAppUserService, AppUserService>();
             services.AddScoped<IRefreshTokenService, RefreshTokenService>();
@@ -76,6 +81,9 @@ namespace WTP.WebAPI
             services.AddScoped<IGameService, GameService>();
             services.AddScoped<IHistoryService, HistoryService>();
             services.AddScoped<IPlayerService, PlayerService>();
+            services.AddScoped<IRankService, RankService>();
+            services.AddScoped<ITeamService, TeamService>();
+            services.AddScoped<IGoalService, GoalService>();
 
             services.AddScoped(provider => new MapperConfiguration(config =>
             {

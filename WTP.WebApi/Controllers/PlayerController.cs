@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using WTP.BLL.DTOs.AppUserDTOs;
 using WTP.BLL.DTOs.PlayerDTOs;
 using WTP.BLL.DTOs.ServicesDTOs;
 using WTP.BLL.Services.Concrete.PlayerSrvices;
@@ -17,20 +19,22 @@ namespace WTP.WebAPI.Controllers
     {
         private readonly IHistoryService _historyService;
         private readonly IPlayerService _playerService;
+        private readonly IMapper _mapper;
 
-        public PlayerController(IPlayerService playerService, IHistoryService historyService)
+        public PlayerController(IPlayerService playerService, IHistoryService historyService, IMapper mapper)
         {
             _playerService = playerService;
             _historyService = historyService;
+            _mapper = mapper;
         }
 
         ////Get List of all players
         [HttpGet]
-        [Route("profile")]
+        [Route("list")]
         //[Authorize(Policy = "RequireAdministratorRole")]
         public async Task<PlayerJoinedDto[]> GetPlayersProfile()
         {
-            var players = await _playerService.GetPlayersList();
+            var players = await _playerService.GetAllPlayersList();
 
             if (players == null)
                 return null;
@@ -39,11 +43,11 @@ namespace WTP.WebAPI.Controllers
         }
 
 
-        //Update players profile
-        [HttpPut]
+        //Create players profile
+        [HttpPost]
         //[Authorize(Policy = "RequireAdministratorRole")]
-        [Route("player/{id}")]
-        public async Task<IActionResult> UpdateUser([FromBody] PlayerDto formdata, [FromRoute]int id)
+        [Route("item")]
+        public async Task<IActionResult> CreateProfile([FromBody] PlayerShortDto formdata)
         {
             //int userId = Convert.ToInt32(User.Claims.First(c => c.Type == "UserID").Value);
             int adminId = 1;
@@ -57,10 +61,43 @@ namespace WTP.WebAPI.Controllers
                 });
             }
 
-            List<string> errorList = new List<string>();
+            formdata.ServerId = formdata.Server.Id;
+            formdata.AppUserId = formdata.AppUser.Id;
+            formdata.RankId= formdata.Rank.Id;
+            formdata.GoalId = formdata.Goal.Id;
+            formdata.GameId = formdata.Game.Id;
+            formdata.TeamId = formdata.Team.Id;
 
+            var newplayer = _mapper.Map<PlayerDto>(formdata);
+            await _playerService.CreateOrUpdateAsync(newplayer, adminId);
 
-            var player = await _playerService.FindAsync(id);
+            return Ok(new ResponseDto
+            {
+                StatusCode = 201,
+                Message = "Player's profile was created."
+            });
+
+        }
+
+        //Update players profile
+        [HttpPut]
+        //[Authorize(Policy = "RequireAdministratorRole")]
+        [Route("item/{id}")]
+        public async Task<IActionResult> UpdateProfile([FromBody] PlayerJoinedDto formdata, [FromRoute]int id)
+        {
+            //int userId = Convert.ToInt32(User.Claims.First(c => c.Type == "UserID").Value);
+            int adminId = 1;
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new ResponseDto
+                {
+                    StatusCode = 400,
+                    Message = "Model is not valid."
+                });
+            }
+
+            var player = await _playerService.GetPlayerInfo(id);
 
             if (player == null)
             {
@@ -72,30 +109,25 @@ namespace WTP.WebAPI.Controllers
                 });
             }
 
-
             player.About = formdata.About;
             player.Decency = formdata.Decency;
-            player.Server.Name = formdata.Server.Name;
+            player.Server = formdata.Server;
             player.Name = formdata.Name;
-            
+            player.AppUser.Email = formdata.AppUser.Email;
+            player.AppUser.Id = formdata.AppUser.Id;
+            player.AppUser.UserName = formdata.AppUser.UserName;
+            player.Game = formdata.Game;
+            player.Goal = formdata.Goal;
+            player.Rank = formdata.Rank;
+            player.Server = formdata.Server;
+            player.Team = formdata.Team;
 
-            try
-            {
-                await _playerService.CreateOrUpdateAsync(player, adminId);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new ResponseDto
-                {
-                    StatusCode = 400,
-                    Message = "Player's profile with id " + id + " wasnt updated.",
-                    Info = ex.Message.ToString()
-                });
-            }
+            var newplayer = _mapper.Map<PlayerDto>(player);
+            await _playerService.CreateOrUpdateAsync(newplayer, adminId);
 
             return Ok(new ResponseDto
             {
-                StatusCode = 202,
+                StatusCode = 200,
                 Message = "Player's profile with id " + id + " was updated."
             });
 
@@ -104,8 +136,8 @@ namespace WTP.WebAPI.Controllers
         //Delete players account by id
         [HttpDelete]
         //[Authorize(Policy = "RequireAdministratorRole")]
-        [Route("player/{id}")]
-        public async Task<IActionResult> DeleteUser([FromRoute]int id)
+        [Route("item/{id}")]
+        public async Task<IActionResult> DeleteProfile([FromRoute]int id)
         {
             //int userId = Convert.ToInt32(User.Claims.First(c => c.Type == "UserID").Value);
             int adminId = 1;
@@ -125,7 +157,7 @@ namespace WTP.WebAPI.Controllers
 
             return Ok(new ResponseDto
             {
-                StatusCode = 202,
+                StatusCode = 200,
                 Message = "Players profile with id " + id + " was deleted."
             });
         }

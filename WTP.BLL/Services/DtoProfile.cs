@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using WTP.BLL.DTOs.AppUserDTOs;
 using WTP.BLL.DTOs.PlayerDTOs;
+using WTP.BLL.DTOs.ServicesDTOs;
 using WTP.BLL.DTOs.TeamDTOs;
 using WTP.DAL.Entities;
 using WTP.DAL.Entities.AppUserEntities;
@@ -53,6 +54,10 @@ namespace WTP.BLL.Services.Concrete
             CreateMap<Match, MatchDto>();
             CreateMap<History, HistoryDto>();
             CreateMap<HistoryDto, History>();
+            CreateMap<PlayerJoinedDto, PlayerDto>();
+            CreateMap<PlayerDto,PlayerJoinedDto>();
+            CreateMap<AppUserDto, ShortUserFormDto>();
+            CreateMap<ShortUserFormDto, AppUserDto>();
 
         }
 
