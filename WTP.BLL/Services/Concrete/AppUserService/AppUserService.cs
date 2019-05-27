@@ -15,13 +15,6 @@ namespace WTP.BLL.Services.Concrete.AppUserService
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _uow;
 
-        /*
-        public AppUserService(IMapper mapper, Func<string, IAppUserRepository> appUserRepository)
-        {
-            _mapper = mapper;
-            _ouw = appUserRepository("CACHE");
-        }
-        */
 
         public AppUserService(IUnitOfWork unitOfWork, IMapper mapper)
         {

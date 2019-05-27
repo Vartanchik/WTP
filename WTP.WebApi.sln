@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WTP.DAL", "WTP.DAL\WTP.DAL.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WTP.BLL", "WTP.BLL\WTP.BLL.csproj", "{0C488185-DFDB-4E5C-9C86-C9F9CC3020BF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WTP.Logging", "WTP.Logging\WTP.Logging.csproj", "{DE0C9C6B-069F-42B7-8C5D-EA830155531F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WTP.Logging", "WTP.Logging\WTP.Logging.csproj", "{DE0C9C6B-069F-42B7-8C5D-EA830155531F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
