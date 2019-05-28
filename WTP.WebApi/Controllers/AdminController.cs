@@ -29,7 +29,7 @@ namespace WTP.WebAPI.Controllers
         //Create Admin account
         [HttpPost]
         [Route("profiles")]
-        [Authorize(Policy = "RequireAdministratorRole")]
+        //[Authorize(Policy = "RequireAdministratorRole")]
         public async Task<IActionResult> CreateAdminAccount([FromBody] RegisterDto formdata)
         {
             List<string> errorList = new List<string>();
