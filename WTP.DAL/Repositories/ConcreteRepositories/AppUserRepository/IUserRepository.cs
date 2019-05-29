@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using WTP.DAL.Entities.AppUserEntities;
 using WTP.DAL.Repositories.GenericRepository;
@@ -21,5 +22,11 @@ namespace WTP.DAL.Repositories.ConcreteRepositories.AppUserRepository
         Task<string> GenerateEmailConfirmationTokenAsync(AppUser appUser);
         Task<AppUser> GetByIdAsync(string userId);
         Task<IdentityResult> ConfirmEmailAsync(int userId, string token);
+        Task<IdentityResult> CreateAdminAsync(AppUser appUser, string password);
+        Task<IdentityResult> CreateModeratorAsync(AppUser appUser, string password);
+        new Task<bool> DeleteAsync(int id);
+        Task<bool> LockAsync(int id, int? days);
+        Task<bool> UnLockAsync(int id);
+
     }
 }

@@ -42,5 +42,12 @@ namespace WTP.DAL.Repositories.ConcreteRepositories.PlayerRepository
                 .Where(p => p.GameId == gameId)
                 .ToListAsync();
         }
+
+        public override IQueryable<Player> AsQueryable()
+        {
+            return _context.Players.Include(s => s.Server).Include(g => g.Game).Include(t => t.Team).Include(u => u.AppUser)
+                .ThenInclude(p => p.Players)
+                .Include(r => r.Rank).AsQueryable();
+        }
     }
 }

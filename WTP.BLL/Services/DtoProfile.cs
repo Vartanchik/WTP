@@ -53,6 +53,7 @@ namespace WTP.BLL.Services.Concrete
             CreateMap<Comment, CommentDto>();
             CreateMap<MatchDto, Match>();
             CreateMap<Match, MatchDto>();
+
             CreateMap<Rank, RankDto>();
             CreateMap<RankDto, Rank>();
             CreateMap<CreateUpdatePlayerDto, Player>();
@@ -66,6 +67,12 @@ namespace WTP.BLL.Services.Concrete
                 .ForMember(dest => dest.Goal,
                            config => config.MapFrom(src => src.Goal.Name));
 
+            CreateMap<History, HistoryDto>();
+            CreateMap<HistoryDto, History>();
+            CreateMap<PlayerJoinedDto, PlayerDto>();
+            CreateMap<PlayerDto,PlayerJoinedDto>();
+            CreateMap<AppUserDto, ShortUserFormDto>();
+            CreateMap<ShortUserFormDto, AppUserDto>();
         }
 
         private string PhotoToView(AppUser user)

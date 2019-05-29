@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using WTP.BLL.DTOs.PlayerDTOs;
 using WTP.BLL.DTOs.TeamDTOs;
 
@@ -14,11 +15,14 @@ namespace WTP.BLL.DTOs.AppUserDTOs
         public string DateOfBirth { get; set; }
         public CountryDto Country { get; set; }
         public string Steam { get; set; }
+        public bool LockoutEnabled { get; set; }
+        public DateTimeOffset? LockoutEnd { get; set; }
         public ICollection<LanguageDto> Languages { get; set; }
         public List<PlayerDto> Players { get; set; }
         public List<TeamDto> Teams { get; set; }
         public string SecurityStamp { get; set; }
         public virtual List<RefreshTokenDto> Tokens { get; set; }
         public bool IsDeleted { get; set; }
+        public List<HistoryDto> Histories { get; set; }
     }
 }

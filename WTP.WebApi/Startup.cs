@@ -24,8 +24,14 @@ using WTP.WebAPI.Helpers;
 using WTP.BLL.Services.AzureBlobStorageService;
 using WTP.BLL.Services.DeleteService;
 using WTP.BLL.Services.Concrete.GameService;
+
 using WTP.BLL.Services.Concrete.PlayerSrvice;
 using WTP.DAL.Entities.AppUserEntities;
+using WTP.BLL.Services.HistoryService;
+using WTP.BLL.Services.Concrete.RankService;
+using WTP.BLL.Services.Concrete.TeamService;
+using WTP.BLL.Services.Concrete.GoalService;
+using WTP.BLL.Services.Concrete.PlayerSrvices;
 
 namespace WTP.WebAPI
 {
@@ -67,12 +73,19 @@ namespace WTP.WebAPI
                 }
             });
             */
+            //DbContextOptions<DbContext> contextOptions = new DbContextOptionsBuilder<DbContext>().UseInMemoryDatabase("Context").Options;
+            //services.AddSingleton(contextOptions);
 
             services.AddScoped<IAppUserService, AppUserService>();
             services.AddScoped<IRefreshTokenService, RefreshTokenService>();
             services.AddScoped<IDeleteService, DeleteService>();
             services.AddScoped<IGameService, GameService>();
+
+            services.AddScoped<IHistoryService, HistoryService>();
             services.AddScoped<IPlayerService, PlayerService>();
+            services.AddScoped<IRankService, RankService>();
+            services.AddScoped<ITeamService, TeamService>();
+            services.AddScoped<IGoalService, GoalService>();
 
             services.AddScoped(provider => new MapperConfiguration(config =>
             {

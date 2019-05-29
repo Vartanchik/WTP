@@ -9,6 +9,7 @@ using WTP.BLL.DTOs.ServicesDTOs;
 using WTP.BLL.Services.Concrete.AppUserService;
 using WTP.BLL.Services.Concrete.PlayerSrvice;
 using WTP.WebAPI.Utility.Extensions;
+using WTP.BLL.Services.Concrete.PlayerSrvices;
 
 namespace WTP.WebAPI.Controllers
 {
@@ -121,6 +122,5 @@ namespace WTP.WebAPI.Controllers
 
             return viewModel;
         }
-
     }
 }

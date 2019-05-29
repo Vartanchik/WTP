@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using WTP.BLL.DTOs.PlayerDTOs;
 using WTP.BLL.DTOs.ServicesDTOs;
 
-namespace WTP.BLL.Services.Concrete.PlayerSrvice
+namespace WTP.BLL.Services.Concrete.PlayerSrvices
 {
     public interface IPlayerService
     {
@@ -16,5 +16,9 @@ namespace WTP.BLL.Services.Concrete.PlayerSrvice
         Task<IList<PlayerListItemDto>> GetListByUserIdAsync(int userId);
         Task<IList<PlayerListItemDto>> GetPlayersList();
         Task<IList<PlayerListItemDto>> GetListByGameIdAsync(int gameId);
+        Task<IQueryable<PlayerJoinedDto>> GetJoinedPlayersList();
+        Task<IList<PlayerDto>> GetPlayers();
+        Task<IList<PlayerJoinedDto>> GetAllPlayersList();
+        Task<PlayerJoinedDto> GetPlayerInfo(int playerId);
     }
 }
