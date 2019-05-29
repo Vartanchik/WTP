@@ -18,12 +18,9 @@ namespace WTP.WebAPI.Controllers
     {
         private readonly IPlayerService _playerService;
 
-        private readonly IAppUserService _appUserService;
-
-        public PlayerController(IPlayerService playerService, IAppUserService appUserService)
+        public PlayerController(IPlayerService playerService)
         {
             _playerService = playerService;
-            _appUserService = appUserService;
         }
 
         /// <summary>
@@ -74,8 +71,6 @@ namespace WTP.WebAPI.Controllers
         /// </summary>
         /// <returns>List of players</returns>
         /// <returns>Response DTO</returns>
-        /// <response code="200">Returns list of players</response>
-        /// <response code="400">Get players failed</response>
         [HttpGet("[action]/{userId:int}")]
         [Authorize(Policy = "RequireLoggedIn")]
         [ProducesResponseType(typeof(IList<PlayerListItemDto>), 200)]
@@ -85,21 +80,8 @@ namespace WTP.WebAPI.Controllers
             return await _playerService.GetListByUserIdAsync(userId);
         }
 
-        [HttpGet("[action]")]
-        [Authorize(Policy = "RequireLoggedIn")]
-        [ProducesResponseType(typeof(IList<PlayerDto>), 200)]
-        [ProducesResponseType(typeof(ResponseDto), 400)]
-        public async Task<IActionResult> DeletePlayer(int playerId)
-        {
-            int userId = this.GetCurrentUserId();
-
-            await _playerService.DeleteAsync(userId, playerId);
-
-            return Ok();
-        }
-
         //Get List of all players by game
-        [Route("players/pagination")]
+        [HttpGet("players/pagination")]
         public async Task<PlayerIndexDto> PlayerIndex(int idGame, int page = 1)
         {
             int pageSize = 5;
@@ -121,6 +103,5 @@ namespace WTP.WebAPI.Controllers
 
             return viewModel;
         }
-
     }
 }

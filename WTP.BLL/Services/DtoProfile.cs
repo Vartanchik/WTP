@@ -65,6 +65,7 @@ namespace WTP.BLL.Services.Concrete
                            config => config.MapFrom(src => src.Server.Name))
                 .ForMember(dest => dest.Goal,
                            config => config.MapFrom(src => src.Goal.Name));
+            CreateMap<CreateUpdateTeamDto, Team>();
 
         }
 

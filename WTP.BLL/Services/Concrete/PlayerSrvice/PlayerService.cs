@@ -51,7 +51,6 @@ namespace WTP.BLL.Services.Concrete.PlayerSrvice
                     // update
                     player.About = dto.About;
                     player.Decency = dto.Decency;
-                    player.GameId = dto.GameId;
                     player.GoalId = dto.GoalId;
                     player.Name = dto.Name;
                     player.RankId = dto.RankId;

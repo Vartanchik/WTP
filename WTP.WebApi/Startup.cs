@@ -26,6 +26,7 @@ using WTP.BLL.Services.DeleteService;
 using WTP.BLL.Services.Concrete.GameService;
 using WTP.BLL.Services.Concrete.PlayerSrvice;
 using WTP.DAL.Entities.AppUserEntities;
+using WTP.BLL.Services.Concrete.TeamService;
 
 namespace WTP.WebAPI
 {
@@ -73,6 +74,7 @@ namespace WTP.WebAPI
             services.AddScoped<IDeleteService, DeleteService>();
             services.AddScoped<IGameService, GameService>();
             services.AddScoped<IPlayerService, PlayerService>();
+            services.AddScoped<ITeamService, TeamService>();
 
             services.AddScoped(provider => new MapperConfiguration(config =>
             {
