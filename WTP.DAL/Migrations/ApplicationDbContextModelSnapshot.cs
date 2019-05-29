@@ -414,6 +414,33 @@ namespace WTP.DAL.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Operations");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            OperationName = 1
+                        },
+                        new
+                        {
+                            Id = 2,
+                            OperationName = 2
+                        },
+                        new
+                        {
+                            Id = 3,
+                            OperationName = 3
+                        },
+                        new
+                        {
+                            Id = 4,
+                            OperationName = 4
+                        },
+                        new
+                        {
+                            Id = 5,
+                            OperationName = 5
+                        });
                 });
 
             modelBuilder.Entity("WTP.DAL.Entities.AppUserEntities.RefreshToken", b =>

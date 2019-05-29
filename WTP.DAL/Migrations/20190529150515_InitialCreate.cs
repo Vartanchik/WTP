@@ -511,18 +511,30 @@ namespace WTP.DAL.Migrations
                 columns: new[] { "Id", "Name" },
                 values: new object[,]
                 {
-                    { 11, "Swedish" },
-                    { 12, "Greek" },
-                    { 9, "Italian" },
                     { 10, "Czech" },
+                    { 11, "Swedish" },
+                    { 9, "Italian" },
+                    { 12, "Greek" },
                     { 7, "Korean" },
-                    { 6, "Japanese" },
-                    { 5, "Ukrainian" },
-                    { 4, "Spanish" },
-                    { 3, "Russian" },
+                    { 8, "French" },
                     { 2, "German" },
+                    { 3, "Russian" },
+                    { 4, "Spanish" },
+                    { 5, "Ukrainian" },
                     { 1, "English" },
-                    { 8, "French" }
+                    { 6, "Japanese" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Operations",
+                columns: new[] { "Id", "OperationName" },
+                values: new object[,]
+                {
+                    { 5, 5 },
+                    { 3, 3 },
+                    { 2, 2 },
+                    { 1, 1 },
+                    { 4, 4 }
                 });
 
             migrationBuilder.InsertData(
@@ -530,13 +542,13 @@ namespace WTP.DAL.Migrations
                 columns: new[] { "Id", "Name" },
                 values: new object[,]
                 {
-                    { 2, "Guardian" },
+                    { 8, "Immortal" },
                     { 7, "Divine" },
                     { 6, "Ancient" },
                     { 5, "Legend" },
-                    { 1, "Uncalibrated" },
                     { 3, "Crusader" },
-                    { 8, "Immortal" },
+                    { 2, "Guardian" },
+                    { 1, "Uncalibrated" },
                     { 4, "Archon" }
                 });
 
@@ -545,9 +557,9 @@ namespace WTP.DAL.Migrations
                 columns: new[] { "Id", "Name" },
                 values: new object[,]
                 {
-                    { 2, "West" },
                     { 3, "North" },
                     { 1, "East" },
+                    { 2, "West" },
                     { 4, "South" }
                 });
 
