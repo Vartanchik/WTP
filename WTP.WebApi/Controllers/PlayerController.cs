@@ -100,8 +100,7 @@ namespace WTP.WebAPI.Controllers
         }
 
         //Get List of all players by game
-        [HttpGet]
-        [Route("players/pagination")]
+        [HttpGet("players/pagination")]
         public async Task<PlayerIndexDto> PlayerIndex(int idGame, int page = 1)
         {
             int pageSize = 5;

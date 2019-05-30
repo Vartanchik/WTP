@@ -24,6 +24,11 @@ namespace WTP.WebAPI.FluentValidators
 
         private bool IsValidDate(string value)
         {
+            if (String.IsNullOrEmpty(value))
+            {
+                return true;
+            }
+            
             string[] formats = new string[] { "yyyy-MM-dd", "dd-MM-yyyy", "dd.MM.yyyy", "yyyy.MM.dd" };
             var result = DateTime.TryParseExact(value,
                                                 formats,
