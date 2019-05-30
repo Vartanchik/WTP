@@ -49,20 +49,35 @@ namespace WTP.WebAPI.Controllers
         /// <summary>
         /// Delete current user team by game id
         /// </summary>
-        /// <param name="teamGameId"></param>
+        /// <param name="gameId"></param>
         /// <returns>IActionResult</returns>
         [HttpDelete]
         [Authorize(Policy = "RequireLoggedIn")]
         [ProducesResponseType(typeof(ResponseDto), 200)]
         [ProducesResponseType(typeof(ResponseDto), 400)]
-        public async Task<IActionResult> Delete(int teamGameId)
+        public async Task<IActionResult> Delete(int gameId)
         {
             var userId = this.GetCurrentUserId();
 
-            var result = await _teamService.DeleteAsync(userId, teamGameId);
+            var result = await _teamService.DeleteAsync(userId, gameId);
 
             return result.Succeeded
                 ? Ok(new ResponseDto(200, "Completed.", "Team deleted."))
+                : (IActionResult)BadRequest(new ResponseDto(400, "Failed.", result.Error));
+        }
+
+        [HttpPost("[action]")]
+        [Authorize(Policy = "RequireLoggedIn")]
+        [ProducesResponseType(typeof(ResponseDto), 200)]
+        [ProducesResponseType(typeof(ResponseDto), 400)]
+        public async Task<IActionResult> Invite(int playerId)
+        {
+            var userId = this.GetCurrentUserId();
+            // not finished!
+            var result = await _teamService.InviteAsync(userId, playerId);
+
+            return result.Succeeded
+                ? Ok(new ResponseDto(200, "Completed.", "Players have been invited to the team."))
                 : (IActionResult)BadRequest(new ResponseDto(400, "Failed.", result.Error));
         }
 
@@ -83,6 +98,7 @@ namespace WTP.WebAPI.Controllers
             }
 
             var userId = this.GetCurrentUserId();
+            // not valid logic!
             var result = await _teamService.AddToTeamAsync(dto, userId);
 
             return result.Succeeded 

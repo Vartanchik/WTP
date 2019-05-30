@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using WTP.BLL.DTOs.TeamDTOs;
 using WTP.DAL.Entities;
+using WTP.DAL.Entities.TeamEntities;
 using WTP.DAL.UnitOfWork;
 
 namespace WTP.BLL.Services.Concrete.TeamService
@@ -90,6 +91,35 @@ namespace WTP.BLL.Services.Concrete.TeamService
             }
         }
 
+        // not finished!
+        public async Task<ServiceResult> InviteAsync(int userId, int playerId)
+        {
+            var player = await _uow.Players.GetByIdAsync(playerId);
+            if (player == null)
+            {
+                return new ServiceResult("User not found.");
+            }
+
+            var team = _uow.Teams.AsQueryable().Where(t => t.CoachId == userId).FirstOrDefault();
+            if (team == null)
+            {
+                return new ServiceResult("Team not found.");
+            }
+            if (team.GameId != player.GameId)
+            {
+                return new ServiceResult("The player must be from the same game as team.");
+            }
+
+            // add without invite:
+            // if (team.CoachId == userId) + if (team.Players.Count() < 5) ... add to team
+
+            var invite = _mapper.Map<Invite>(new InviteDto(player.Id, team.Id, true));
+            await _uow.Invites.CreateOrUpdate(invite);
+
+            return new ServiceResult();
+        }
+
+        // not valid !
         public async Task<ServiceResult> AddToTeamAsync(AddPlayerToTeamDto dto, int userId)
         {
             var coach = await _uow.AppUsers.GetByIdAsync(userId);

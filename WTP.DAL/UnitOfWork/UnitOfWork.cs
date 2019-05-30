@@ -10,6 +10,7 @@ using WTP.DAL.Repositories.ConcreteRepositories.RefreshTokenRepository;
 using WTP.DAL.Repositories.ConcreteRepositories.RestoreTokenRepository;
 using WTP.DAL.Repositories.ConcreteRepositories;
 using Microsoft.Extensions.Caching.Distributed;
+using WTP.DAL.Entities.TeamEntities;
 
 namespace WTP.DAL.UnitOfWork
 {
@@ -32,6 +33,7 @@ namespace WTP.DAL.UnitOfWork
         private IRepository<Goal> _goals;
         private IRepository<Rank> _ranks;
         private IRestoreTokenRepository<RestoreToken> _restoreAccountTokens;
+        private IRepository<Invite> _invites;
         private bool _disposed = false;
 
         public UnitOfWork(ApplicationDbContext context, UserManager<AppUser> userManager, IDistributedCache distributedCache)
@@ -55,7 +57,7 @@ namespace WTP.DAL.UnitOfWork
         public IRepository<Goal> Goals => _goals ?? (_goals = new RepositoryBase<Goal>(_context));
         public IRepository<Rank> Ranks => _ranks ?? (_ranks = new RepositoryBase<Rank>(_context));
         public IRestoreTokenRepository<RestoreToken> RestoreTokens => _restoreAccountTokens ?? (_restoreAccountTokens = new RestoreTokenRepository<RestoreToken>(_context));
-
+        public IRepository<Invite> Invites => _invites ?? (_invites = new RepositoryBase<Invite>(_context));
         public void Commit()
         {
             _context.SaveChanges();

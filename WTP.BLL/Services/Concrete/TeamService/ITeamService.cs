@@ -8,6 +8,7 @@ namespace WTP.BLL.Services.Concrete.TeamService
     {
         Task<ServiceResult> CreateOrUpdateAsync(CreateUpdateTeamDto dto, int userId);
         Task<ServiceResult> DeleteAsync(int userId, int gameId);
+        Task<ServiceResult> InviteAsync(int userId, int playerId);
         Task<ServiceResult> AddToTeamAsync(AddPlayerToTeamDto dto, int userId);
     }
 }

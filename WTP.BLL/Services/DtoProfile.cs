@@ -8,6 +8,7 @@ using WTP.BLL.DTOs.ServicesDTOs;
 using WTP.BLL.DTOs.TeamDTOs;
 using WTP.DAL.Entities;
 using WTP.DAL.Entities.AppUserEntities;
+using WTP.DAL.Entities.TeamEntities;
 
 namespace WTP.BLL.Services.Concrete
 {
@@ -66,6 +67,7 @@ namespace WTP.BLL.Services.Concrete
                 .ForMember(dest => dest.Goal,
                            config => config.MapFrom(src => src.Goal.Name));
             CreateMap<CreateUpdateTeamDto, Team>();
+            CreateMap<InviteDto, Invite>();
 
         }
 
