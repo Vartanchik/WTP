@@ -1,8 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using WTP.DAL.Entities;
 using WTP.DAL.Repositories.GenericRepository;
@@ -28,18 +26,6 @@ namespace WTP.DAL.Repositories.ConcreteRepositories.PlayerRepository
                 .Include(p => p.Rank)
                 .AsNoTracking()
                 .Where(p => p.AppUserId == userId)
-                .ToListAsync();
-        }
-
-        public async Task<IList<Player>> GetListByGameIdAsync(int gameId)
-        {
-            return await _context.Players
-                .Include(p => p.Game)
-                .Include(p => p.Server)
-                .Include(p => p.Goal)
-                .Include(p => p.Rank)
-                .AsNoTracking()
-                .Where(p => p.GameId == gameId)
                 .ToListAsync();
         }
     }

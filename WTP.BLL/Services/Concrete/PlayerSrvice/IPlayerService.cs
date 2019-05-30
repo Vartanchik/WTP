@@ -15,6 +15,10 @@ namespace WTP.BLL.Services.Concrete.PlayerSrvice
         IQueryable<MatchDto> FindMatchesAsync(int playerId);
         Task<IList<PlayerListItemDto>> GetListByUserIdAsync(int userId);
         Task<IList<PlayerListItemDto>> GetPlayersList();
-        Task<IList<PlayerListItemDto>> GetListByGameIdAsync(int gameId);
+        Task<PlayerPaginationDto> GetListByGameIdWithSortAndFiltersAsync(int gameId, int page, int pageSize, int idSort, int idSortType,
+                                                               string nameValue,
+                                                               int rankLeftValue, int rankRightValue,
+                                                               int decencyLeftValue, int decencyRightValue);
+
     }
 }

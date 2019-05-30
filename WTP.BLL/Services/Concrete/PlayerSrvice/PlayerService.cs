@@ -122,12 +122,177 @@ namespace WTP.BLL.Services.Concrete.PlayerSrvice
             return _mapper.Map<IList<PlayerListItemDto>>(allPlayers);
         }
 
-        public async Task<IList<PlayerListItemDto>> GetListByGameIdAsync(int gameId)
+        public async Task<PlayerPaginationDto> GetListByGameIdWithSortAndFiltersAsync(int gameId, int page, int pageSize,
+                                                                                      int idSort, int idSortType,
+                                                                                      string nameValue,
+                                                                                      int rankLeftValue, int rankRightValue,
+                                                                                      int decencyLeftValue, int decencyRightValue)
         {
-            var listOfPlayers = await _uow.Players.GetListByGameIdAsync(gameId);
+            IList<Player> listOfPlayers = null;
 
-            return _mapper.Map<IList<PlayerListItemDto>>(listOfPlayers);
+            switch (idSort)
+            {
+                    case 1:
+                    {
+                        if (idSortType == 1)
+                        {
+                            listOfPlayers = await _uow.Players.AsQueryable()
+                                                    .Include(p => p.Game)
+                                                    .Include(p => p.Server)
+                                                    .Include(p => p.Goal)
+                                                    .Include(p => p.Rank)
+                                                    .OrderBy(s => s.Decency)
+                                                    .Where(p => p.GameId == gameId 
+                                                    && p.Name.Contains(nameValue)
+                                                    && p.Rank.Value <= rankRightValue 
+                                                    && p.Rank.Value >= rankLeftValue
+                                                    && p.Decency <= decencyRightValue
+                                                    && p.Decency >= decencyLeftValue)
+                                                    .Skip((page - 1) * pageSize)
+                                                    .Take(pageSize)
+                                                    .ToListAsync();
+
+                        }
+
+                        else if (idSortType == 2)
+                        {
+                            listOfPlayers = await _uow.Players.AsQueryable()
+                                                    .Include(p => p.Game)
+                                                    .Include(p => p.Server)
+                                                    .Include(p => p.Goal)
+                                                    .Include(p => p.Rank)
+                                                    .OrderByDescending(s => s.Decency)
+                                                    .Where(p => p.GameId == gameId 
+                                                    && p.Name.Contains(nameValue)
+                                                    && p.Rank.Value <= rankRightValue
+                                                    && p.Rank.Value >= rankLeftValue
+                                                    && p.Decency <= decencyRightValue
+                                                    && p.Decency >= decencyLeftValue)
+                                                    .Skip((page - 1) * pageSize)
+                                                    .Take(pageSize)
+                                                    .ToListAsync();
+                        }
+
+                        else
+                        {
+                            listOfPlayers = await _uow.Players.AsQueryable()
+                                                   .Include(p => p.Game)
+                                                   .Include(p => p.Server)
+                                                   .Include(p => p.Goal)
+                                                   .Include(p => p.Rank)
+                                                   .Where(p => p.GameId == gameId 
+                                                   && p.Name.Contains(nameValue)
+                                                   && p.Rank.Value <= rankRightValue
+                                                   && p.Rank.Value >= rankLeftValue
+                                                   && p.Decency <= decencyRightValue
+                                                   && p.Decency >= decencyLeftValue)
+                                                   .Skip((page - 1) * pageSize)
+                                                   .Take(pageSize)
+                                                   .ToListAsync();
+
+                        }
+                        break;
+                    }
+
+                    case 2:
+                    {
+                        if (idSortType == 1)
+                        {
+                            listOfPlayers = await _uow.Players.AsQueryable()
+                                                    .Include(p => p.Game)
+                                                    .Include(p => p.Server)
+                                                    .Include(p => p.Goal)
+                                                    .Include(p => p.Rank)
+                                                    .OrderBy(s => s.Rank.Value)
+                                                    .Where(p => p.GameId == gameId 
+                                                    && p.Name.Contains(nameValue)
+                                                    && p.Rank.Value <= rankRightValue
+                                                    && p.Rank.Value >= rankLeftValue
+                                                    && p.Decency <= decencyRightValue
+                                                    && p.Decency >= decencyLeftValue)
+                                                    .Skip((page - 1) * pageSize)
+                                                    .Take(pageSize)
+                                                    .ToListAsync();
+                        }
+
+                        else if (idSortType == 2)
+                        {
+                            listOfPlayers = await _uow.Players.AsQueryable()
+                                                    .Include(p => p.Game)
+                                                    .Include(p => p.Server)
+                                                    .Include(p => p.Goal)
+                                                    .Include(p => p.Rank)
+                                                    .OrderByDescending(s => s.Rank.Value)
+                                                    .Where(p => p.GameId == gameId 
+                                                    && p.Name.Contains(nameValue)
+                                                    && p.Rank.Value <= rankRightValue
+                                                    && p.Rank.Value >= rankLeftValue
+                                                    && p.Decency <= decencyRightValue
+                                                    && p.Decency >= decencyLeftValue)
+                                                    .Skip((page - 1) * pageSize)
+                                                    .Take(pageSize)
+                                                    .ToListAsync();
+                        }
+
+                        else
+                        {
+                            listOfPlayers = await _uow.Players.AsQueryable()
+                                                   .Include(p => p.Game)
+                                                   .Include(p => p.Server)
+                                                   .Include(p => p.Goal)
+                                                   .Include(p => p.Rank)
+                                                   .Where(p => p.GameId == gameId
+                                                   && p.Name.Contains(nameValue)
+                                                   && p.Rank.Value <= rankRightValue
+                                                   && p.Rank.Value >= rankLeftValue
+                                                   && p.Decency <= decencyRightValue
+                                                   && p.Decency >= decencyLeftValue)
+                                                   .Skip((page - 1) * pageSize)
+                                                   .Take(pageSize)
+                                                   .ToListAsync();
+
+                        }
+                        break;
+                    }
+                        default:
+                    {
+                         listOfPlayers = await _uow.Players.AsQueryable()
+                                                    .Include(p => p.Game)
+                                                    .Include(p => p.Server)
+                                                    .Include(p => p.Goal)
+                                                    .Include(p => p.Rank)
+                                                    .Where(p => p.GameId == gameId
+                                                    && p.Name.Contains(nameValue)
+                                                    && p.Rank.Value <= rankRightValue
+                                                    && p.Rank.Value >= rankLeftValue
+                                                    && p.Decency <= decencyRightValue
+                                                    && p.Decency >= decencyLeftValue)
+                                                    .Skip((page - 1) * pageSize)
+                                                    .Take(pageSize)
+                                                    .ToListAsync();
+                         break;
+                    }
+
+            }
+
+            var resultList = _mapper.Map<IList<PlayerListItemDto>>(listOfPlayers);
+
+            int playersQuantity = _uow.Players.AsQueryable()
+                                    .Where(p => p.GameId == gameId
+                                    && p.Name.Contains(nameValue)
+                                    && p.Rank.Value <= rankRightValue
+                                    && p.Rank.Value >= rankLeftValue
+                                    && p.Decency <= decencyRightValue
+                                    && p.Decency >= decencyLeftValue)
+                                    .Count();
+
+            var resultModel = new PlayerPaginationDto
+            {
+                Players = resultList,
+                PlayersQuantity = playersQuantity
+            };
+
+            return resultModel;
         }
-
     }
 }

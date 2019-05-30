@@ -98,29 +98,33 @@ namespace WTP.WebAPI.Controllers
             return Ok();
         }
 
-        //Get List of all players by game
-        [Route("players/pagination")]
-        public async Task<PlayerIndexDto> PlayerIndex(int idGame, int page = 1)
+        //Get List of all players by game with sorting
+        [HttpGet("players/pagination")]
+        public async Task<PlayerIndexDto> PlayerIndex(int idGame, int pageSize = 5, int page = 1,
+                                                      int idSort = 0, int idSortType = 0,
+                                                      string nameValue = "",
+                                                      int rankLeftValue = 0, int rankRightValue = 100,
+                                                      int decencyLeftValue = 0, int decencyRightValue = 10000)
         {
-            int pageSize = 5;
+            PlayerPaginationDto inputModel = await _playerService.GetListByGameIdWithSortAndFiltersAsync(idGame, page, pageSize,
+                                                                                                         idSort, idSortType,
+                                                                                                         nameValue,
+                                                                                                         rankLeftValue, rankRightValue,
+                                                                                                         decencyLeftValue, decencyRightValue);
 
-            List<PlayerListItemDto> players = new List<PlayerListItemDto>(await _playerService.GetListByGameIdAsync(idGame));
+            List<PlayerListItemDto> players = new List<PlayerListItemDto>(inputModel.Players);
             if (players == null)
                 return null;
 
-            // Pagination
-            var count = players.Count();
-            var items = players.Skip((page - 1) * pageSize).Take(pageSize).ToList();
 
             // representation model
             PlayerIndexDto viewModel = new PlayerIndexDto
             {
-                PageViewModel = new PageDto(count, page, pageSize),
-                Players = items
+                PageViewModel = new PageDto(inputModel.PlayersQuantity, page, pageSize),
+                Players = players
             };
 
             return viewModel;
         }
-
     }
 }

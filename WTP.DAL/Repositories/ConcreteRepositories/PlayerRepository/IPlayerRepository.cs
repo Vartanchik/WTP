@@ -10,6 +10,5 @@ namespace WTP.DAL.Repositories.ConcreteRepositories.PlayerRepository
     public interface IPlayerRepository<TEntity> : IRepository<TEntity> where TEntity : class, IEntity
     {
         Task<IList<Player>> GetListByUserIdAsync(int userId);
-        Task<IList<Player>> GetListByGameIdAsync(int gameId);
     }
 }
