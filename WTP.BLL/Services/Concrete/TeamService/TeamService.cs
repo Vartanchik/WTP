@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -129,5 +130,40 @@ namespace WTP.BLL.Services.Concrete.TeamService
 
             return new ServiceResult();
         }
+
+        public async Task<IList<TeamListItemDto>> GetListByUserIdAsync(int userId)
+        {
+            var listOfTeams = await _uow.Teams
+                .AsQueryable()
+                .Include(t => t.Game)
+                .Include(t => t.Server)
+                .Include(t => t.Goal)
+                .AsNoTracking()
+                .Where(p => p.CoachId == userId)
+                .ToListAsync();
+
+            return _mapper.Map<IList<TeamListItemDto>>(listOfTeams);
+        }
+
+        public async Task<ServiceResult> UpdateLogoAsync(int userId, int gameId, string logo)
+        {
+            var team = await _uow.Teams
+                .AsQueryable()
+                .Where(t => t.CoachId == userId && t.GameId == gameId)
+                .FirstOrDefaultAsync();
+
+            if (team == null)
+            {
+                return new ServiceResult("Team not found.");
+            }
+
+            team.Photo = logo;
+
+            await _uow.Teams.CreateOrUpdate(team);
+            await _uow.CommitAsync();
+
+            return new ServiceResult();
+        }
+
     }
 }
