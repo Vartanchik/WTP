@@ -91,11 +91,11 @@ namespace WTP.DAL
                 );
 
             builder.Entity<Operation>().HasData(
-                    new { Id = 1, OperationName=1 },//OperationName = OperationEnum.Create },
-                    new { Id = 2, OperationName = 2 }, //OperationName = OperationEnum.Update },
-                    new { Id = 3, OperationName = 3 },//OperationName = OperationEnum.Delete },
-                    new { Id = 4, OperationName = 4 }, //OperationName = OperationEnum.Lock },
-                    new { Id = 5, OperationName = 5 } //OperationName = OperationEnum.UnLock }
+                    new { Id = 1, OperationName="Create" },//OperationName = OperationEnum.Create },
+                    new { Id = 2, OperationName = "Update" }, //OperationName = OperationEnum.Update },
+                    new { Id = 3, OperationName = "Delete"},//OperationName = OperationEnum.Delete },
+                    new { Id = 4, OperationName = "Lock" }, //OperationName = OperationEnum.Lock },
+                    new { Id = 5, OperationName = "UnLock" } //OperationName = OperationEnum.UnLock }
             );
 
             //builder.Entity<AppUser>().HasData(

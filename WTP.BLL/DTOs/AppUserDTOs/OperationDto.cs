@@ -8,11 +8,12 @@ namespace WTP.BLL.DTOs.AppUserDTOs
     public class OperationDto
     {
         public int Id { get; set; }
-        public OperationEnum OperationName
-        {
-            get => (OperationEnum)Id;
-            set => Id = (int)value;
-        }
+        public string OperationName { get; set; }
+        //public OperationEnum OperationName
+        //{
+        //    get => (OperationEnum)Id;
+        //    set => Id = (int)value;
+        //}
 
         public List<HistoryDto> Histories { get; set; }
     }

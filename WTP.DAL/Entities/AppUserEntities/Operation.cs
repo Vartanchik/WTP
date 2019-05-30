@@ -16,11 +16,12 @@ namespace WTP.DAL.Entities.AppUserEntities
     public class Operation : IEntity
     {
         public int Id { get; set; }
-        public OperationEnum OperationName
-        {
-            get => (OperationEnum)Id;
-            set => Id = (int)value;
-        }
+        public string OperationName { get; set; }
+        //public OperationEnum OperationName
+        //{
+        //    get => (OperationEnum)Id;
+        //    set => Id = (int)value;
+        //}
 
         public List<History> Histories { get; set; }
     }
