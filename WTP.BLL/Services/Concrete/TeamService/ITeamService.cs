@@ -16,7 +16,7 @@ namespace WTP.BLL.Services.Concrete.TeamService
         Task<ServiceResult> InviteToTeamAsync(TeamActionDto dto);
         Task<ServiceResult> AcceptInvitation(InviteActionDto dto);
         Task<ServiceResult> DeclineInvitation(InviteActionDto dto);
-        Task<ServiceResult> AddToTeam(TeamActionDto dto);
+        Task<ServiceResult> AddToTeam(int playerId, int teamId);
         Task<ServiceResult> RemoveFromTeam(TeamActionDto dto);
     }
 }

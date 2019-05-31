@@ -27,7 +27,7 @@ namespace WTP.DAL.UnitOfWork
         IRepository<Goal> Goals { get; }
         IRepository<Rank> Ranks { get; }
         IRestoreTokenRepository<RestoreToken> RestoreTokens { get; }
-        IRepository<Invitations> Invitations { get; }
+        IRepository<Invitation> Invitations { get; }
 
         void Commit();
 

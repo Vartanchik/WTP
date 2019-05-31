@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WTP.BLL.DTOs.ServicesDTOs;
@@ -22,6 +19,11 @@ namespace WTP.WebAPI.Controllers
             _teamService = teamService;
         }
 
+        /// <summary>
+        /// Get team
+        /// </summary>
+        /// <param name="teamId"></param>
+        /// <returns></returns>
         [HttpGet]
         [ProducesResponseType(typeof(ResponseDto), 200)]
         [ProducesResponseType(typeof(ResponseDto), 400)]
@@ -29,7 +31,6 @@ namespace WTP.WebAPI.Controllers
         {
             return await _teamService.GetTeamAsync(teamId);
         }
-
 
         /// <summary>
         /// Create team
