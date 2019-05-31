@@ -116,5 +116,16 @@ namespace WTP.BLL.Services.HistoryService
 
             return histories;
         }
+
+        public async Task<List<HistoryDto>> GetItemsOnPage(int page, int pageSize)
+        {
+            var items = await _uow.Histories.AsQueryable().Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+            return _mapper.Map<List<HistoryDto>>(items);
+        }
+
+        public async Task<int> GetCountOfRecords()
+        {
+            return await _uow.Histories.AsQueryable().CountAsync();
+        }
     }
 }

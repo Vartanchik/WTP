@@ -276,13 +276,14 @@ namespace WTP.BLL.Services.Concrete.AppUserService
 
         public async Task<IList<AppUserDto>> GetUsersList()
         {
-            var allUsers = await _uow.AppUsers.AsQueryable().ToListAsync();
+            var allUsers = await _uow.AppUsers.AsQueryable().Where(u=>!u.IsDeleted).ToListAsync();
             return _mapper.Map<IList<AppUserDto>>(allUsers);
         }
 
         public async Task<IdentityResult> CreateAdminAsync(AppUserDto appUserDto, string password)
         {
             var appUser = _mapper.Map<AppUser>(appUserDto);
+            appUser.EmailConfirmed = true;
 
             var result = await _uow.AppUsers.CreateAdminAsync(appUser, password);
 
@@ -394,6 +395,17 @@ namespace WTP.BLL.Services.Concrete.AppUserService
                 users = users.Where(s => s.LockoutEnd == null).ToList();
 
             return users;
+        }
+
+        public async Task<List<AppUserDto>> GetItemsOnPage(int page,int pageSize)
+        {
+            var items = await _uow.AppUsers.AsQueryable().Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+            return _mapper.Map<List<AppUserDto>>(items);
+        }
+
+        public async Task<int> GetCountOfPlayers()
+        {
+            return await _uow.AppUsers.AsQueryable().CountAsync();
         }
     }
 }

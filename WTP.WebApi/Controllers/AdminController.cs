@@ -32,8 +32,7 @@ namespace WTP.WebAPI.Controllers
         //[Authorize(Policy = "RequireAdministratorRole")]
         public async Task<IActionResult> CreateAdminAccount([FromBody] RegisterDto formdata)
         {
-            List<string> errorList = new List<string>();
-
+            string errorResult = "";
             var user = new AppUserDto
             {
                 Email = formdata.Email,
@@ -42,24 +41,14 @@ namespace WTP.WebAPI.Controllers
             };
 
             var result = await _appUserService.CreateAdminAsync(user, formdata.Password);
-
+            
             if (result.Succeeded)
-            {
-                //Confirmation Email
-
-                return Ok(result);
-            }
+                return Ok(new ResponseDto(201, "Creating admin is success."));
             else
             {
                 foreach (var error in result.Errors)
-                {
-                    errorList.Add(error.Code);
-                }
+                    errorResult += error.Code;
             }
-
-            string errorResult = "";
-            foreach (var t in errorList)
-                errorResult += t;
 
             return BadRequest(new ResponseDto(400, "Creating admin is failed.", errorResult));
         }
@@ -72,8 +61,7 @@ namespace WTP.WebAPI.Controllers
         {
             //int userId = Convert.ToInt32(User.Claims.First(c => c.Type == "UserID").Value);
             int adminId = 1;
-
-            List<string> errorList = new List<string>();
+            string errorResult = "";
 
             var user = new AppUserDto
             {
@@ -84,23 +72,13 @@ namespace WTP.WebAPI.Controllers
 
             var result = await _appUserService.CreateAsync(user, formdata.Password, adminId);
 
-            if (result.Succeeded)
-            {
-                // Sending Confirmation Email
-
-                return Ok(result);
-            }
+            if (result.Succeeded)            
+                return Ok(new ResponseDto(201, "Creating user is success."));            
             else
             {
                 foreach (var error in result.Errors)
-                {
-                    errorList.Add(error.Code);
-                }
+                    errorResult += error.Code;
             }
-
-            string errorResult = "";
-            foreach (var t in errorList)
-                errorResult += t;
 
             return BadRequest(new ResponseDto(400, "Creating user account is failed.", errorResult));
         }
@@ -111,8 +89,7 @@ namespace WTP.WebAPI.Controllers
         [Authorize(Policy = "RequireAdministratorRole")]
         public async Task<IActionResult> CreateModeratorProfile([FromBody] RegisterDto formdata)
         {
-            List<string> errorList = new List<string>();
-
+            string errorResult = "";
             var user = new AppUserDto
             {
                 Email = formdata.Email,
@@ -123,22 +100,12 @@ namespace WTP.WebAPI.Controllers
             var result = await _appUserService.CreateModeratorAsync(user, formdata.Password);
 
             if (result.Succeeded)
-            {
-                // Sending Confirmation Email
-
-                return Ok(result);
-            }
+                return Ok(new ResponseDto(201, "Creating moderator is success."));                
             else
             {
                 foreach (var error in result.Errors)
-                {
-                    errorList.Add(error.Code);
-                }
+                    errorResult += error.Code;
             }
-
-            string errorResult = "";
-            foreach (var t in errorList)
-                errorResult += t;
 
             return BadRequest(new ResponseDto(400, "Creating moderator account is failed.", errorResult));
         }
@@ -155,32 +122,8 @@ namespace WTP.WebAPI.Controllers
 
             if (users.Count() == 0)
                 return result.ToArray();
-            //return Ok("List of Users are empty!");
-
-            foreach (var user in users)
-            {               
-                var appUserDtoViewModel = new AppUserDto()
-                {
-                    Id = user.Id,
-                    Email = user.Email,
-                    Photo = user.Photo,
-                    UserName = user.UserName,
-                    Gender = user.Gender,
-                    DateOfBirth = user.DateOfBirth,
-                    Country = user.Country,
-                    Steam = user.Steam,
-                    Players = user.Players,
-                    Teams = user.Teams,
-                    LockoutEnabled = user.LockoutEnabled,
-                    LockoutEnd = user.LockoutEnd,
-                    IsDeleted = user.IsDeleted
-                };
-
-                //Check if account isn't deleted
-                if (user.IsDeleted != true)
-                    result.Add(appUserDtoViewModel);
-            }
-            return result.ToArray();
+            
+            return users.ToArray(); 
         }
 
         //Update user's account
@@ -191,6 +134,7 @@ namespace WTP.WebAPI.Controllers
         {
             //int userId = Convert.ToInt32(User.Claims.First(c => c.Type == "UserID").Value);
             int adminId = 1;
+            string errorResult = "";
 
             if (!ModelState.IsValid)
             {
@@ -200,10 +144,6 @@ namespace WTP.WebAPI.Controllers
                     Message = "Model is not valid."
                 });
             }
-
-            // Will hold all the errors related to registration
-            List<string> errorList = new List<string>();
-
 
             var user = await _appUserService.GetByIdAsync(id);
 
@@ -234,13 +174,9 @@ namespace WTP.WebAPI.Controllers
             {
                 foreach (var error in result.Errors)
                 {
-                    errorList.Add(error.Code);
+                    errorResult+=error.Code;
                 }
             }
-
-            string errorResult = "";
-            foreach (var t in errorList)
-                errorResult += t;
 
             return BadRequest(new ResponseDto
             {
@@ -324,8 +260,6 @@ namespace WTP.WebAPI.Controllers
                 StatusCode = 404,
                 Message = "User's profile with id " + id + " wasn't found."
             });
-
-            //return StatusCode(Microsoft.AspNetCore.Http.StatusCodes.Status406NotAcceptable);
         }
 
         [HttpGet]
@@ -335,23 +269,11 @@ namespace WTP.WebAPI.Controllers
             SortState sortOrder = SortState.NameAsc, bool enableDeleted = true, bool enableLocked = true)
         {
             int pageSize = 3;
+            var items = await _appUserService.GetItemsOnPage(page, pageSize);
+            var count = await _appUserService.GetCountOfPlayers();
+            items = _appUserService.FilterByName(items, name);
+            items = _appUserService.SortByParam(items, sortOrder, enableDeleted, enableLocked);
 
-            List<AppUserDto> users = new List<AppUserDto>(await _appUserService.GetUsersList());
-            if (users == null)
-                return null;
-                //return NoContent();
-
-            //Filtration
-            users = _appUserService.FilterByName(users, name);
-
-            // Sorting
-            users = _appUserService.SortByParam(users, sortOrder, enableDeleted, enableLocked);
-
-            // Pagination
-            var count = users.Count();
-            var items = users.Skip((page - 1) * pageSize).Take(pageSize).ToList();
-
-            // representation model
             UserIndexDto viewModel = new UserIndexDto
             {
                 PageViewModel = new PageDto(count, page, pageSize),
@@ -369,24 +291,11 @@ namespace WTP.WebAPI.Controllers
             HistorySortState sortOrder = HistorySortState.DateDesc)
         {
             int pageSize = 3;
-            List<HistoryDto> histories = new List<HistoryDto>(await _historyService.GetHistoryList());
+            var items = await _historyService.GetItemsOnPage(page, pageSize);
+            var count = await _historyService.GetCountOfRecords();
+            items = _historyService.FilterByUserName(items, name).ToList();
+            items = _historyService.SortByParam(items, sortOrder).ToList();
 
-            if (histories == null)
-                return null;
-                //return NoContent();
-
-            //Filtration
-            histories = _historyService.FilterByUserName(histories, name).ToList();
-
-            // Sorting
-            histories = _historyService.SortByParam(histories, sortOrder).ToList();
-
-
-            // Pagination
-            var count = histories.Count();
-            var items = histories.Skip((page - 1) * pageSize).Take(pageSize).ToList();
-
-            // representation model
             HistoryIndexDto viewModel = new HistoryIndexDto
             {
                 PageViewModel = new PageDto(count, page, pageSize),

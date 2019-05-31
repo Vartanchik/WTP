@@ -15,6 +15,8 @@ namespace WTP.BLL.Services.HistoryService
         Task<HistoryDto> GetAsync(int id);
         Task<IList<HistoryDto>> GetHistoryList();
 
+        Task<List<HistoryDto>> GetItemsOnPage(int page, int pageSize);
+        Task<int> GetCountOfRecords();
         IList<HistoryDto> FilterByUserName(List<HistoryDto> histories, string name);
         IList<HistoryDto> SortByParam(List<HistoryDto> histories, HistorySortState sortOrder);
 

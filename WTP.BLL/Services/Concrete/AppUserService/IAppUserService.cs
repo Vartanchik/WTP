@@ -36,6 +36,8 @@ namespace WTP.BLL.Services.Concrete.AppUserService
         Task<bool> LockAsync(int id, int? days, int? adminId = null);
         Task<bool> UnLockAsync(int id, int? adminId = null);
 
+        Task<List<AppUserDto>> GetItemsOnPage(int page, int pageSize);
+        Task<int> GetCountOfPlayers();
         List<AppUserDto> FilterByName(List<AppUserDto> users, string name);
         List<AppUserDto> SortByParam(List<AppUserDto> users, SortState sortOrder, bool enableDeleted, bool enableLocked);
     }

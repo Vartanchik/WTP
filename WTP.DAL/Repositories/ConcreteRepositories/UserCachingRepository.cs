@@ -18,12 +18,12 @@ namespace WTP.DAL.Repositories.ConcreteRepositories
 
     public class UserCachingRepository : UserRepository
     {
-        
+
         private readonly IDistributedCache _Cache;
         private readonly UserRepository _baseRepository;
 
         public UserCachingRepository(UserRepository baseRepository, IDistributedCache distributedCache, ApplicationDbContext context, UserManager<AppUser> userManager)
-        :base (context, userManager)
+        : base(context, userManager)
         {
             _Cache = distributedCache;
             _baseRepository = baseRepository;
@@ -42,7 +42,7 @@ namespace WTP.DAL.Repositories.ConcreteRepositories
             {
                 return JsonConvert.DeserializeObject<AppUser>(value);
             }
-                
+
             else
             {
                 AppUser currentUser = await _baseRepository.GetByIdAsync(id);
@@ -90,6 +90,6 @@ namespace WTP.DAL.Repositories.ConcreteRepositories
             return ResultOfBaseChangePasswordAsync;
 
         }
-        
+
     }
 }

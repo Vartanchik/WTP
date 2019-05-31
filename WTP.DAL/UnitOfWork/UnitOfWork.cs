@@ -42,7 +42,7 @@ namespace WTP.DAL.UnitOfWork
             _distributedCache = distributedCache;
         }
 
-        public IUserRepository<AppUser> AppUsers => _appUsers ?? (_appUsers = new UserCachingRepository(new UserRepository(_context, _identityService), _distributedCache ,_context, _identityService));
+        public IUserRepository<AppUser> AppUsers => _appUsers ?? (_appUsers = /*UserRepository<AppUser>(_context, _identityService))*/ new UserCachingRepository(new UserRepository(_context, _identityService), _distributedCache ,_context, _identityService));
         public IRepository<Country> Countries => _countries ?? (_countries = new RepositoryBase<Country>(_context));
         public IRepository<Gender> Genders => _genders ?? (_genders = new RepositoryBase<Gender>(_context));
         public IRepository<Language> Languages => _languages ?? (_languages = new RepositoryBase<Language>(_context));

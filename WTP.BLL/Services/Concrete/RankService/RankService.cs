@@ -25,7 +25,7 @@ namespace WTP.BLL.Services.Concrete.RankService
         public async Task<IList<RankDto>> GetRanksListAsync()
         {
             var listOfranks = from rank in await _uow.Ranks.AsQueryable().ToListAsync()
-                                join game in await _uow.Games.AsQueryable().ToListAsync() on rank.Id equals game.Id
+                             //   join game in await _uow.Games.AsQueryable().ToListAsync() on rank.Id equals game.Id
                              select _mapper.Map<RankDto>(rank);
 
             return listOfranks.ToList();

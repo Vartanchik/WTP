@@ -16,9 +16,6 @@ namespace WTP.BLL.Services.Concrete.PlayerSrvices
         Task<IList<PlayerListItemDto>> GetListByUserIdAsync(int userId);
         Task<IList<PlayerListItemDto>> GetPlayersList();
         Task<IList<PlayerListItemDto>> GetListByGameIdAsync(int gameId);
-        Task<IQueryable<PlayerJoinedDto>> GetJoinedPlayersList();
         Task<IList<PlayerDto>> GetPlayers();
-        Task<IList<PlayerJoinedDto>> GetAllPlayersList();
-        Task<PlayerJoinedDto> GetPlayerInfo(int playerId);
     }
 }
