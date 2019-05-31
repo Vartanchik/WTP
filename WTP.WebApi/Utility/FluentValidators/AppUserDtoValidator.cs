@@ -32,7 +32,7 @@ namespace WTP.WebAPI.FluentValidators
             string[] formats = new string[] { "yyyy-MM-dd", "dd-MM-yyyy", "dd.MM.yyyy", "yyyy.MM.dd" };
             var result = DateTime.TryParseExact(value,
                                                 formats,
-                                                CultureInfo.InvariantCulture,
+                                                new CultureInfo("de-DE"),
                                                 DateTimeStyles.NoCurrentDateDefault,
                                                 result: out _);
             return result;
