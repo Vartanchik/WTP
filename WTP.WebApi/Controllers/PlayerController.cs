@@ -98,19 +98,25 @@ namespace WTP.WebAPI.Controllers
             return Ok();
         }
 
-        //Get List of all players by game with sorting
+        //Get List of all players by game with filers and sorting
         [HttpGet("players/pagination")]
-        public async Task<PlayerIndexDto> PlayerIndex(int idGame, int pageSize = 5, int page = 1,
-                                                      int idSort = 0, int idSortType = 0,
-                                                      string nameValue = "",
-                                                      int rankLeftValue = 0, int rankRightValue = 100,
-                                                      int decencyLeftValue = 0, int decencyRightValue = 10000)
+        public async Task<PlayerIndexDto> PlayerIndex([FromQuery] PlayerControllerInputDto valuesFromUi)
         {
-            PlayerPaginationDto inputModel = await _playerService.GetListByGameIdWithSortAndFiltersAsync(idGame, page, pageSize,
-                                                                                                         idSort, idSortType,
-                                                                                                         nameValue,
-                                                                                                         rankLeftValue, rankRightValue,
-                                                                                                         decencyLeftValue, decencyRightValue);
+            PlayerInputValuesModelDto inputValues = new PlayerInputValuesModelDto()
+            {
+                GameId = valuesFromUi.IdGame,
+                Page = valuesFromUi.Page,
+                PageSize = valuesFromUi.PageSize,
+                SortField = valuesFromUi.SortField,
+                SortType = valuesFromUi.SortType,
+                NameValue = valuesFromUi.NameValue,
+                RankLeftValue = valuesFromUi.RankLeftValue,
+                RankRightValue = valuesFromUi.RankRightValue,
+                DecencyLeftValue = valuesFromUi.DecencyLeftValue,
+                DecencyRightValue = valuesFromUi.DecencyRightValue
+            };
+
+            PlayerPaginationDto inputModel = await _playerService.GetFilteredPlayersByGameIdAsync(inputValues);
 
             List<PlayerListItemDto> players = new List<PlayerListItemDto>(inputModel.Players);
             if (players == null)
@@ -120,7 +126,7 @@ namespace WTP.WebAPI.Controllers
             // representation model
             PlayerIndexDto viewModel = new PlayerIndexDto
             {
-                PageViewModel = new PageDto(inputModel.PlayersQuantity, page, pageSize),
+                PageViewModel = new PageDto(inputModel.PlayersQuantity, valuesFromUi.Page, valuesFromUi.PageSize),
                 Players = players
             };
 
