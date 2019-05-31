@@ -10,13 +10,12 @@ namespace WTP.BLL.DTOs.TeamDTOs
         public int Id { get; set; }
         public string Name { get; set; }
         public string Photo { get; set; }
-        public AppUserDto Coach { get; set; }
-        public GameDto Game { get; set; }
-        public ServerDto Server { get; set; }
-        public GoalDto Goal { get; set; }
-        [MaxLength(5)]
-        public List<PlayerDto> Players { get; set; }
-        [Range(0, 100)]
+        public int CoachId { get; set; }
+        public string Game { get; set; }
+        public string Server { get; set; }
+        public string Goal { get; set; }
+        public List<PlayerListItemDto> Players { get; set; }
+        [Range(1, 100)]
         public int WinRate { get; set; }
     }
 }

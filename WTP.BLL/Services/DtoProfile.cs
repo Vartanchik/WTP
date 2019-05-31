@@ -66,9 +66,16 @@ namespace WTP.BLL.Services.Concrete
                            config => config.MapFrom(src => src.Server.Name))
                 .ForMember(dest => dest.Goal,
                            config => config.MapFrom(src => src.Goal.Name));
-            CreateMap<CreateUpdateTeamDto, Team>();
-            CreateMap<InviteDto, Invite>();
-
+            CreateMap<CreateOrUpdateTeamDto, Team>();
+            CreateMap<Team, TeamListItemDto>()
+                .ForMember(dest => dest.Game,
+                           config => config.MapFrom(src => src.Game.Name))
+                .ForMember(dest => dest.Server,
+                           config => config.MapFrom(src => src.Server.Name))
+                .ForMember(dest => dest.Goal,
+                           config => config.MapFrom(src => src.Goal.Name))
+                .ForMember(dest => dest.Photo,
+                           config => config.MapFrom(src => TeamLogoToView(src)));
         }
 
         private string PhotoToView(AppUser user)
@@ -105,6 +112,13 @@ namespace WTP.BLL.Services.Concrete
                     Name = x.Language.Name
                 }));
 
+        }
+
+        private string TeamLogoToView(Team team)
+        {
+            return string.IsNullOrEmpty(team.Photo)
+                ? _defaultPhoto
+                : team.Photo;
         }
     }
 }

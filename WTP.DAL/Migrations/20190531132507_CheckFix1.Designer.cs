@@ -10,14 +10,14 @@ using WTP.DAL;
 namespace WTP.DAL.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20190525092713_InitalCreate")]
-    partial class InitalCreate
+    [Migration("20190531132507_CheckFix1")]
+    partial class CheckFix1
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.2.4-servicing-10062")
+                .HasAnnotation("ProductVersion", "2.2.3-servicing-35854")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -607,13 +607,30 @@ namespace WTP.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int?>("AppUserId");
+                    b.Property<int>("CoachId");
+
+                    b.Property<int>("GameId");
+
+                    b.Property<int>("GoalId");
 
                     b.Property<string>("Name");
 
+                    b.Property<string>("Photo")
+                        .HasColumnType("varchar(250)");
+
+                    b.Property<int>("ServerId");
+
+                    b.Property<int>("WinRate");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("AppUserId");
+                    b.HasIndex("CoachId");
+
+                    b.HasIndex("GameId");
+
+                    b.HasIndex("GoalId");
+
+                    b.HasIndex("ServerId");
 
                     b.ToTable("Team");
                 });
@@ -731,15 +748,31 @@ namespace WTP.DAL.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("WTP.DAL.Entities.Team", "Team")
-                        .WithMany()
+                        .WithMany("Players")
                         .HasForeignKey("TeamId");
                 });
 
             modelBuilder.Entity("WTP.DAL.Entities.Team", b =>
                 {
-                    b.HasOne("WTP.DAL.Entities.AppUserEntities.AppUser")
+                    b.HasOne("WTP.DAL.Entities.AppUserEntities.AppUser", "Coach")
                         .WithMany("Teams")
-                        .HasForeignKey("AppUserId");
+                        .HasForeignKey("CoachId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("WTP.DAL.Entities.Game", "Game")
+                        .WithMany()
+                        .HasForeignKey("GameId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("WTP.DAL.Entities.Goal", "Goal")
+                        .WithMany()
+                        .HasForeignKey("GoalId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("WTP.DAL.Entities.Server", "Server")
+                        .WithMany()
+                        .HasForeignKey("ServerId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 #pragma warning restore 612, 618
         }

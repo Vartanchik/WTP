@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using WTP.BLL.DTOs.PlayerDTOs;
 using WTP.BLL.DTOs.TeamDTOs;
 using WTP.DAL.Entities;
 using WTP.DAL.Entities.TeamEntities;
@@ -22,7 +23,15 @@ namespace WTP.BLL.Services.Concrete.TeamService
             _mapper = mapper;
         }
 
-        public async Task<ServiceResult> CreateAsync(CreateUpdateTeamDto dto, int userId)
+        public async Task<TeamDto> GetTeamAsync(int teamId)
+        {
+            var team = await _uow.Teams.GetByIdAsync(teamId);
+            var dto = _mapper.Map<TeamDto>(team);
+
+            return dto;
+        }
+
+        public async Task<ServiceResult> CreateAsync(CreateOrUpdateTeamDto dto, int userId)
         {
             bool existed = _uow.Teams.AsQueryable()
                                      .Any(t => t.Name == dto.Name &&
@@ -40,7 +49,7 @@ namespace WTP.BLL.Services.Concrete.TeamService
             return new ServiceResult();
         }
 
-        public async Task<ServiceResult> UpdateAsync(CreateUpdateTeamDto dto, int userId)
+        public async Task<ServiceResult> UpdateAsync(CreateOrUpdateTeamDto dto, int userId)
         {
             var existedTeam = _uow.Teams.AsQueryable()
                                         .FirstOrDefault(t => t.CoachId == userId &&
@@ -72,27 +81,88 @@ namespace WTP.BLL.Services.Concrete.TeamService
             return new ServiceResult();
         }
 
-        public Task<ServiceResult> InviteToTeamAsync(int userId, int playerId)
+        public IList<PlayerListItemDto> GetPlayers(int teamId)
+        {
+            var players = _uow.Teams.AsQueryable().FirstOrDefault(t => t.Id == teamId).Players;
+
+            return players == null
+                ? null
+                : _mapper.Map<IList<PlayerListItemDto>>(players);
+        }
+
+        public async Task<ServiceResult> InviteToPlayerAsync(TeamActionDto dto)
+        {
+            // check player
+            var existedPlayer = await _uow.Players.AsQueryable()
+                                                  .AnyAsync(p => p.Id == dto.PlayerId);
+
+            if (!existedPlayer) return new ServiceResult("Player not found.");
+            
+            // check team
+            var existedTeam = await _uow.Teams.AsQueryable()
+                                              .AnyAsync(t => t.Id == dto.TeamId && 
+                                                             t.CoachId == dto.UserId);
+
+            if (!existedTeam) return new ServiceResult("Team not found.");
+
+            // create invitation
+            var invite = new Invitations {
+                PlayerId = dto.PlayerId,
+                TeamId = dto.TeamId,
+                Author = Invitation.Coach
+            };
+
+            await _uow.Invitations.CreateOrUpdate(invite);
+            await _uow.CommitAsync();
+
+            return new ServiceResult();
+        }
+
+        public async Task<ServiceResult> InviteToTeamAsync(TeamActionDto dto)
+        {
+            //
+            var existedPlayer = await _uow.Players.AsQueryable()
+                                                  .AnyAsync(p => p.Id == dto.PlayerId && 
+                                                                 p.AppUserId == dto.UserId);
+
+            if (!existedPlayer) return new ServiceResult("Player not found.");
+
+            //
+            var existedTeam = await _uow.Teams.AsQueryable()
+                                              .AnyAsync(t => t.Id == dto.TeamId);
+
+            if (!existedTeam) return new ServiceResult("Team not found.");
+
+            // create invitation
+            var invite = new Invitations
+            {
+                PlayerId = dto.PlayerId,
+                TeamId = dto.TeamId,
+                Author = Invitation.Player
+            };
+
+            await _uow.Invitations.CreateOrUpdate(invite);
+            await _uow.CommitAsync();
+
+            return new ServiceResult();
+        }
+
+        public Task<ServiceResult> AcceptInvitation(InviteActionDto dto)
         {
             throw new NotImplementedException();
         }
 
-        public Task<ServiceResult> CancelInviteToTeamAsync(int userId, int playerId)
+        public Task<ServiceResult> DeclineInvitation(InviteActionDto dto)
         {
             throw new NotImplementedException();
         }
 
-        public Task<ServiceResult> AddToTeamAsync(int userId, int playerId, int teamId)
+        public Task<ServiceResult> AddToTeam(TeamActionDto dto)
         {
             throw new NotImplementedException();
         }
 
-        public Task<ServiceResult> RemoveFromTeamAsync(int userId, int playerId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<ServiceResult> ChangeTeamAsync(int userId, int playerId, int teamId)
+        public Task<ServiceResult> RemoveFromTeam(TeamActionDto dto)
         {
             throw new NotImplementedException();
         }

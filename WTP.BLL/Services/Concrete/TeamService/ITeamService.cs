@@ -1,17 +1,22 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using WTP.BLL.DTOs.PlayerDTOs;
 using WTP.BLL.DTOs.TeamDTOs;
 
 namespace WTP.BLL.Services.Concrete.TeamService
 {
     public interface ITeamService
     {
-        Task<ServiceResult> CreateAsync(CreateUpdateTeamDto dto, int userId);
-        Task<ServiceResult> UpdateAsync(CreateUpdateTeamDto dto, int userId);
-        Task<ServiceResult> DeleteAsync(int userId, int teamId);
-        Task<ServiceResult> InviteToTeamAsync(int userId, int playerId);
-        Task<ServiceResult> CancelInviteToTeamAsync(int userId, int playerId);
-        Task<ServiceResult> AddToTeamAsync(int userId, int playerId, int teamId);
-        Task<ServiceResult> RemoveFromTeamAsync(int userId, int playerId);
-        Task<ServiceResult> ChangeTeamAsync(int userId, int playerId, int teamId);
+        Task<TeamDto> GetTeamAsync(int teamId);
+        Task<ServiceResult> CreateAsync(CreateOrUpdateTeamDto dto, int userId);
+        Task<ServiceResult> UpdateAsync(CreateOrUpdateTeamDto dto, int userId);
+        Task<ServiceResult> DeleteAsync(int teamId, int userId);
+        IList<PlayerListItemDto> GetPlayers(int teamId);
+        Task<ServiceResult> InviteToPlayerAsync(TeamActionDto dto);
+        Task<ServiceResult> InviteToTeamAsync(TeamActionDto dto);
+        Task<ServiceResult> AcceptInvitation(InviteActionDto dto);
+        Task<ServiceResult> DeclineInvitation(InviteActionDto dto);
+        Task<ServiceResult> AddToTeam(TeamActionDto dto);
+        Task<ServiceResult> RemoveFromTeam(TeamActionDto dto);
     }
 }

@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Data;
 using WTP.DAL.Entities.AppUserEntities;
 
 namespace WTP.DAL.Entities
@@ -8,6 +10,7 @@ namespace WTP.DAL.Entities
     {
         public int Id { get; set; }
         public string Name { get; set; }
+        [Column(TypeName = "varchar(250)")]
         public string Photo { get; set; }
         public int CoachId { get; set; }
         public AppUser Coach { get; set; }

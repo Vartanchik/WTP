@@ -22,27 +22,50 @@ namespace WTP.WebAPI.Controllers
             _teamService = teamService;
         }
 
+        [HttpGet]
+        [ProducesResponseType(typeof(ResponseDto), 200)]
+        [ProducesResponseType(typeof(ResponseDto), 400)]
+        public async Task<TeamDto> Get(int teamId)
+        {
+            return await _teamService.GetTeamAsync(teamId);
+        }
+
+
         /// <summary>
-        /// Create or update current user team by game id
+        /// Create team
         /// </summary>
         /// <param name="dto"></param>
-        /// <returns>IActionResult</returns>
+        /// <returns></returns>
         [HttpPost]
         [Authorize(Policy = "RequireLoggedIn")]
         [ProducesResponseType(typeof(ResponseDto), 200)]
         [ProducesResponseType(typeof(ResponseDto), 400)]
-        public async Task<IActionResult> PostTeam([FromBody] CreateUpdateTeamDto dto)
+        public async Task<IActionResult> Create(CreateOrUpdateTeamDto dto)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(new ResponseDto(400, "Failed.", "Redisplay form."));
-            }
-
             var userId = this.GetCurrentUserId();
-            var result = await _teamService.CreateOrUpdateAsync(dto, userId);
+            var result = await _teamService.CreateAsync(dto, userId);
 
             return result.Succeeded
-                ? Ok(new ResponseDto(200, "Completed.", "Player created."))
+                ? Ok(new ResponseDto(200, "Completed.", "Team created."))
+                : (IActionResult)BadRequest(new ResponseDto(400, "Failed.", result.Error));
+        }
+
+        /// <summary>
+        /// Update team
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Authorize(Policy = "RequireLoggedIn")]
+        [ProducesResponseType(typeof(ResponseDto), 200)]
+        [ProducesResponseType(typeof(ResponseDto), 400)]
+        public async Task<IActionResult> Update(CreateOrUpdateTeamDto dto)
+        {
+            var userId = this.GetCurrentUserId();
+            var result = await _teamService.UpdateAsync(dto, userId);
+
+            return result.Succeeded
+                ? Ok(new ResponseDto(200, "Completed.", "Team updated."))
                 : (IActionResult)BadRequest(new ResponseDto(400, "Failed.", result.Error));
         }
 
@@ -55,54 +78,14 @@ namespace WTP.WebAPI.Controllers
         [Authorize(Policy = "RequireLoggedIn")]
         [ProducesResponseType(typeof(ResponseDto), 200)]
         [ProducesResponseType(typeof(ResponseDto), 400)]
-        public async Task<IActionResult> Delete(int gameId)
+        public async Task<IActionResult> Delete(int teamId)
         {
             var userId = this.GetCurrentUserId();
 
-            var result = await _teamService.DeleteAsync(userId, gameId);
+            var result = await _teamService.DeleteAsync(teamId, userId);
 
             return result.Succeeded
                 ? Ok(new ResponseDto(200, "Completed.", "Team deleted."))
-                : (IActionResult)BadRequest(new ResponseDto(400, "Failed.", result.Error));
-        }
-
-        [HttpPost("[action]")]
-        [Authorize(Policy = "RequireLoggedIn")]
-        [ProducesResponseType(typeof(ResponseDto), 200)]
-        [ProducesResponseType(typeof(ResponseDto), 400)]
-        public async Task<IActionResult> Invite(int playerId)
-        {
-            var userId = this.GetCurrentUserId();
-            // not finished!
-            var result = await _teamService.InviteAsync(userId, playerId);
-
-            return result.Succeeded
-                ? Ok(new ResponseDto(200, "Completed.", "Players have been invited to the team."))
-                : (IActionResult)BadRequest(new ResponseDto(400, "Failed.", result.Error));
-        }
-
-        /// <summary>
-        /// Add to team players by id
-        /// </summary>
-        /// <param name="dto"></param>
-        /// <returns></returns>
-        [HttpPut("[action]")]
-        [Authorize(Policy = "RequireLoggedIn")]
-        [ProducesResponseType(typeof(ResponseDto), 200)]
-        [ProducesResponseType(typeof(ResponseDto), 400)]
-        public async Task<IActionResult> AddPlayer(AddPlayerToTeamDto dto)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(new ResponseDto(400, "Failed.", "Redisplay form."));
-            }
-
-            var userId = this.GetCurrentUserId();
-            // not valid logic!
-            var result = await _teamService.AddToTeamAsync(dto, userId);
-
-            return result.Succeeded 
-                ? Ok(new ResponseDto(200, "Completed.", "Players have been added to the team."))
                 : (IActionResult)BadRequest(new ResponseDto(400, "Failed.", result.Error));
         }
     }

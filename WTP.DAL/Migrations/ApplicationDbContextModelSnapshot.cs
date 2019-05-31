@@ -613,7 +613,8 @@ namespace WTP.DAL.Migrations
 
                     b.Property<string>("Name");
 
-                    b.Property<string>("Photo");
+                    b.Property<string>("Photo")
+                        .HasColumnType("varchar(250)");
 
                     b.Property<int>("ServerId");
 
