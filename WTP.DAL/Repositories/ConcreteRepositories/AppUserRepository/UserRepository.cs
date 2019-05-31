@@ -161,8 +161,11 @@ namespace WTP.DAL.Repositories.ConcreteRepositories.AppUserRepository
 
         public async Task<bool> LockAsync(int id, int? days)
         {
-            var user = await GetByIdAsync(id);
+            var user = await  GetByIdAsync(id);
             if (user == null)
+                return false;
+
+            if (user.IsDeleted)
                 return false;
 
             await _userManager.SetLockoutEnabledAsync(user, true);
