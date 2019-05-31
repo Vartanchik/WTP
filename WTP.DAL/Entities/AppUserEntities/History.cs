@@ -18,7 +18,7 @@ namespace WTP.DAL.Entities.AppUserEntities
         public int? AppUserId { get; set; }
         public AppUser AppUser { get; set; }
 
-        public int AdminId { get; set; }
+        public int? AdminId { get; set; }
         //public AppUser Admin { get; set; }
 
         public int OperationId { get; set; }
