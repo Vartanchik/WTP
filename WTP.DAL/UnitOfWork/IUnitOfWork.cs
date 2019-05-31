@@ -6,6 +6,7 @@ using WTP.DAL.Repositories.ConcreteRepositories.AppUserRepository;
 using WTP.DAL.Repositories.ConcreteRepositories.RefreshTokenRepository;
 using WTP.DAL.Repositories.ConcreteRepositories.RestoreTokenRepository;
 using WTP.DAL.Repositories.GenericRepository;
+using WTP.DAL.Entities.TeamEntities;
 
 namespace WTP.DAL.UnitOfWork
 {
@@ -25,6 +26,7 @@ namespace WTP.DAL.UnitOfWork
         IRepository<Goal> Goals { get; }
         IRepository<Rank> Ranks { get; }
         IRestoreTokenRepository<RestoreToken> RestoreTokens { get; }
+        IRepository<Invitations> Invitations { get; }
 
         void Commit();
 

@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace WTP.DAL.Migrations
 {
-    public partial class InitalCreate : Migration
+    public partial class CheckFix1 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -340,17 +340,40 @@ namespace WTP.DAL.Migrations
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     Name = table.Column<string>(nullable: true),
-                    AppUserId = table.Column<int>(nullable: true)
+                    Photo = table.Column<string>(type: "varchar(250)", nullable: true),
+                    CoachId = table.Column<int>(nullable: false),
+                    GameId = table.Column<int>(nullable: false),
+                    ServerId = table.Column<int>(nullable: false),
+                    GoalId = table.Column<int>(nullable: false),
+                    WinRate = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Team", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Team_AspNetUsers_AppUserId",
-                        column: x => x.AppUserId,
+                        name: "FK_Team_AspNetUsers_CoachId",
+                        column: x => x.CoachId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Team_Games_GameId",
+                        column: x => x.GameId,
+                        principalTable: "Games",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Team_Goals_GoalId",
+                        column: x => x.GoalId,
+                        principalTable: "Goals",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Team_Servers_ServerId",
+                        column: x => x.ServerId,
+                        principalTable: "Servers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -600,9 +623,24 @@ namespace WTP.DAL.Migrations
                 column: "AppUserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Team_AppUserId",
+                name: "IX_Team_CoachId",
                 table: "Team",
-                column: "AppUserId");
+                column: "CoachId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Team_GameId",
+                table: "Team",
+                column: "GameId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Team_GoalId",
+                table: "Team",
+                column: "GoalId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Team_ServerId",
+                table: "Team",
+                column: "ServerId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -641,22 +679,22 @@ namespace WTP.DAL.Migrations
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "Games");
-
-            migrationBuilder.DropTable(
-                name: "Goals");
-
-            migrationBuilder.DropTable(
                 name: "Ranks");
-
-            migrationBuilder.DropTable(
-                name: "Servers");
 
             migrationBuilder.DropTable(
                 name: "Team");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "Games");
+
+            migrationBuilder.DropTable(
+                name: "Goals");
+
+            migrationBuilder.DropTable(
+                name: "Servers");
 
             migrationBuilder.DropTable(
                 name: "Country");

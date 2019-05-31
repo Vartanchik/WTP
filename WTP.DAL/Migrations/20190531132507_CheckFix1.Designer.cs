@@ -10,8 +10,8 @@ using WTP.DAL;
 namespace WTP.DAL.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20190529212448_TeamInit")]
-    partial class TeamInit
+    [Migration("20190531132507_CheckFix1")]
+    partial class CheckFix1
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -615,7 +615,8 @@ namespace WTP.DAL.Migrations
 
                     b.Property<string>("Name");
 
-                    b.Property<string>("Photo");
+                    b.Property<string>("Photo")
+                        .HasColumnType("varchar(250)");
 
                     b.Property<int>("ServerId");
 

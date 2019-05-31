@@ -30,71 +30,70 @@ namespace WTP.WebAPI.Controllers
             _azureBlobStorageService = azureBlobStorageService;
         }
 
+        [HttpGet]
+        [ProducesResponseType(typeof(ResponseDto), 200)]
+        [ProducesResponseType(typeof(ResponseDto), 400)]
+        public async Task<TeamDto> Get(int teamId)
+        {
+            return await _teamService.GetTeamAsync(teamId);
+        }
+
+
         /// <summary>
-        /// Create or update current user team by game id
+        /// Create team
         /// </summary>
         /// <param name="dto"></param>
-        /// <returns>IActionResult</returns>
+        /// <returns></returns>
         [HttpPost]
         [Authorize(Policy = "RequireLoggedIn")]
         [ProducesResponseType(typeof(ResponseDto), 200)]
         [ProducesResponseType(typeof(ResponseDto), 400)]
-        public async Task<IActionResult> PostTeam([FromBody] CreateUpdateTeamDto dto)
+        public async Task<IActionResult> Create(CreateOrUpdateTeamDto dto)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(new ResponseDto(400, "Failed.", "Redisplay form."));
-            }
-
             var userId = this.GetCurrentUserId();
-            var result = await _teamService.CreateOrUpdateAsync(dto, userId);
+            var result = await _teamService.CreateAsync(dto, userId);
 
             return result.Succeeded
-                ? Ok(new ResponseDto(200, "Completed.", "Player created."))
+                ? Ok(new ResponseDto(200, "Completed.", "Team created."))
+                : (IActionResult)BadRequest(new ResponseDto(400, "Failed.", result.Error));
+        }
+
+        /// <summary>
+        /// Update team
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Authorize(Policy = "RequireLoggedIn")]
+        [ProducesResponseType(typeof(ResponseDto), 200)]
+        [ProducesResponseType(typeof(ResponseDto), 400)]
+        public async Task<IActionResult> Update(CreateOrUpdateTeamDto dto)
+        {
+            var userId = this.GetCurrentUserId();
+            var result = await _teamService.UpdateAsync(dto, userId);
+
+            return result.Succeeded
+                ? Ok(new ResponseDto(200, "Completed.", "Team updated."))
                 : (IActionResult)BadRequest(new ResponseDto(400, "Failed.", result.Error));
         }
 
         /// <summary>
         /// Delete current user team by game id
         /// </summary>
-        /// <param name="teamGameId"></param>
+        /// <param name="gameId"></param>
         /// <returns>IActionResult</returns>
         [HttpDelete]
         [Authorize(Policy = "RequireLoggedIn")]
         [ProducesResponseType(typeof(ResponseDto), 200)]
         [ProducesResponseType(typeof(ResponseDto), 400)]
-        public async Task<IActionResult> Delete(int teamGameId)
+        public async Task<IActionResult> Delete(int teamId)
         {
             var userId = this.GetCurrentUserId();
 
-            var result = await _teamService.DeleteAsync(userId, teamGameId);
+            var result = await _teamService.DeleteAsync(teamId, userId);
 
             return result.Succeeded
                 ? Ok(new ResponseDto(200, "Completed.", "Team deleted."))
-                : (IActionResult)BadRequest(new ResponseDto(400, "Failed.", result.Error));
-        }
-
-        /// <summary>
-        /// Add to team players by id
-        /// </summary>
-        /// <param name="dto"></param>
-        /// <returns></returns>
-        [HttpPut("[action]")]
-        [Authorize(Policy = "RequireLoggedIn")]
-        [ProducesResponseType(typeof(ResponseDto), 200)]
-        [ProducesResponseType(typeof(ResponseDto), 400)]
-        public async Task<IActionResult> AddPlayer(AddPlayerToTeamDto dto)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(new ResponseDto(400, "Failed.", "Redisplay form."));
-            }
-
-            var userId = this.GetCurrentUserId();
-            var result = await _teamService.AddToTeamAsync(dto, userId);
-
-            return result.Succeeded
-                ? Ok(new ResponseDto(200, "Completed.", "Players have been added to the team."))
                 : (IActionResult)BadRequest(new ResponseDto(400, "Failed.", result.Error));
         }
 
@@ -123,7 +122,7 @@ namespace WTP.WebAPI.Controllers
         [Authorize(Policy = "RequireLoggedIn")]
         [ProducesResponseType(typeof(ResponseDto), 200)]
         [ProducesResponseType(typeof(ResponseDto), 400)]
-        public async Task<IActionResult> UpdateLogo([FromForm]PhotoFormDataDto formData, int teamGameId)
+        public async Task<IActionResult> UpdateLogo([FromForm]PhotoFormDataDto formData, int teamId)
         {
             var azureStorageConfig = new AzureBlobStorageConfigDto(_configuration["AzureBlobStorage:AccountName"],
                                                                    _configuration["AzureBlobStorage:AccountKey"],
@@ -136,7 +135,7 @@ namespace WTP.WebAPI.Controllers
 
             var userId = this.GetCurrentUserId();
 
-            var result = await _teamService.UpdateLogoAsync(userId, teamGameId, teamLogoUrl);
+            var result = await _teamService.UpdateLogoAsync(userId, teamId, teamLogoUrl);
 
             return (teamLogoUrl != null && result.Succeeded)
                 ? Ok(new ResponseDto(200, "Logo was updated.", teamLogoUrl))

@@ -8,6 +8,7 @@ using WTP.BLL.DTOs.ServicesDTOs;
 using WTP.BLL.DTOs.TeamDTOs;
 using WTP.DAL.Entities;
 using WTP.DAL.Entities.AppUserEntities;
+using WTP.DAL.Entities.TeamEntities;
 
 namespace WTP.BLL.Services.Concrete
 {
@@ -65,7 +66,7 @@ namespace WTP.BLL.Services.Concrete
                            config => config.MapFrom(src => src.Server.Name))
                 .ForMember(dest => dest.Goal,
                            config => config.MapFrom(src => src.Goal.Name));
-            CreateMap<CreateUpdateTeamDto, Team>();
+            CreateMap<CreateOrUpdateTeamDto, Team>();
             CreateMap<Team, TeamListItemDto>()
                 .ForMember(dest => dest.Game,
                            config => config.MapFrom(src => src.Game.Name))
@@ -75,7 +76,6 @@ namespace WTP.BLL.Services.Concrete
                            config => config.MapFrom(src => src.Goal.Name))
                 .ForMember(dest => dest.Photo,
                            config => config.MapFrom(src => TeamLogoToView(src)));
-
         }
 
         private string PhotoToView(AppUser user)

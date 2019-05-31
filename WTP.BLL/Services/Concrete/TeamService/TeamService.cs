@@ -4,8 +4,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using WTP.BLL.DTOs.PlayerDTOs;
 using WTP.BLL.DTOs.TeamDTOs;
 using WTP.DAL.Entities;
+using WTP.DAL.Entities.TeamEntities;
 using WTP.DAL.UnitOfWork;
 
 namespace WTP.BLL.Services.Concrete.TeamService
@@ -21,111 +23,125 @@ namespace WTP.BLL.Services.Concrete.TeamService
             _mapper = mapper;
         }
 
-        public async Task<ServiceResult> CreateOrUpdateAsync(CreateUpdateTeamDto dto, int userId)
+        public async Task<TeamDto> GetTeamAsync(int teamId)
         {
-            var boockedTeam = _uow.Teams.AsQueryable()
-                .Where(t => t.Name == dto.Name && t.GameId == dto.GameId && t.CoachId != userId)
-                .FirstOrDefault();
+            var team = await _uow.Teams.GetByIdAsync(teamId);
+            var dto = _mapper.Map<TeamDto>(team);
 
-            if (boockedTeam != null)
-            {
-                return new ServiceResult("Team with such name already exists.");
-            }
-
-            try
-            {
-                var team = _uow.Teams.AsQueryable()
-                    .Where(t => t.CoachId == userId && t.GameId == dto.GameId)
-                    .FirstOrDefault();
-
-                if (team == null)
-                {
-                    // create
-                    team = _mapper.Map<Team>(dto);
-                    team.CoachId = userId;
-                }
-                else
-                {
-                    // update
-                    team.GoalId = dto.GoalId;
-                    team.Name = dto.Name;
-                    team.ServerId = dto.ServerId;
-                }
-
-                await _uow.Teams.CreateOrUpdate(team);
-                await _uow.CommitAsync();
-
-                return new ServiceResult();
-            }
-            catch(Exception ex)
-            {
-                string exe = ex.Message;
-                // error logging
-                return new ServiceResult("Server error.");
-            }
+            return dto;
         }
 
-        public async Task<ServiceResult> DeleteAsync(int userId, int gameId)
+        public async Task<ServiceResult> CreateAsync(CreateOrUpdateTeamDto dto, int userId)
         {
-            var team = _uow.Teams.AsQueryable()
-                .Where(t => t.CoachId == userId && t.GameId == gameId)
-                .FirstOrDefault();
+            bool existed = _uow.Teams.AsQueryable()
+                                     .Any(t => t.Name == dto.Name &&
+                                               t.GameId == dto.GameId &&
+                                               t.CoachId != userId);
 
-            if (team == null)
-            {
-                return new ServiceResult("Player not found.");
-            }
+            if (existed) return new ServiceResult("Team already existed.");
 
-            try
-            {
-                // delete
-                await _uow.Teams.DeleteAsync(team.Id);
-                await _uow.CommitAsync();
-
-                return new ServiceResult();
-            }
-            catch
-            {
-                // error logging
-                return new ServiceResult("Server error.");
-            }
-        }
-
-        public async Task<ServiceResult> AddToTeamAsync(AddPlayerToTeamDto dto, int userId)
-        {
-            var coach = await _uow.AppUsers.GetByIdAsync(userId);
-            if (coach == null)
-            {
-                return new ServiceResult("User not found.");
-            }
-
-            var team = coach.Teams.AsQueryable().Where(t => t.GameId == dto.GameId).FirstOrDefault();
-            if (team == null)
-            {
-                return new ServiceResult("The user does not have a team in the selected game.");
-            }
-            if (team.Players.Count() >= 5)
-            {
-                return new ServiceResult("The team is full.");
-            }
-
-            var player = await _uow.Players.GetByIdAsync(dto.PlayerId);
-            if (player == null)
-            {
-                return new ServiceResult("Player not found.");
-            }
-            if (player.GameId != dto.GameId)
-            {
-                return new ServiceResult("The player must be from the same game as team.");
-            }
-            if (team.Players.Contains(player))
-            {
-                return new ServiceResult("The player has already been added to the team.");
-            }
-
-            team.Players.Add(player);
+            var team = _mapper.Map<Team>(dto);
+            team.CoachId = userId;
 
             await _uow.Teams.CreateOrUpdate(team);
+            await _uow.CommitAsync();
+
+            return new ServiceResult();
+        }
+
+        public async Task<ServiceResult> UpdateAsync(CreateOrUpdateTeamDto dto, int userId)
+        {
+            var existedTeam = _uow.Teams.AsQueryable()
+                                        .FirstOrDefault(t => t.CoachId == userId &&
+                                                             t.GameId == dto.GameId);
+
+            if (existedTeam == null) return new ServiceResult("Team not found.");
+
+            existedTeam.GoalId = dto.GoalId;
+            existedTeam.Name = dto.Name;
+            existedTeam.ServerId = dto.ServerId;
+
+            await _uow.Teams.CreateOrUpdate(existedTeam);
+            await _uow.CommitAsync();
+
+            return new ServiceResult();
+        }
+
+        public async Task<ServiceResult> DeleteAsync(int teamId, int userId)
+        {
+            var team = await _uow.Teams.AsQueryable()
+                                       .FirstOrDefaultAsync(t => t.CoachId == userId &&
+                                                                 t.Id == teamId);
+
+            if (team == null) return new ServiceResult("Team not found.");
+
+            await _uow.Teams.DeleteAsync(team.Id);
+            await _uow.CommitAsync();
+
+            return new ServiceResult();
+        }
+
+        public IList<PlayerListItemDto> GetPlayers(int teamId)
+        {
+            var players = _uow.Teams.AsQueryable().FirstOrDefault(t => t.Id == teamId).Players;
+
+            return players == null
+                ? null
+                : _mapper.Map<IList<PlayerListItemDto>>(players);
+        }
+
+        public async Task<ServiceResult> InviteToPlayerAsync(TeamActionDto dto)
+        {
+            // check player
+            var existedPlayer = await _uow.Players.AsQueryable()
+                                                  .AnyAsync(p => p.Id == dto.PlayerId);
+
+            if (!existedPlayer) return new ServiceResult("Player not found.");
+            
+            // check team
+            var existedTeam = await _uow.Teams.AsQueryable()
+                                              .AnyAsync(t => t.Id == dto.TeamId && 
+                                                             t.CoachId == dto.UserId);
+
+            if (!existedTeam) return new ServiceResult("Team not found.");
+
+            // create invitation
+            var invite = new Invitations {
+                PlayerId = dto.PlayerId,
+                TeamId = dto.TeamId,
+                Author = Invitation.Coach
+            };
+
+            await _uow.Invitations.CreateOrUpdate(invite);
+            await _uow.CommitAsync();
+
+            return new ServiceResult();
+        }
+
+        public async Task<ServiceResult> InviteToTeamAsync(TeamActionDto dto)
+        {
+            //
+            var existedPlayer = await _uow.Players.AsQueryable()
+                                                  .AnyAsync(p => p.Id == dto.PlayerId && 
+                                                                 p.AppUserId == dto.UserId);
+
+            if (!existedPlayer) return new ServiceResult("Player not found.");
+
+            //
+            var existedTeam = await _uow.Teams.AsQueryable()
+                                              .AnyAsync(t => t.Id == dto.TeamId);
+
+            if (!existedTeam) return new ServiceResult("Team not found.");
+
+            // create invitation
+            var invite = new Invitations
+            {
+                PlayerId = dto.PlayerId,
+                TeamId = dto.TeamId,
+                Author = Invitation.Player
+            };
+
+            await _uow.Invitations.CreateOrUpdate(invite);
             await _uow.CommitAsync();
 
             return new ServiceResult();
@@ -145,11 +161,11 @@ namespace WTP.BLL.Services.Concrete.TeamService
             return _mapper.Map<IList<TeamListItemDto>>(listOfTeams);
         }
 
-        public async Task<ServiceResult> UpdateLogoAsync(int userId, int gameId, string logo)
+        public async Task<ServiceResult> UpdateLogoAsync(int userId, int teamId, string logo)
         {
             var team = await _uow.Teams
                 .AsQueryable()
-                .Where(t => t.CoachId == userId && t.GameId == gameId)
+                .Where(t => t.CoachId == userId && t.Id == teamId)
                 .FirstOrDefaultAsync();
 
             if (team == null)
@@ -164,6 +180,24 @@ namespace WTP.BLL.Services.Concrete.TeamService
 
             return new ServiceResult();
         }
+        public Task<ServiceResult> AcceptInvitation(InviteActionDto dto)
+        {
+            throw new NotImplementedException();
+        }
 
+        public Task<ServiceResult> DeclineInvitation(InviteActionDto dto)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ServiceResult> AddToTeam(TeamActionDto dto)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ServiceResult> RemoveFromTeam(TeamActionDto dto)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
