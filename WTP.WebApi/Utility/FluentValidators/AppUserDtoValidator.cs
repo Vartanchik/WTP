@@ -29,7 +29,7 @@ namespace WTP.WebAPI.FluentValidators
                 return true;
             }
             
-            string[] formats = new string[] { "yyyy-MM-dd", "dd-MM-yyyy", "dd.MM.yyyy", "yyyy.MM.dd" };
+            string[] formats = new string[] { "yyyy-MM-dd", "dd-MM-yyyy", "dd.MM.yyyy", "yyyy.MM.dd", "dd.MM.yy" };
             var result = DateTime.TryParseExact(value,
                                                 formats,
                                                 new CultureInfo("de-DE"),
