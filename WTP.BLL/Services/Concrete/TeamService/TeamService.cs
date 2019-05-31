@@ -79,7 +79,7 @@ namespace WTP.BLL.Services.Concrete.TeamService
             try
             {
                 // delete
-                await _uow.Players.DeleteAsync(team.Id);
+                await _uow.Teams.DeleteAsync(team.Id);
                 await _uow.CommitAsync();
 
                 return new ServiceResult();

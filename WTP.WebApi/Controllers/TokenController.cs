@@ -155,7 +155,7 @@ namespace WTP.WebAPI.Controllers
                 Value = Guid.NewGuid().ToString("N"),
                 CreatedDate = DateTime.UtcNow,
                 UserId = userId,
-                ExpiryTime = DateTime.UtcNow.AddMinutes(4)
+                ExpiryTime = DateTime.UtcNow.AddMinutes(60)
             };
         }
 

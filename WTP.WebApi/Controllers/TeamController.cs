@@ -125,10 +125,10 @@ namespace WTP.WebAPI.Controllers
         [ProducesResponseType(typeof(ResponseDto), 400)]
         public async Task<IActionResult> UpdateLogo([FromForm]PhotoFormDataDto formData, int teamGameId)
         {
-            var azureStorageConfig = new AzureBlobStorageConfigDto(_configuration["AzureBlobStorage:AccountKey"],
-                                                                    _configuration["AzureBlobStorage:ContainerName"],
-                                                                    _configuration["AzureBlobStorage:AccountName"],
-                                                                    _configuration["Url:TeamLogoStorageUrl"]);
+            var azureStorageConfig = new AzureBlobStorageConfigDto(_configuration["AzureBlobStorage:AccountName"],
+                                                                   _configuration["AzureBlobStorage:AccountKey"],
+                                                                   _configuration["AzureBlobStorage:ContainerName"],
+                                                                   _configuration["Url:TeamLogoStorageUrl"]);
 
             var fileDataDto = new FileDataDto(formData.File.OpenReadStream(), formData.File.ContentType, formData.File.FileName);
 
