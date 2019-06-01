@@ -120,5 +120,21 @@ namespace WTP.BLL.Services.Concrete
                 ? _defaultPhoto
                 : team.Photo;
         }
+
+        private List<PlayerListItemDto> GetListOfPlayers(List<Player> players)
+        {
+            return new List<PlayerListItemDto>(players.Select(x =>
+                new PlayerListItemDto
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    Game = x.Game.Name,
+                    Rank = x.Rank.Name,
+                    Server = x.Server.Name,
+                    Goal = x.Goal.Name,
+                    About = x.About,
+                    Decency = (int)x.Decency
+                }));
+        }
     }
 }

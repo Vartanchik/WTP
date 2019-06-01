@@ -70,14 +70,26 @@ namespace WTP.WebAPI.Controllers
         /// Get all user's players 
         /// </summary>
         /// <returns>List of players</returns>
-        /// <returns>Response DTO</returns>
-        [HttpGet("[action]/{userId:int}")]
-        [Authorize(Policy = "RequireLoggedIn")]
+        /// <returns>List<PlayerListItemDto></returns>
+        [HttpGet("[action]")]
         [ProducesResponseType(typeof(IList<PlayerListItemDto>), 200)]
         [ProducesResponseType(typeof(ResponseDto), 400)]
-        public async Task<IList<PlayerListItemDto>> GetPlayersOfUser(int userId)
+        public async Task<IList<PlayerListItemDto>> GetPlayersByUser(int userId)
         {
             return await _playerService.GetListByUserIdAsync(userId);
+        }
+
+        /// <summary>
+        /// Get list players by team
+        /// </summary>
+        /// <param name="teamId"></param>
+        /// <returns>List<PlayerListItemDto></returns>
+        [HttpGet("[action]")]
+        [ProducesResponseType(typeof(IList<PlayerListItemDto>), 200)]
+        [ProducesResponseType(typeof(ResponseDto), 400)]
+        public async Task<IList<PlayerListItemDto>> GetPlayersByTeam(int teamId)
+        {
+            return await _playerService.GetListByTeamIdAsync(teamId);
         }
 
         //Get List of all players by game

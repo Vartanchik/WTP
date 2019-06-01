@@ -1,4 +1,7 @@
-﻿namespace WTP.BLL.DTOs.TeamDTOs
+﻿using System.Collections.Generic;
+using WTP.BLL.DTOs.PlayerDTOs;
+
+namespace WTP.BLL.DTOs.TeamDTOs
 {
     public class TeamListItemDto
     {

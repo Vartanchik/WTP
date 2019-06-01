@@ -144,5 +144,18 @@ namespace WTP.BLL.Services.Concrete.PlayerSrvice
             return _mapper.Map<IList<PlayerListItemDto>>(listOfPlayers);
         }
 
+        public async Task<IList<PlayerListItemDto>> GetListByTeamIdAsync(int teamId)
+        {
+            var listOfPlayers = await _uow.Players.AsQueryable()
+                                                  .Include(p => p.Game)
+                                                  .Include(p => p.Server)
+                                                  .Include(p => p.Goal)
+                                                  .Include(p => p.Rank)
+                                                  .AsNoTracking()
+                                                  .Where(p => p.TeamId == teamId)
+                                                  .ToListAsync();
+
+            return _mapper.Map<IList<PlayerListItemDto>>(listOfPlayers);
+        }
     }
 }

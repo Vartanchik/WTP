@@ -98,12 +98,37 @@ namespace WTP.WebAPI.Controllers
         }
 
         /// <summary>
-        /// Get all user's teams 
+        /// Remove player from team
         /// </summary>
-        /// <returns>List of teams</returns>
-        /// <returns>Response DTO</returns>
-        [HttpGet("[action]/{userId:int}")]
+        /// <param name="playerId"></param>
+        /// <param name="teamId"></param>
+        /// <returns>IActionResult</returns>
+        [HttpPut("[action]")]
         [Authorize(Policy = "RequireLoggedIn")]
+        [ProducesResponseType(typeof(ResponseDto), 200)]
+        [ProducesResponseType(typeof(ResponseDto), 400)]
+        public async Task<IActionResult> RemovePlayerFromTeam(int playerId, int teamId)
+        {
+            var userId = this.GetCurrentUserId();
+
+            var result = await _teamService.RemoveFromTeamAsync(new TeamActionDto
+            {
+                PlayerId = playerId,
+                TeamId = teamId,
+                UserId = userId
+            });
+
+            return result.Succeeded
+                ? Ok(new ResponseDto(200, "Completed.", "Player removed from team."))
+                : (IActionResult)BadRequest(new ResponseDto(400, "Failed.", result.Error));
+        }
+
+        /// <summary>
+        /// Get list of teams
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns>IList<TeamListItemDto></returns>
+        [HttpGet("[action]")]
         [ProducesResponseType(typeof(IList<TeamListItemDto>), 200)]
         [ProducesResponseType(typeof(ResponseDto), 400)]
         public async Task<IList<TeamListItemDto>> ListByUserId(int userId)

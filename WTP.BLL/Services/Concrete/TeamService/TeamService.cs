@@ -149,24 +149,22 @@ namespace WTP.BLL.Services.Concrete.TeamService
 
         public async Task<IList<TeamListItemDto>> GetListByUserIdAsync(int userId)
         {
-            var listOfTeams = await _uow.Teams
-                .AsQueryable()
-                .Include(t => t.Game)
-                .Include(t => t.Server)
-                .Include(t => t.Goal)
-                .AsNoTracking()
-                .Where(p => p.CoachId == userId)
-                .ToListAsync();
+            var listOfTeams = await _uow.Teams.AsQueryable()
+                                              .Include(t => t.Game)
+                                              .Include(t => t.Server)
+                                              .Include(t => t.Goal)
+                                              .AsNoTracking()
+                                              .Where(p => p.CoachId == userId)
+                                              .ToListAsync();
 
             return _mapper.Map<IList<TeamListItemDto>>(listOfTeams);
         }
 
         public async Task<ServiceResult> UpdateLogoAsync(int userId, int teamId, string logo)
         {
-            var team = await _uow.Teams
-                .AsQueryable()
-                .Where(t => t.CoachId == userId && t.Id == teamId)
-                .FirstOrDefaultAsync();
+            var team = await _uow.Teams.AsQueryable()
+                                       .Where(t => t.CoachId == userId && t.Id == teamId)
+                                       .FirstOrDefaultAsync();
 
             if (team == null)
             {
@@ -195,9 +193,28 @@ namespace WTP.BLL.Services.Concrete.TeamService
             throw new NotImplementedException();
         }
 
-        public Task<ServiceResult> RemoveFromTeam(TeamActionDto dto)
+        public async Task<ServiceResult> RemoveFromTeamAsync(TeamActionDto dto)
         {
-            throw new NotImplementedException();
+            var existedPlayer = await _uow.Players.AsQueryable()
+                                                  .AnyAsync(p => p.Id == dto.PlayerId &&
+                                                                 p.TeamId == dto.TeamId);
+
+            if (!existedPlayer) return new ServiceResult("Player not found.");
+
+            var existedTeam = await _uow.Teams.AsQueryable()
+                                              .AnyAsync(t => t.Id == dto.TeamId &&
+                                                             t.CoachId == dto.UserId);
+
+            if (!existedTeam) return new ServiceResult("Team not found.");
+
+            var playerToModify = await _uow.Players.AsQueryable()
+                                           .Where(p => p.Id == dto.PlayerId)
+                                           .FirstOrDefaultAsync();
+            playerToModify.TeamId = null;
+
+            await _uow.CommitAsync();
+
+            return new ServiceResult();
         }
     }
 }
