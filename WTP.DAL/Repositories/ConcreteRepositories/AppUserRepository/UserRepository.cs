@@ -70,12 +70,7 @@ namespace WTP.DAL.Repositories.ConcreteRepositories.AppUserRepository
             var user = await _context.AppUsers.Include(x => x.Country).Include(x => x.Gender)
                 .Include(userInc => userInc.AppUserLanguages).ThenInclude(a => a.Language)
                 .FirstOrDefaultAsync(userInc => userInc.Id == userId);
-            /*
-            var user = await _context.AppUsers
-                .Include(x => x.Country)
-                .Include(g => g.Gender)
-                .Include(userInc => userInc.AppUserLanguages).ThenInclude(a => a.Language)
-                .FirstOrDefaultAsync(userInc => userInc.Id == userId);*/
+
             return user;
         }
 
