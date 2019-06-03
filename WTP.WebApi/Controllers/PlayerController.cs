@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WTP.BLL.DTOs.PlayerDTOs;
 using WTP.BLL.DTOs.ServicesDTOs;
-using WTP.BLL.Services.Concrete.AppUserService;
 using WTP.BLL.Services.Concrete.PlayerSrvice;
 using WTP.WebAPI.Utility.Extensions;
 
@@ -92,25 +89,36 @@ namespace WTP.WebAPI.Controllers
             return await _playerService.GetListByTeamIdAsync(teamId);
         }
 
-        //Get List of all players by game
+        //Get List of all players by game with filers and sorting
         [HttpGet("players/pagination")]
-        public async Task<PlayerIndexDto> PlayerIndex(int idGame, int page = 1)
+        public async Task<PlayerIndexDto> PlayerIndex([FromQuery] PlayerControllerInputDto valuesFromUi)
         {
-            int pageSize = 5;
+            PlayerInputValuesModelDto inputValues = new PlayerInputValuesModelDto()
+            {
+                GameId = valuesFromUi.IdGame,
+                Page = valuesFromUi.Page,
+                PageSize = valuesFromUi.PageSize,
+                SortField = valuesFromUi.SortField,
+                SortType = valuesFromUi.SortType,
+                NameValue = valuesFromUi.NameValue,
+                RankLeftValue = valuesFromUi.RankLeftValue,
+                RankRightValue = valuesFromUi.RankRightValue,
+                DecencyLeftValue = valuesFromUi.DecencyLeftValue,
+                DecencyRightValue = valuesFromUi.DecencyRightValue
+            };
 
-            List<PlayerListItemDto> players = new List<PlayerListItemDto>(await _playerService.GetListByGameIdAsync(idGame));
+            PlayerPaginationDto inputModel = await _playerService.GetFilteredPlayersByGameIdAsync(inputValues);
+
+            List<PlayerListItemDto> players = new List<PlayerListItemDto>(inputModel.Players);
             if (players == null)
                 return null;
 
-            // Pagination
-            var count = players.Count();
-            var items = players.Skip((page - 1) * pageSize).Take(pageSize).ToList();
 
             // representation model
             PlayerIndexDto viewModel = new PlayerIndexDto
             {
-                PageViewModel = new PageDto(count, page, pageSize),
-                Players = items
+                PageViewModel = new PageDto(inputModel.PlayersQuantity, valuesFromUi.Page, valuesFromUi.PageSize),
+                Players = players
             };
 
             return viewModel;

@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace WTP.DAL.Migrations
 {
-    public partial class CheckFix1 : Migration
+    public partial class InitialCreate : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -94,7 +94,8 @@ namespace WTP.DAL.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    Name = table.Column<string>(nullable: true)
+                    Name = table.Column<string>(nullable: true),
+                    Value = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -504,17 +505,17 @@ namespace WTP.DAL.Migrations
 
             migrationBuilder.InsertData(
                 table: "Ranks",
-                columns: new[] { "Id", "Name" },
+                columns: new[] { "Id", "Name", "Value" },
                 values: new object[,]
                 {
-                    { 2, "Guardian" },
-                    { 7, "Divine" },
-                    { 6, "Ancient" },
-                    { 5, "Legend" },
-                    { 1, "Uncalibrated" },
-                    { 3, "Crusader" },
-                    { 8, "Immortal" },
-                    { 4, "Archon" }
+                    { 2, "Guardian", 20 },
+                    { 7, "Divine", 70 },
+                    { 6, "Ancient", 60 },
+                    { 5, "Legend", 50 },
+                    { 1, "Uncalibrated", 10 },
+                    { 3, "Crusader", 30 },
+                    { 8, "Immortal", 80 },
+                    { 4, "Archon", 40 }
                 });
 
             migrationBuilder.InsertData(

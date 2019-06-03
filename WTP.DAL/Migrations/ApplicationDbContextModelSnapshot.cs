@@ -15,7 +15,7 @@ namespace WTP.DAL.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.2.3-servicing-35854")
+                .HasAnnotation("ProductVersion", "2.2.4-servicing-10062")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -517,6 +517,8 @@ namespace WTP.DAL.Migrations
 
                     b.Property<string>("Name");
 
+                    b.Property<int?>("Value");
+
                     b.HasKey("Id");
 
                     b.ToTable("Ranks");
@@ -525,42 +527,50 @@ namespace WTP.DAL.Migrations
                         new
                         {
                             Id = 1,
-                            Name = "Uncalibrated"
+                            Name = "Uncalibrated",
+                            Value = 10
                         },
                         new
                         {
                             Id = 2,
-                            Name = "Guardian"
+                            Name = "Guardian",
+                            Value = 20
                         },
                         new
                         {
                             Id = 3,
-                            Name = "Crusader"
+                            Name = "Crusader",
+                            Value = 30
                         },
                         new
                         {
                             Id = 4,
-                            Name = "Archon"
+                            Name = "Archon",
+                            Value = 40
                         },
                         new
                         {
                             Id = 5,
-                            Name = "Legend"
+                            Name = "Legend",
+                            Value = 50
                         },
                         new
                         {
                             Id = 6,
-                            Name = "Ancient"
+                            Name = "Ancient",
+                            Value = 60
                         },
                         new
                         {
                             Id = 7,
-                            Name = "Divine"
+                            Name = "Divine",
+                            Value = 70
                         },
                         new
                         {
                             Id = 8,
-                            Name = "Immortal"
+                            Name = "Immortal",
+                            Value = 80
                         });
                 });
 
