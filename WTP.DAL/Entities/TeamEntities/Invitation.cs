@@ -1,7 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
-namespace WTP.DAL.Entities.TeamEntities
+﻿namespace WTP.DAL.Entities.TeamEntities
 {
     public class Invitation : IEntity
     {

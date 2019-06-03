@@ -82,7 +82,6 @@ namespace WTP.WebAPI.Controllers
         public async Task<IActionResult> Delete(int teamId)
         {
             var userId = this.GetCurrentUserId();
-
             var result = await _teamService.DeleteAsync(teamId, userId);
 
             return result.Succeeded
@@ -147,7 +146,6 @@ namespace WTP.WebAPI.Controllers
         public async Task<IActionResult> AcceptInvitation(int invitationId)
         {
             var userId = this.GetCurrentUserId();
-
             var result = await _teamService.AcceptInvitationAsync(new InviteActionDto
             {
                 InviteId = invitationId,
@@ -166,7 +164,6 @@ namespace WTP.WebAPI.Controllers
         public async Task<IActionResult> DeclineInvitation(int invitationId)
         {
             var userId = this.GetCurrentUserId();
-
             var result = await _teamService.DeclineInvitationAsync(new InviteActionDto
             {
                 InviteId = invitationId,
@@ -174,7 +171,7 @@ namespace WTP.WebAPI.Controllers
             });
 
             return result.Succeeded
-                ? Ok(new ResponseDto(200, "Completed.", "Invite accept."))
+                ? Ok(new ResponseDto(200, "Completed.", "Invite decline."))
                 : (IActionResult)BadRequest(new ResponseDto(400, "Failed.", result.Error));
         }
     }

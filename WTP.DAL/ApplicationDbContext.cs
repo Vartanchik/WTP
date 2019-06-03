@@ -1,6 +1,4 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using WTP.DAL.Entities;
@@ -30,7 +28,12 @@ namespace WTP.DAL
             base.OnModelCreating(builder);
 
             SetDefaultData(builder);
+            ManyToManyTablesCongiguration(builder);
+        }
 
+        private void ManyToManyTablesCongiguration(ModelBuilder builder)
+        {
+            // Users and Languages
             builder.Entity<AppUserLanguage>()
                 .HasKey(_ => new { _.AppUserId, _.LanguageId });
             builder.Entity<AppUserLanguage>()
@@ -42,6 +45,7 @@ namespace WTP.DAL
                 .WithMany(_ => _.AppUserLanguages)
                 .HasForeignKey(_ => _.LanguageId);
 
+            // Players, Teams and Invitations
             builder.Entity<Invitation>()
                 .Property(_ => _.Id)
                 .ValueGeneratedOnAdd();
@@ -59,11 +63,6 @@ namespace WTP.DAL
                 .OnDelete(DeleteBehavior.Restrict);
         }
 
-        private Type DatabaseGenerated()
-        {
-            throw new NotImplementedException();
-        }
-
         private void SetDefaultData(ModelBuilder builder)
         {
             builder.Entity<IdentityRole<int>>().HasData(
@@ -79,10 +78,12 @@ namespace WTP.DAL
 
             builder.Entity<Country>().HasData(
                     new Country { Id = 1, Name = "Ukraine" },
-                    new Country { Id = 2, Name = "Spanish" },
+                    new Country { Id = 2, Name = "Spain" },
                     new Country { Id = 3, Name = "USA" },
                     new Country { Id = 4, Name = "Brazil" },
-                    new Country { Id = 5, Name = "German" }
+                    new Country { Id = 5, Name = "Germany" },
+                    new Country { Id = 6, Name = "China" },
+                    new Country { Id = 7, Name = "Poland" }
                 );
 
             builder.Entity<Language>().HasData(
@@ -107,15 +108,18 @@ namespace WTP.DAL
                 );
 
             builder.Entity<Server>().HasData(
-                    new Server { Id = 1, Name = "East" },
-                    new Server { Id = 2, Name = "West" },
-                    new Server { Id = 3, Name = "North" },
-                    new Server { Id = 4, Name = "South" }
+                    new Server { Id = 1, Name = "EU East" },
+                    new Server { Id = 2, Name = "EU West" },
+                    new Server { Id = 3, Name = "South America" },
+                    new Server { Id = 4, Name = "Norht America" },
+                    new Server { Id = 5, Name = "Middle East" },
+                    new Server { Id = 6, Name = "Asia" }
                 );
 
             builder.Entity<Goal>().HasData(
-                    new Goal { Id = 1, Name = "Fun" },
-                    new Goal { Id = 2, Name = "Profi" }
+                    new Goal { Id = 1, Name = "To have fun" },
+                    new Goal { Id = 2, Name = "To become a pro" },
+                    new Goal { Id = 3, Name = "To play competitlvely" }
                 );
 
             builder.Entity<Rank>().HasData(
