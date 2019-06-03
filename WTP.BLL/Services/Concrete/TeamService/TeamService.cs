@@ -33,12 +33,12 @@ namespace WTP.BLL.Services.Concrete.TeamService
 
         public async Task<ServiceResult> CreateAsync(CreateOrUpdateTeamDto dto, int userId)
         {
-            bool existed = _uow.Teams.AsQueryable()
-                                     .Any(t => t.Name == dto.Name &&
-                                               t.GameId == dto.GameId &&
-                                               t.CoachId != userId);
+            bool existedTeam = _uow.Teams.AsQueryable()
+                                         .Any(t => t.Name == dto.Name &&
+                                                   t.GameId == dto.GameId &&
+                                                   t.CoachId != userId);
 
-            if (existed) return new ServiceResult("Team already existed.");
+            if (existedTeam) return new ServiceResult("Team already existed.");
 
             var team = _mapper.Map<Team>(dto);
             team.CoachId = userId;
@@ -51,6 +51,7 @@ namespace WTP.BLL.Services.Concrete.TeamService
 
         public async Task<ServiceResult> UpdateAsync(CreateOrUpdateTeamDto dto, int userId)
         {
+            // check team
             var existedTeam = _uow.Teams.AsQueryable()
                                         .FirstOrDefault(t => t.CoachId == userId &&
                                                              t.GameId == dto.GameId);
@@ -83,7 +84,9 @@ namespace WTP.BLL.Services.Concrete.TeamService
 
         public IList<PlayerListItemDto> GetPlayers(int teamId)
         {
-            var players = _uow.Teams.AsQueryable().FirstOrDefault(t => t.Id == teamId).Players;
+            var players = _uow.Teams.AsQueryable()
+                                    .FirstOrDefault(t => t.Id == teamId)
+                                    .Players;
 
             return players == null
                 ? null
@@ -105,8 +108,9 @@ namespace WTP.BLL.Services.Concrete.TeamService
 
             if (!existedTeam) return new ServiceResult("Team not found.");
 
-            // create invitation
-            var invite = new Invitation {
+            // invite
+            var invite = new Invitation
+            {
                 PlayerId = dto.PlayerId,
                 TeamId = dto.TeamId,
                 Author = Author.Coach
@@ -120,18 +124,20 @@ namespace WTP.BLL.Services.Concrete.TeamService
 
         public async Task<ServiceResult> InviteToTeamAsync(TeamActionDto dto)
         {
+            // check player
             var existedPlayer = await _uow.Players.AsQueryable()
                                                   .AnyAsync(p => p.Id == dto.PlayerId && 
                                                                  p.AppUserId == dto.UserId);
 
             if (!existedPlayer) return new ServiceResult("Player not found.");
 
+            // check team
             var existedTeam = await _uow.Teams.AsQueryable()
                                               .AnyAsync(t => t.Id == dto.TeamId);
 
             if (!existedTeam) return new ServiceResult("Team not found.");
 
-            // create invitation
+            // invite
             var invite = new Invitation
             {
                 PlayerId = dto.PlayerId,
@@ -175,7 +181,7 @@ namespace WTP.BLL.Services.Concrete.TeamService
             return new ServiceResult();
         }
 
-        public async Task<ServiceResult> AddToTeamAsync(int playerId, int teamId)
+        private async Task<ServiceResult> AddToTeamAsync(int playerId, int teamId)
         {
             var team = await _uow.Teams.GetByIdAsync(teamId);
             if (team == null) return new ServiceResult("Team not found.");
@@ -184,7 +190,8 @@ namespace WTP.BLL.Services.Concrete.TeamService
 
             var player = await _uow.Players.GetByIdAsync(playerId);
             if (player == null) return new ServiceResult("Player not found.");
-            if (player.TeamId.GetValueOrDefault() != 0) return new ServiceResult("In order to state part of the team you must exit the current one");
+            if (player.TeamId.GetValueOrDefault() != 0)
+                return new ServiceResult("In order to state part of the team you must exit the current one.");
 
             team.Players.Add(player);
 
@@ -194,9 +201,21 @@ namespace WTP.BLL.Services.Concrete.TeamService
             return new ServiceResult();
         }
 
-        public Task<ServiceResult> RemoveFromTeamAsync(TeamActionDto dto)
+        public async Task<ServiceResult> RemoveFromTeamAsync(TeamActionDto dto)
         {
-            throw new NotImplementedException();
+            var team = await _uow.Teams.GetByIdAsync(dto.TeamId);
+            if (team == null) return new ServiceResult("Team not found.");
+
+            bool playerWithUserId(Player player) => player.Id == dto.UserId;
+            if (team.CoachId != dto.UserId && !team.Players.Any(playerWithUserId))
+                return new ServiceResult("You do not have access to perform this operation.");
+
+            team.Players.Remove(team.Players.FirstOrDefault(playerWithUserId));
+
+            await _uow.Teams.CreateOrUpdate(team);
+            await _uow.CommitAsync();
+
+            return new ServiceResult();
         }
 
         private async Task<bool> CheckAuthor(Invitation invitation, int authorId)
