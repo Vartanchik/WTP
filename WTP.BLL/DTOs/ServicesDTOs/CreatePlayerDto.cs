@@ -10,7 +10,6 @@ namespace WTP.BLL.DTOs.ServicesDTOs
         public int GameId { get; set; }
         public int ServerId { get; set; }
         public int GoalId { get; set; }
-        [Required]
         public string About { get; set; }
         public int RankId { get; set; }
         [Range(1, 10000)]

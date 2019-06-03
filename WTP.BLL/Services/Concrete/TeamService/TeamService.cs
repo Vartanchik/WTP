@@ -234,19 +234,27 @@ namespace WTP.BLL.Services.Concrete.TeamService
 
         public async Task<ServiceResult> RemoveFromTeamAsync(TeamActionDto dto)
         {
-            var team = await _uow.Teams.GetByIdAsync(dto.TeamId);
-            if (team == null) return new ServiceResult("Team not found.");
+            var existedPlayer = await _uow.Players.AsQueryable()
+                                                     .AnyAsync(p => p.Id == dto.PlayerId &&
+                                                                    p.TeamId == dto.TeamId);
 
-            bool playerWithUserId(Player player) => player.Id == dto.UserId;
-            if (team.CoachId != dto.UserId && !team.Players.Any(playerWithUserId))
-                return new ServiceResult("You do not have access to perform this operation.");
+            if (!existedPlayer) return new ServiceResult("Player not found.");
 
-            team.Players.Remove(team.Players.FirstOrDefault(playerWithUserId));
+            var existedTeam = await _uow.Teams.AsQueryable()
+                                              .AnyAsync(t => t.Id == dto.TeamId &&
+                                                             t.CoachId == dto.UserId);
 
-            await _uow.Teams.CreateOrUpdate(team);
+            if (!existedTeam) return new ServiceResult("Team not found.");
+
+            var playerToModify = await _uow.Players.AsQueryable()
+                                           .Where(p => p.Id == dto.PlayerId)
+                                           .FirstOrDefaultAsync();
+            playerToModify.TeamId = null;
+
             await _uow.CommitAsync();
 
             return new ServiceResult();
+
         }
 
         private async Task<bool> CheckAuthor(Invitation invitation, int authorId)

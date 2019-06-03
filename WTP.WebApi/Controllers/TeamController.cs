@@ -227,6 +227,17 @@ namespace WTP.WebAPI.Controllers
                 : (IActionResult)BadRequest(new ResponseDto(400, "Failed.", result.Error));
         }
 
+        /// <summary>
+        /// Update current team logo
+        /// </summary>
+        /// <param name="formData"></param>
+        /// <returns>Response DTO (with or without url)</returns>
+        /// <response code="200">Successful performance</response>
+        /// <response code="400">The action failed</response>
+        [HttpPost("[action]")]
+        [Authorize(Policy = "RequireLoggedIn")]
+        [ProducesResponseType(typeof(ResponseDto), 200)]
+        [ProducesResponseType(typeof(ResponseDto), 400)]
         public async Task<IActionResult> UpdateLogo([FromForm]PhotoFormDataDto formData, int teamId)
         {
             var azureStorageConfig = new AzureBlobStorageConfigDto(_configuration["AzureBlobStorage:AccountName"],
