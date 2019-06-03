@@ -179,7 +179,8 @@ namespace WTP.BLL.Services.Concrete.TeamService
         {
             var team = await _uow.Teams.GetByIdAsync(teamId);
             if (team == null) return new ServiceResult("Team not found.");
-            if (team.Players.Count >= 5) return new ServiceResult("Team is fuel.");
+            if (team.Players == null) team.Players = new List<Player>();
+            else if (team.Players.Count >= 5) return new ServiceResult("Team is fuel.");
 
             var player = await _uow.Players.GetByIdAsync(playerId);
             if (player == null) return new ServiceResult("Player not found.");

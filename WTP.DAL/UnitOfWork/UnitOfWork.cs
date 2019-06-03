@@ -8,6 +8,7 @@ using WTP.DAL.Entities.AppUserEntities;
 using WTP.DAL.Repositories.ConcreteRepositories.AppUserRepository;
 using WTP.DAL.Repositories.ConcreteRepositories.RefreshTokenRepository;
 using WTP.DAL.Repositories.ConcreteRepositories.RestoreTokenRepository;
+using WTP.DAL.Repositories.ConcreteRepositories.InvitationRepository;
 using WTP.DAL.Repositories.ConcreteRepositories;
 using Microsoft.Extensions.Caching.Distributed;
 using WTP.DAL.Entities.TeamEntities;
@@ -57,7 +58,7 @@ namespace WTP.DAL.UnitOfWork
         public IRepository<Goal> Goals => _goals ?? (_goals = new RepositoryBase<Goal>(_context));
         public IRepository<Rank> Ranks => _ranks ?? (_ranks = new RepositoryBase<Rank>(_context));
         public IRestoreTokenRepository<RestoreToken> RestoreTokens => _restoreAccountTokens ?? (_restoreAccountTokens = new RestoreTokenRepository<RestoreToken>(_context));
-        public IRepository<Invitation> Invitations => _invitations ?? (_invitations = new RepositoryBase<Invitation>(_context));
+        public IRepository<Invitation> Invitations => _invitations ?? (_invitations = new InvitationRepository(_context));
         public void Commit()
         {
             _context.SaveChanges();
