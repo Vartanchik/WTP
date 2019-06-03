@@ -22,49 +22,50 @@ namespace WTP.BLL.Services.Concrete.PlayerSrvice
             _mapper = mapper;
         }
 
-        public async Task<ServiceResult> CreateOrUpdateAsync(CreateUpdatePlayerDto dto, int userId)
+        public async Task<PlayerDto> GetPlayerAsync(int playerId)
         {
-            var bookedPlayer = _uow.Players.AsQueryable()
-                .Where(p => p.Name == dto.Name && p.GameId == dto.GameId && p.AppUserId != userId)
-                .FirstOrDefault();
+            var player = await _uow.Players.GetByIdAsync(playerId);
 
-            if (bookedPlayer != null)
-            {
-                return new ServiceResult("Player with such name already exists.");
-            }
+            return _mapper.Map<PlayerDto>(player);
+        }
 
-            try
-            {
-                var player = _uow.Players.AsQueryable()
-                    .Where(p => p.AppUserId == userId && p.GameId == dto.GameId)
-                    .FirstOrDefault();
+        public async Task<ServiceResult> CreateAsync(CreatePlayerDto dto, int userId)
+        {
+            bool existedPlayer = _uow.Players.AsQueryable()
+                                              .Any(p => p.Name == dto.Name &&
+                                                        p.GameId == dto.GameId &&
+                                                        p.AppUserId != userId);
 
-                if (player == null)
-                {
-                    // create
-                    player = _mapper.Map<Player>(dto);
-                    player.AppUserId = userId;
-                }
-                else
-                {
-                    // update
-                    player.About = dto.About;
-                    player.Decency = dto.Decency;
-                    player.GoalId = dto.GoalId;
-                    player.Name = dto.Name;
-                    player.RankId = dto.RankId;
-                    player.ServerId = dto.ServerId;
-                }
+            if (existedPlayer) return new ServiceResult("Player already existed.");
 
-                await _uow.Players.CreateOrUpdate(player);
-                await _uow.CommitAsync();
+            var player = _mapper.Map<Player>(dto);
+            player.AppUserId = userId;
 
-                return new ServiceResult();
-            }
-            catch
-            {
-                return new ServiceResult("Server error.");
-            }
+            await _uow.Players.CreateOrUpdate(player);
+            await _uow.CommitAsync();
+
+            return new ServiceResult();
+        }
+
+        public async Task<ServiceResult> UpdateAsync(UpdatePlayerDto dto, int userId)
+        {
+            var existedPlayer = _uow.Players.AsQueryable()
+                                            .FirstOrDefault(p => p.AppUserId == userId &&
+                                                                 p.Id == dto.Id);
+
+            if (existedPlayer == null) return new ServiceResult("Player not found.");
+
+            existedPlayer.About = dto.About;
+            existedPlayer.Decency = dto.Decency;
+            existedPlayer.GoalId = dto.GoalId;
+            existedPlayer.Name = dto.Name;
+            existedPlayer.RankId = dto.RankId;
+            existedPlayer.ServerId = dto.ServerId;
+
+            await _uow.Players.CreateOrUpdate(existedPlayer);
+            await _uow.CommitAsync();
+
+            return new ServiceResult();
         }
 
         public async Task<ServiceResult> DeleteAsync(int userId, int playerGameId)

@@ -55,7 +55,7 @@ namespace WTP.BLL.Services.Concrete
             CreateMap<Match, MatchDto>();
             CreateMap<Rank, RankDto>();
             CreateMap<RankDto, Rank>();
-            CreateMap<CreateUpdatePlayerDto, Player>();
+            CreateMap<CreatePlayerDto, Player>();
             CreateMap<Player, PlayerListItemDto>()
                 .ForMember(dest => dest.Game,
                            config => config.MapFrom(src => src.Game.Name))

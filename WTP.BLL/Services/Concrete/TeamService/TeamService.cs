@@ -31,7 +31,7 @@ namespace WTP.BLL.Services.Concrete.TeamService
             return dto;
         }
 
-        public async Task<ServiceResult> CreateAsync(CreateOrUpdateTeamDto dto, int userId)
+        public async Task<ServiceResult> CreateAsync(CreateTeamDto dto, int userId)
         {
             bool existedTeam = _uow.Teams.AsQueryable()
                                          .Any(t => t.Name == dto.Name &&
@@ -49,15 +49,16 @@ namespace WTP.BLL.Services.Concrete.TeamService
             return new ServiceResult();
         }
 
-        public async Task<ServiceResult> UpdateAsync(CreateOrUpdateTeamDto dto, int userId)
+        public async Task<ServiceResult> UpdateAsync(UpdateTeamDto dto, int userId)
         {
             // check team
             var existedTeam = _uow.Teams.AsQueryable()
                                         .FirstOrDefault(t => t.CoachId == userId &&
-                                                             t.GameId == dto.GameId);
+                                                             t.Id == dto.Id);
 
             if (existedTeam == null) return new ServiceResult("Team not found.");
 
+            // update
             existedTeam.GoalId = dto.GoalId;
             existedTeam.Name = dto.Name;
             existedTeam.ServerId = dto.ServerId;

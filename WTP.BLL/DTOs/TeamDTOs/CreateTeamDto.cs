@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace WTP.BLL.DTOs.ServicesDTOs
+namespace WTP.BLL.DTOs.TeamDTOs
 {
-    public class CreatePlayerDto
+    public class CreateTeamDto
     {
         [Required]
         [StringLength(16, MinimumLength = 4)]
@@ -13,11 +13,5 @@ namespace WTP.BLL.DTOs.ServicesDTOs
         public int ServerId { get; set; }
         [Required]
         public int GoalId { get; set; }
-        public string About { get; set; }
-        [Required]
-        public int RankId { get; set; }
-        [Required]
-        [Range(1, 10000)]
-        public int Decency { get; set; }
     }
 }

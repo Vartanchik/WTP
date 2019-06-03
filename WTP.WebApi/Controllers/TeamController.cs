@@ -50,7 +50,7 @@ namespace WTP.WebAPI.Controllers
         [Authorize(Policy = "RequireLoggedIn")]
         [ProducesResponseType(typeof(ResponseDto), 200)]
         [ProducesResponseType(typeof(ResponseDto), 400)]
-        public async Task<IActionResult> Create(CreateOrUpdateTeamDto dto)
+        public async Task<IActionResult> Create(CreateTeamDto dto)
         {
             var userId = this.GetCurrentUserId();
             var result = await _teamService.CreateAsync(dto, userId);
@@ -69,7 +69,7 @@ namespace WTP.WebAPI.Controllers
         [Authorize(Policy = "RequireLoggedIn")]
         [ProducesResponseType(typeof(ResponseDto), 200)]
         [ProducesResponseType(typeof(ResponseDto), 400)]
-        public async Task<IActionResult> Update(CreateOrUpdateTeamDto dto)
+        public async Task<IActionResult> Update(UpdateTeamDto dto)
         {
             var userId = this.GetCurrentUserId();
             var result = await _teamService.UpdateAsync(dto, userId);
