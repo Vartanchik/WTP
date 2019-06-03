@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using WTP.BLL.DTOs.AppUserDTOs;
@@ -12,11 +11,11 @@ using WTP.DAL.Entities.TeamEntities;
 
 namespace WTP.BLL.Services.Concrete
 {
-    public class DtoProfile : Profile
+    public class DtoMapperProfile : Profile
     {
         private readonly string _defaultPhoto;
 
-        public DtoProfile(string defaultPhoto)
+        public DtoMapperProfile(string defaultPhoto)
         {
             this._defaultPhoto = defaultPhoto;
 

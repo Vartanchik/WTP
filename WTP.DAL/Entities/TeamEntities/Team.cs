@@ -5,7 +5,7 @@ using System.Data;
 using WTP.DAL.Entities.AppUserEntities;
 using WTP.DAL.Entities.TeamEntities;
 
-namespace WTP.DAL.Entities
+namespace WTP.DAL.Entities.TeamEntities
 {
     public class Team : IEntity
     {

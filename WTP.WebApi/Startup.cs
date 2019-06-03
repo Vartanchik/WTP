@@ -78,7 +78,7 @@ namespace WTP.WebAPI
 
             services.AddScoped(provider => new MapperConfiguration(config =>
             {
-                config.AddProfile(new DtoProfile(Configuration["Photo:DefaultPhoto"]));
+                config.AddProfile(new DtoMapperProfile(Configuration["Photo:DefaultPhoto"]));
             }).CreateMapper());
 
             //// In production, the Angular files will be served from this directory

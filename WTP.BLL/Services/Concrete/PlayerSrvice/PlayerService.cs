@@ -62,7 +62,7 @@ namespace WTP.BLL.Services.Concrete.PlayerSrvice
 
                 return new ServiceResult();
             }
-            catch(Exception ex)
+            catch
             {
                 return new ServiceResult("Server error.");
             }
