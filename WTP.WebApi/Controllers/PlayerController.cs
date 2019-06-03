@@ -29,7 +29,7 @@ namespace WTP.WebAPI.Controllers
         [Authorize(Policy = "RequireLoggedIn")]
         [ProducesResponseType(typeof(ResponseDto), 200)]
         [ProducesResponseType(typeof(ResponseDto), 400)]
-        public async Task<IActionResult> PostUser([FromBody] CreateUpdatePlayerDto dto)
+        public async Task<IActionResult> Create([FromBody] CreatePlayerDto dto)
         {
             if (!ModelState.IsValid)
             {
@@ -37,7 +37,31 @@ namespace WTP.WebAPI.Controllers
             }
 
             var userId = this.GetCurrentUserId();
-            var result = await _playerService.CreateOrUpdateAsync(dto, userId);
+            var result = await _playerService.CreateAsync(dto, userId);
+
+            return result.Succeeded
+                ? Ok(new ResponseDto(200, "Completed.", "Player created."))
+                : (IActionResult)BadRequest(new ResponseDto(400, "Failed.", result.Error));
+        }
+
+        /// <summary>
+        /// Create new player
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns>Response DTO</returns>
+        [HttpPut]
+        [Authorize(Policy = "RequireLoggedIn")]
+        [ProducesResponseType(typeof(ResponseDto), 200)]
+        [ProducesResponseType(typeof(ResponseDto), 400)]
+        public async Task<IActionResult> Update([FromBody] UpdatePlayerDto dto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new ResponseDto(400, "Failed.", "Redisplay form."));
+            }
+
+            var userId = this.GetCurrentUserId();
+            var result = await _playerService.UpdateAsync(dto, userId);
 
             return result.Succeeded
                 ? Ok(new ResponseDto(200, "Completed.", "Player created."))

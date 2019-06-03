@@ -8,8 +8,8 @@ namespace WTP.BLL.Services.Concrete.TeamService
     public interface ITeamService
     {
         Task<TeamDto> GetTeamAsync(int teamId);
-        Task<ServiceResult> CreateAsync(CreateOrUpdateTeamDto dto, int userId);
-        Task<ServiceResult> UpdateAsync(CreateOrUpdateTeamDto dto, int userId);
+        Task<ServiceResult> CreateAsync(CreateTeamDto dto, int userId);
+        Task<ServiceResult> UpdateAsync(UpdateTeamDto dto, int userId);
         Task<ServiceResult> DeleteAsync(int teamId, int userId);
         IList<PlayerListItemDto> GetPlayers(int teamId);
         Task<ServiceResult> InviteToPlayerAsync(TeamActionDto dto);
