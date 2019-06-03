@@ -2,7 +2,7 @@
 {
     public enum Author
     {
-        Coach,
-        Player
+        Player,
+        Coach
     }
 }
