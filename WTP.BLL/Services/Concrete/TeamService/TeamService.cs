@@ -67,7 +67,7 @@ namespace WTP.BLL.Services.Concrete.TeamService
             return new ServiceResult();
         }
 
-        public async Task<ServiceResult> DeleteAsync(int userId, int teamId)
+        public async Task<ServiceResult> DeleteAsync(int teamId, int userId)
         {
             var team = await _uow.Teams.AsQueryable()
                                        .FirstOrDefaultAsync(t => t.CoachId == userId &&
@@ -145,7 +145,7 @@ namespace WTP.BLL.Services.Concrete.TeamService
             return new ServiceResult();
         }
 
-        public async Task<ServiceResult> AcceptInvitation(InviteActionDto dto)
+        public async Task<ServiceResult> AcceptInvitationAsync(InviteActionDto dto)
         {
             var invitation = await _uow.Invitations.GetByIdAsync(dto.InviteId);
             if (invitation == null) return new ServiceResult("Invitation not found.");
@@ -159,10 +159,10 @@ namespace WTP.BLL.Services.Concrete.TeamService
 
             if (!await CheckAuthor(invitation, dto.UserId)) return new ServiceResult("Error access.");
 
-            return await AddToTeam(invitation.PlayerId, invitation.TeamId);
+            return await AddToTeamAsync(invitation.PlayerId, invitation.TeamId);
         }
 
-        public async Task<ServiceResult> DeclineInvitation(InviteActionDto dto)
+        public async Task<ServiceResult> DeclineInvitationAsync(InviteActionDto dto)
         {
             var invitation = await _uow.Invitations.GetByIdAsync(dto.InviteId);
             if (invitation == null) return new ServiceResult("Invitation not found.");
@@ -175,7 +175,7 @@ namespace WTP.BLL.Services.Concrete.TeamService
             return new ServiceResult();
         }
 
-        public async Task<ServiceResult> AddToTeam(int playerId, int teamId)
+        public async Task<ServiceResult> AddToTeamAsync(int playerId, int teamId)
         {
             var team = await _uow.Teams.GetByIdAsync(teamId);
             if (team == null) return new ServiceResult("Team not found.");
@@ -193,7 +193,7 @@ namespace WTP.BLL.Services.Concrete.TeamService
             return new ServiceResult();
         }
 
-        public Task<ServiceResult> RemoveFromTeam(TeamActionDto dto)
+        public Task<ServiceResult> RemoveFromTeamAsync(TeamActionDto dto)
         {
             throw new NotImplementedException();
         }

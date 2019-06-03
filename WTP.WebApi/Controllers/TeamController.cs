@@ -89,5 +89,93 @@ namespace WTP.WebAPI.Controllers
                 ? Ok(new ResponseDto(200, "Completed.", "Team deleted."))
                 : (IActionResult)BadRequest(new ResponseDto(400, "Failed.", result.Error));
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="playerId"></param>
+        /// <param name="teamId"></param>
+        /// <returns></returns>
+        [HttpPost("[action]")]
+        [Authorize(Policy = "RequireLoggedIn")]
+        [ProducesResponseType(typeof(ResponseDto), 200)]
+        [ProducesResponseType(typeof(ResponseDto), 400)]
+        public async Task<IActionResult> InvitePlayer(int playerId, int teamId)
+        {
+            var userId = this.GetCurrentUserId();
+            var result = await _teamService.InviteToPlayerAsync(new TeamActionDto
+            {
+                PlayerId = playerId,
+                TeamId = teamId,
+                UserId = userId
+            });
+
+            return result.Succeeded
+                ? Ok(new ResponseDto(200, "Completed.", "Invite created."))
+                : (IActionResult)BadRequest(new ResponseDto(400, "Failed.", result.Error));
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="playerId"></param>
+        /// <param name="teamId"></param>
+        /// <returns></returns>
+        [HttpPost("[action]")]
+        [Authorize(Policy = "RequireLoggedIn")]
+        [ProducesResponseType(typeof(ResponseDto), 200)]
+        [ProducesResponseType(typeof(ResponseDto), 400)]
+        public async Task<IActionResult> InviteTeam(int playerId, int teamId)
+        {
+            var userId = this.GetCurrentUserId();
+            var result = await _teamService.InviteToTeamAsync(new TeamActionDto
+            {
+                PlayerId = playerId,
+                TeamId = teamId,
+                UserId = userId
+            });
+
+            return result.Succeeded
+                ? Ok(new ResponseDto(200, "Completed.", "Invite created."))
+                : (IActionResult)BadRequest(new ResponseDto(400, "Failed.", result.Error));
+        }
+
+        [HttpPost("[action]")]
+        [Authorize(Policy = "RequireLoggedIn")]
+        [ProducesResponseType(typeof(ResponseDto), 200)]
+        [ProducesResponseType(typeof(ResponseDto), 400)]
+        public async Task<IActionResult> AcceptInvitation(int invitationId)
+        {
+            var userId = this.GetCurrentUserId();
+
+            var result = await _teamService.AcceptInvitationAsync(new InviteActionDto
+            {
+                InviteId = invitationId,
+                UserId = userId
+            });
+
+            return result.Succeeded
+                ? Ok(new ResponseDto(200, "Completed.", "Invite accept."))
+                : (IActionResult)BadRequest(new ResponseDto(400, "Failed.", result.Error));
+        }
+
+        [HttpPost("[action]")]
+        [Authorize(Policy = "RequireLoggedIn")]
+        [ProducesResponseType(typeof(ResponseDto), 200)]
+        [ProducesResponseType(typeof(ResponseDto), 400)]
+        public async Task<IActionResult> DeclineInvitation(int invitationId)
+        {
+            var userId = this.GetCurrentUserId();
+
+            var result = await _teamService.DeclineInvitationAsync(new InviteActionDto
+            {
+                InviteId = invitationId,
+                UserId = userId
+            });
+
+            return result.Succeeded
+                ? Ok(new ResponseDto(200, "Completed.", "Invite accept."))
+                : (IActionResult)BadRequest(new ResponseDto(400, "Failed.", result.Error));
+        }
     }
 }

@@ -219,7 +219,7 @@ namespace WTP.DAL.Migrations
 
             modelBuilder.Entity("WTP.DAL.Entities.AppUserEntities.AppUserLanguage", b =>
                 {
-                    b.Property<int?>("AppUserId");
+                    b.Property<int>("AppUserId");
 
                     b.Property<int>("LanguageId");
 
@@ -633,6 +633,27 @@ namespace WTP.DAL.Migrations
                     b.ToTable("Team");
                 });
 
+            modelBuilder.Entity("WTP.DAL.Entities.TeamEntities.Invitation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("PlayerId");
+
+                    b.Property<int>("TeamId");
+
+                    b.Property<int>("Author");
+
+                    b.HasKey("Id", "PlayerId", "TeamId");
+
+                    b.HasIndex("PlayerId");
+
+                    b.HasIndex("TeamId");
+
+                    b.ToTable("Invitations");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<int>")
@@ -771,6 +792,19 @@ namespace WTP.DAL.Migrations
                         .WithMany()
                         .HasForeignKey("ServerId")
                         .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("WTP.DAL.Entities.TeamEntities.Invitation", b =>
+                {
+                    b.HasOne("WTP.DAL.Entities.Player", "Player")
+                        .WithMany("Invitations")
+                        .HasForeignKey("PlayerId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("WTP.DAL.Entities.Team", "Team")
+                        .WithMany("Invitations")
+                        .HasForeignKey("TeamId")
+                        .OnDelete(DeleteBehavior.Restrict);
                 });
 #pragma warning restore 612, 618
         }

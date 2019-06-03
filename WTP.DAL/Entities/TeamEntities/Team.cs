@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Data;
 using WTP.DAL.Entities.AppUserEntities;
+using WTP.DAL.Entities.TeamEntities;
 
 namespace WTP.DAL.Entities
 {
@@ -22,5 +23,6 @@ namespace WTP.DAL.Entities
         public Goal Goal { get; set; }
         public List<Player> Players { get; set; }
         public int WinRate { get; set; }
+        public ICollection<Invitation> Invitations { get; set; }
     }
 }

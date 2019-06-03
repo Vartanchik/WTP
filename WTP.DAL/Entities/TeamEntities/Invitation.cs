@@ -1,4 +1,7 @@
-﻿namespace WTP.DAL.Entities.TeamEntities
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace WTP.DAL.Entities.TeamEntities
 {
     public class Invitation : IEntity
     {
@@ -8,11 +11,5 @@
         public int TeamId { get; set; }
         public Team Team { get; set; }
         public Author Author { get; set; }
-    }
-
-    public enum Author
-    {
-        Coach,
-        Player
     }
 }

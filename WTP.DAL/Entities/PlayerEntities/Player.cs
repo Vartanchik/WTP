@@ -1,4 +1,6 @@
-﻿using WTP.DAL.Entities.AppUserEntities;
+﻿using System.Collections.Generic;
+using WTP.DAL.Entities.AppUserEntities;
+using WTP.DAL.Entities.TeamEntities;
 
 namespace WTP.DAL.Entities
 {
@@ -20,5 +22,6 @@ namespace WTP.DAL.Entities
         public int? Decency { get; set; }
         public int? TeamId { get; set; }
         public Team Team { get; set; }
+        public ICollection<Invitation> Invitations { get; set; }
     }
 }

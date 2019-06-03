@@ -1,8 +1,11 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using System;
+using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using WTP.DAL.Entities;
 using WTP.DAL.Entities.AppUserEntities;
+using WTP.DAL.Entities.TeamEntities;
 
 namespace WTP.DAL
 {
@@ -20,11 +23,49 @@ namespace WTP.DAL
         public DbSet<Goal> Goals { get; set; }
         public DbSet<Rank> Ranks { get; set; }
         public DbSet<RestoreToken> RestoreTokens { get; set; }
+        public DbSet<Invitation> Invitations { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
 
+            SetDefaultData(builder);
+
+            builder.Entity<AppUserLanguage>()
+                .HasKey(_ => new { _.AppUserId, _.LanguageId });
+            builder.Entity<AppUserLanguage>()
+                .HasOne(_ => _.AppUser)
+                .WithMany(_ => _.AppUserLanguages)
+                .HasForeignKey(_ => _.AppUserId);
+            builder.Entity<AppUserLanguage>()
+                .HasOne(_ => _.Language)
+                .WithMany(_ => _.AppUserLanguages)
+                .HasForeignKey(_ => _.LanguageId);
+
+            builder.Entity<Invitation>()
+                .Property(_ => _.Id)
+                .ValueGeneratedOnAdd();
+            builder.Entity<Invitation>()
+                .HasKey(_ => new { _.Id, _.PlayerId, _.TeamId });
+            builder.Entity<Invitation>()
+                .HasOne(_ => _.Player)
+                .WithMany(_ => _.Invitations)
+                .HasForeignKey(_ => _.PlayerId)
+                .OnDelete(DeleteBehavior.Cascade);
+            builder.Entity<Invitation>()
+                .HasOne(_ => _.Team)
+                .WithMany(_ => _.Invitations)
+                .HasForeignKey(_ => _.TeamId)
+                .OnDelete(DeleteBehavior.Restrict);
+        }
+
+        private Type DatabaseGenerated()
+        {
+            throw new NotImplementedException();
+        }
+
+        private void SetDefaultData(ModelBuilder builder)
+        {
             builder.Entity<IdentityRole<int>>().HasData(
                     new { Id = 1, Name = "Admin", NormalizedName = "ADMIN" },
                     new { Id = 2, Name = "User", NormalizedName = "USER" },
@@ -33,7 +74,7 @@ namespace WTP.DAL
 
             builder.Entity<Gender>().HasData(
                     new Gender { Id = 1, Name = "Male" },
-                    new Gender { Id = 2, Name = "Female"}
+                    new Gender { Id = 2, Name = "Female" }
                 );
 
             builder.Entity<Country>().HasData(
@@ -87,17 +128,6 @@ namespace WTP.DAL
                     new Rank { Id = 7, Name = "Divine" },
                     new Rank { Id = 8, Name = "Immortal" }
                 );
-
-            builder.Entity<AppUserLanguage>()
-                .HasKey(_ => new { _.AppUserId, _.LanguageId });
-            builder.Entity<AppUserLanguage>()
-                .HasOne(_ => _.AppUser)
-                .WithMany(_ => _.AppUserLanguages)
-                .HasForeignKey(_ => _.AppUserId);
-            builder.Entity<AppUserLanguage>()
-                .HasOne(_ => _.Language)
-                .WithMany(_ => _.AppUserLanguages)
-                .HasForeignKey(_ => _.LanguageId);
         }
     }
 }

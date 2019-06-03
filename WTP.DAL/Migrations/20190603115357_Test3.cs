@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace WTP.DAL.Migrations
 {
-    public partial class CheckFix1 : Migration
+    public partial class Test3 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -433,6 +433,33 @@ namespace WTP.DAL.Migrations
                         onDelete: ReferentialAction.Restrict);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Invitations",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    PlayerId = table.Column<int>(nullable: false),
+                    TeamId = table.Column<int>(nullable: false),
+                    Author = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Invitations", x => new { x.Id, x.PlayerId, x.TeamId });
+                    table.ForeignKey(
+                        name: "FK_Invitations_Players_PlayerId",
+                        column: x => x.PlayerId,
+                        principalTable: "Players",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Invitations_Team_TeamId",
+                        column: x => x.TeamId,
+                        principalTable: "Team",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
             migrationBuilder.InsertData(
                 table: "AspNetRoles",
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
@@ -583,6 +610,16 @@ namespace WTP.DAL.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Invitations_PlayerId",
+                table: "Invitations",
+                column: "PlayerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Invitations_TeamId",
+                table: "Invitations",
+                column: "TeamId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Players_AppUserId",
                 table: "Players",
                 column: "AppUserId");
@@ -664,7 +701,7 @@ namespace WTP.DAL.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "Players");
+                name: "Invitations");
 
             migrationBuilder.DropTable(
                 name: "RefreshTokens");
@@ -677,6 +714,9 @@ namespace WTP.DAL.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
+
+            migrationBuilder.DropTable(
+                name: "Players");
 
             migrationBuilder.DropTable(
                 name: "Ranks");
