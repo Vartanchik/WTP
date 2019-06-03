@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace WTP.DAL.Migrations
 {
-    public partial class Test3 : Migration
+    public partial class TeamFunctionality : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -94,7 +94,8 @@ namespace WTP.DAL.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    Name = table.Column<string>(nullable: true)
+                    Name = table.Column<string>(nullable: true),
+                    Value = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -475,11 +476,13 @@ namespace WTP.DAL.Migrations
                 columns: new[] { "Id", "Name" },
                 values: new object[,]
                 {
-                    { 1, "Ukraine" },
-                    { 2, "Spanish" },
-                    { 3, "USA" },
+                    { 6, "China" },
+                    { 5, "Germany" },
                     { 4, "Brazil" },
-                    { 5, "German" }
+                    { 7, "Poland" },
+                    { 2, "Spain" },
+                    { 1, "Ukraine" },
+                    { 3, "USA" }
                 });
 
             migrationBuilder.InsertData(
@@ -487,9 +490,9 @@ namespace WTP.DAL.Migrations
                 columns: new[] { "Id", "Name" },
                 values: new object[,]
                 {
-                    { 1, "Dota 2" },
+                    { 3, "GTA V" },
                     { 2, "CS:GO" },
-                    { 3, "GTA V" }
+                    { 1, "Dota 2" }
                 });
 
             migrationBuilder.InsertData(
@@ -506,8 +509,9 @@ namespace WTP.DAL.Migrations
                 columns: new[] { "Id", "Name" },
                 values: new object[,]
                 {
-                    { 2, "Profi" },
-                    { 1, "Fun" }
+                    { 3, "To play competitlvely" },
+                    { 2, "To become a pro" },
+                    { 1, "To have fun" }
                 });
 
             migrationBuilder.InsertData(
@@ -515,10 +519,10 @@ namespace WTP.DAL.Migrations
                 columns: new[] { "Id", "Name" },
                 values: new object[,]
                 {
-                    { 11, "Swedish" },
                     { 12, "Greek" },
-                    { 9, "Italian" },
+                    { 11, "Swedish" },
                     { 10, "Czech" },
+                    { 8, "French" },
                     { 7, "Korean" },
                     { 6, "Japanese" },
                     { 5, "Ukrainian" },
@@ -526,22 +530,22 @@ namespace WTP.DAL.Migrations
                     { 3, "Russian" },
                     { 2, "German" },
                     { 1, "English" },
-                    { 8, "French" }
+                    { 9, "Italian" }
                 });
 
             migrationBuilder.InsertData(
                 table: "Ranks",
-                columns: new[] { "Id", "Name" },
+                columns: new[] { "Id", "Name", "Value" },
                 values: new object[,]
                 {
-                    { 2, "Guardian" },
-                    { 7, "Divine" },
-                    { 6, "Ancient" },
-                    { 5, "Legend" },
-                    { 1, "Uncalibrated" },
-                    { 3, "Crusader" },
-                    { 8, "Immortal" },
-                    { 4, "Archon" }
+                    { 3, "Crusader", 30 },
+                    { 8, "Immortal", 80 },
+                    { 7, "Divine", 70 },
+                    { 6, "Ancient", 60 },
+                    { 1, "Uncalibrated", 10 },
+                    { 4, "Archon", 40 },
+                    { 2, "Guardian", 20 },
+                    { 5, "Legend", 50 }
                 });
 
             migrationBuilder.InsertData(
@@ -549,10 +553,12 @@ namespace WTP.DAL.Migrations
                 columns: new[] { "Id", "Name" },
                 values: new object[,]
                 {
-                    { 2, "West" },
-                    { 3, "North" },
-                    { 1, "East" },
-                    { 4, "South" }
+                    { 4, "Norht America" },
+                    { 3, "South America" },
+                    { 5, "Middle East" },
+                    { 1, "EU East" },
+                    { 2, "EU West" },
+                    { 6, "Asia" }
                 });
 
             migrationBuilder.CreateIndex(

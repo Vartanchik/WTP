@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using WTP.BLL.DTOs.AppUserDTOs;
 using WTP.BLL.DTOs.PlayerDTOs;
 using WTP.BLL.DTOs.ServicesDTOs;
 using WTP.DAL.Entities;
@@ -16,7 +15,7 @@ namespace WTP.BLL.Services.Concrete.PlayerSrvice
     {
         private readonly IUnitOfWork _uow;
         private readonly IMapper _mapper;
-        
+
         public PlayerService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _uow = unitOfWork;
@@ -106,7 +105,15 @@ namespace WTP.BLL.Services.Concrete.PlayerSrvice
 
         public async Task<IList<PlayerListItemDto>> GetListByUserIdAsync(int userId)
         {
-            var listOfPlayers = await _uow.Players.GetListByUserIdAsync(userId);
+            var listOfPlayers = await _uow.Players
+                .AsQueryable()
+                .Include(p => p.Game)
+                .Include(p => p.Server)
+                .Include(p => p.Goal)
+                .Include(p => p.Rank)
+                .AsNoTracking()
+                .Where(p => p.AppUserId == userId)
+                .ToListAsync();
 
             return _mapper.Map<IList<PlayerListItemDto>>(listOfPlayers);
         }
@@ -120,12 +127,107 @@ namespace WTP.BLL.Services.Concrete.PlayerSrvice
             return _mapper.Map<IList<PlayerListItemDto>>(allPlayers);
         }
 
-        public async Task<IList<PlayerListItemDto>> GetListByGameIdAsync(int gameId)
+        public async Task<PlayerPaginationDto> GetFilteredPlayersByGameIdAsync(PlayerInputValuesModelDto inputValues)
         {
-            var listOfPlayers = await _uow.Players.GetListByGameIdAsync(gameId);
+            IList<Player> listOfPlayers = null;
+
+            //chose sort field 
+            int? sortOperator(Player player)
+            {
+                if (inputValues.SortField == "decency")
+                    return player.Decency;
+
+                else if (inputValues.SortField == "rank")
+                    return player.Rank.Value;
+
+                else
+                    return null;
+            }
+
+            //add filter fields 
+            bool filterOperator(Player player) => player.GameId == inputValues.GameId
+                                               && player.Name.Contains(inputValues.NameValue)
+                                               && player.Rank.Value <= inputValues.RankRightValue
+                                               && player.Rank.Value >= inputValues.RankLeftValue
+                                               && player.Decency <= inputValues.DecencyRightValue
+                                               && player.Decency >= inputValues.DecencyLeftValue;
+            //sorting by ASC
+            if (inputValues.SortType == "asc")
+            {
+                listOfPlayers = _uow.Players.AsQueryable()
+                                            .Include(p => p.Game)
+                                            .Include(p => p.Server)
+                                            .Include(p => p.Goal)
+                                            .Include(p => p.Rank)
+                                            .OrderBy(sortOperator)
+                                            .Where(filterOperator)
+                                            .Skip((inputValues.Page - 1) * inputValues.PageSize)
+                                            .Take(inputValues.PageSize)
+                                            .ToList();
+            }
+
+            //sorting by DESC
+            else if (inputValues.SortType == "desc")
+            {
+                listOfPlayers = _uow.Players.AsQueryable()
+                                            .Include(p => p.Game)
+                                            .Include(p => p.Server)
+                                            .Include(p => p.Goal)
+                                            .Include(p => p.Rank)
+                                            .OrderByDescending(sortOperator)
+                                            .Where(filterOperator)
+                                            .Skip((inputValues.Page - 1) * inputValues.PageSize)
+                                            .Take(inputValues.PageSize)
+                                            .ToList();
+            }
+
+            //get filtered players without sorting
+            else
+            {
+                listOfPlayers = _uow.Players.AsQueryable()
+                                            .Include(p => p.Game)
+                                            .Include(p => p.Server)
+                                            .Include(p => p.Goal)
+                                            .Include(p => p.Rank)
+                                            .Where(filterOperator)
+                                            .Skip((inputValues.Page - 1) * inputValues.PageSize)
+                                            .Take(inputValues.PageSize)
+                                            .ToList();
+            }
+
+            var mappedPlayersList = _mapper.Map<IList<PlayerListItemDto>>(listOfPlayers);
+
+            //Count total quantity of filtered players 
+            int playersQuantity = await _uow.Players.AsQueryable()
+                                                    .Where(p => p.GameId == inputValues.GameId
+                                                        && p.Name.Contains(inputValues.NameValue)
+                                                        && p.Rank.Value <= inputValues.RankRightValue
+                                                        && p.Rank.Value >= inputValues.RankLeftValue
+                                                        && p.Decency <= inputValues.DecencyRightValue
+                                                        && p.Decency >= inputValues.DecencyLeftValue)
+                                                    .CountAsync();
+
+            var resultModel = new PlayerPaginationDto
+            {
+                Players = mappedPlayersList,
+                PlayersQuantity = playersQuantity
+            };
+
+            return resultModel;
+        }
+
+        public async Task<IList<PlayerListItemDto>> GetListByTeamIdAsync(int teamId)
+        {
+            var listOfPlayers = await _uow.Players.AsQueryable()
+                                                  .Include(p => p.Game)
+                                                  .Include(p => p.Server)
+                                                  .Include(p => p.Goal)
+                                                  .Include(p => p.Rank)
+                                                  .AsNoTracking()
+                                                  .Where(p => p.TeamId == teamId)
+                                                  .ToListAsync();
 
             return _mapper.Map<IList<PlayerListItemDto>>(listOfPlayers);
         }
-
     }
 }

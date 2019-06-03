@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WTP.BLL.DTOs.PlayerDTOs;
 using WTP.BLL.DTOs.ServicesDTOs;
-using WTP.BLL.Services.Concrete.AppUserService;
 using WTP.BLL.Services.Concrete.PlayerSrvice;
 using WTP.WebAPI.Utility.Extensions;
 
@@ -70,35 +67,58 @@ namespace WTP.WebAPI.Controllers
         /// Get all user's players 
         /// </summary>
         /// <returns>List of players</returns>
-        /// <returns>Response DTO</returns>
-        [HttpGet("[action]/{userId:int}")]
-        [Authorize(Policy = "RequireLoggedIn")]
+        /// <returns>List<PlayerListItemDto></returns>
+        [HttpGet("[action]")]
         [ProducesResponseType(typeof(IList<PlayerListItemDto>), 200)]
         [ProducesResponseType(typeof(ResponseDto), 400)]
-        public async Task<IList<PlayerListItemDto>> GetPlayersOfUser(int userId)
+        public async Task<IList<PlayerListItemDto>> GetPlayersByUser(int userId)
         {
             return await _playerService.GetListByUserIdAsync(userId);
         }
 
-        //Get List of all players by game
-        [HttpGet("players/pagination")]
-        public async Task<PlayerIndexDto> PlayerIndex(int idGame, int page = 1)
+        /// <summary>
+        /// Get list players by team
+        /// </summary>
+        /// <param name="teamId"></param>
+        /// <returns>List<PlayerListItemDto></returns>
+        [HttpGet("[action]")]
+        [ProducesResponseType(typeof(IList<PlayerListItemDto>), 200)]
+        [ProducesResponseType(typeof(ResponseDto), 400)]
+        public async Task<IList<PlayerListItemDto>> GetPlayersByTeam(int teamId)
         {
-            int pageSize = 5;
+            return await _playerService.GetListByTeamIdAsync(teamId);
+        }
 
-            List<PlayerListItemDto> players = new List<PlayerListItemDto>(await _playerService.GetListByGameIdAsync(idGame));
+        //Get List of all players by game with filers and sorting
+        [HttpGet("players/pagination")]
+        public async Task<PlayerIndexDto> PlayerIndex([FromQuery] PlayerControllerInputDto valuesFromUi)
+        {
+            PlayerInputValuesModelDto inputValues = new PlayerInputValuesModelDto()
+            {
+                GameId = valuesFromUi.IdGame,
+                Page = valuesFromUi.Page,
+                PageSize = valuesFromUi.PageSize,
+                SortField = valuesFromUi.SortField,
+                SortType = valuesFromUi.SortType,
+                NameValue = valuesFromUi.NameValue,
+                RankLeftValue = valuesFromUi.RankLeftValue,
+                RankRightValue = valuesFromUi.RankRightValue,
+                DecencyLeftValue = valuesFromUi.DecencyLeftValue,
+                DecencyRightValue = valuesFromUi.DecencyRightValue
+            };
+
+            PlayerPaginationDto inputModel = await _playerService.GetFilteredPlayersByGameIdAsync(inputValues);
+
+            List<PlayerListItemDto> players = new List<PlayerListItemDto>(inputModel.Players);
             if (players == null)
                 return null;
 
-            // Pagination
-            var count = players.Count();
-            var items = players.Skip((page - 1) * pageSize).Take(pageSize).ToList();
 
             // representation model
             PlayerIndexDto viewModel = new PlayerIndexDto
             {
-                PageViewModel = new PageDto(count, page, pageSize),
-                Players = items
+                PageViewModel = new PageDto(inputModel.PlayersQuantity, valuesFromUi.Page, valuesFromUi.PageSize),
+                Players = players
             };
 
             return viewModel;
