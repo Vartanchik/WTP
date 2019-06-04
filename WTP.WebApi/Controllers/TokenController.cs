@@ -1,6 +1,8 @@
 ﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WTP.BLL.DTOs.ServicesDTOs;
+using WTP.BLL.DTOs.TokensDTOs;
 using WTP.BLL.Services.Concrete.RefreshTokenService;
 using WTP.WebAPI.Utility.Extensions;
 
@@ -19,12 +21,12 @@ namespace WTP.WebAPI.Controllers
         }
 
         /// <summary>
-        /// Create JWT token
+        /// Get access and refresh tokens
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost("[action]")]
-        [ProducesResponseType(typeof(AccessResponseDto), 200)]
+        [ProducesResponseType(typeof(AccessDto), 200)]
         [ProducesResponseType(typeof(ResponseDto), 400)]
         public async Task<IActionResult> GetToken([FromBody] LoginDto dto)
         {
@@ -33,45 +35,36 @@ namespace WTP.WebAPI.Controllers
                 return BadRequest(new ResponseDto(400, "Invalid value was entered! Please, redisplay form."));
             }
 
-            var verifyResult = await _refreshTokenService.VerifyUser(dto);
-            if (!verifyResult.Succeeded) return BadRequest(new ResponseDto(400, "Login faild.", verifyResult.Error));
+            // user verification
+            var verify = await _refreshTokenService.UserVerifyAsync(dto);
+            if (!verify.Succeeded) return BadRequest(new ResponseDto(400, "Login faild.", verify.Error));
 
-            var access = await _refreshTokenService.GetAccess(dto.Email);
+            var access = await _refreshTokenService.GetAccessAsync(dto.Email);
 
             return access == null
                 ? BadRequest(new ResponseDto(400, "Login faild.", "Something going wrong."))
-                : (IActionResult)Ok(new { access, message = "Login successful." });
+                : (IActionResult)Ok(access);
         }
 
         /// <summary>
-        /// Update JWT token
+        /// Update access and refresh tokens
         /// </summary>
         /// <param name="refreshToken"></param>
         /// <returns></returns>
         [HttpPost("[action]")]
-        [ProducesResponseType(typeof(string), 200)]
-        [ProducesResponseType(typeof(ResponseDto), 400)]
-        public async Task<IActionResult> UpdateToken(string refreshToken)
+        [Authorize(Policy = "RequireLoggedIn")]
+        [ProducesResponseType(typeof(AccessDto), 200)]
+        public async Task<IActionResult> Refresh(string refreshToken)
         {
-            if (string.IsNullOrEmpty(refreshToken))
-                return BadRequest(new ResponseDto(400,
-                                                  "Refresh token update faild.",
-                                                  "Refresh token is null or empty."));
-
             var userId = this.GetCurrentUserId();
-            var result = await _refreshTokenService
-                                    .UpdateAccessToken(new UpdateRefreshTokenDto
-                                                                {
-                                                                    UserId = userId,
-                                                                    RefreshToken = refreshToken
-                                                                });
+            var newAccess = await _refreshTokenService.UpdateAccessAsync(
+                new AccessOperationDto
+                {
+                    UserId = userId,
+                    RefreshToken = refreshToken
+                });
 
-            if (!result.Succeeded) return BadRequest(new ResponseDto(400,
-                                                                     "Refresh token update faild.",
-                                                                     result.Error));
-
-            var newAccessToken = _refreshTokenService.GetCurrentTokenByUserId(userId);
-            return Ok(newAccessToken);
+            return Ok(newAccess);
         }
     }
 }

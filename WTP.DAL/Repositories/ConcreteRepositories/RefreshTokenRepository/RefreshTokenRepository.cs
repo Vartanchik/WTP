@@ -11,14 +11,16 @@ namespace WTP.DAL.Repositories.ConcreteRepositories.RefreshTokenRepository
     {
         private readonly ApplicationDbContext _context;
 
-        public RefreshTokenRepository(ApplicationDbContext context) : base(context)
+        public RefreshTokenRepository(ApplicationDbContext context)
+            : base(context)
         {
             _context = context;
         }
 
         public async Task DeleteUserTokensAsync(int userId)
         {
-            var tokens = GetUserTokensAsync(userId);
+            var tokens = _context.RefreshTokens.AsQueryable()
+                                               .Where(t => t.UserId == userId);
 
             if (tokens != null)
             {
@@ -28,14 +30,16 @@ namespace WTP.DAL.Repositories.ConcreteRepositories.RefreshTokenRepository
             }
         }
 
-        public async Task<RefreshToken> GetByUserIdAsync(int userId, string refreshToken)
+        public async Task<RefreshToken> UserTokenByValue(int userId, string refreshToken)
         {
-            return await _context.RefreshTokens.FirstOrDefaultAsync(_ => _.UserId == userId && _.Value == refreshToken);
+            return await _context.RefreshTokens.FirstOrDefaultAsync(t => t.UserId == userId && 
+                                                                         t.Value == refreshToken);
         }
 
         public IQueryable<RefreshToken> GetUserTokensAsync(int id)
         {
-            return _context.RefreshTokens.Where(_ => _.UserId == id).AsQueryable();
+            return _context.RefreshTokens.AsQueryable()
+                                         .Where(t => t.UserId == id);
         }
 
         public virtual int GetIdByCondition(Func<RefreshToken, bool> condition)

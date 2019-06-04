@@ -239,9 +239,13 @@ namespace WTP.WebAPI.Controllers
 
             int userId = this.GetCurrentUserId();
 
-            var result = await _appUserService.ChangePasswordAsync(new ChangePasswordDto(userId,
-                                                                                         dto.CurrentPassword,
-                                                                                         dto.NewPassword));
+            var result = await _appUserService.ChangePasswordAsync(
+                new ChangeUserPasswordDto
+                {
+                    UserId = userId,
+                    CurrentPassword = dto.NewPassword,
+                    NewPassword = dto.NewPassword
+                });
 
             return result.Succeeded
                 ? Ok(new ResponseDto(200, "Completed.", "Password update successful."))

@@ -105,7 +105,7 @@ namespace WTP.BLL.Services.Concrete.AppUserService
                                                          dto.NewPassword);
         }
 
-        public async Task<IdentityResult> ChangePasswordAsync(ChangePasswordDto dto)
+        public async Task<IdentityResult> ChangePasswordAsync(ChangeUserPasswordDto dto)
         {
             if (await GetByIdAsync(dto.UserId) == null)
             {

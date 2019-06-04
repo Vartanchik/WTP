@@ -1,87 +1,29 @@
-﻿using AutoMapper;
-using System.Collections.Generic;
+﻿using System;
+using System.Text;
 using System.Linq;
-using System.Threading.Tasks;
-using WTP.BLL.DTOs.AppUserDTOs;
-using WTP.BLL.DTOs.ServicesDTOs;
-using WTP.DAL.Entities.AppUserEntities;
-using WTP.DAL.UnitOfWork;
-using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Text;
+using System.Threading.Tasks;
+using WTP.BLL.DTOs.ServicesDTOs;
+using WTP.BLL.DTOs.TokensDTOs;
+using WTP.DAL.Entities.AppUserEntities;
+using WTP.DAL.UnitOfWork;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.Extensions.Configuration;
 
 namespace WTP.BLL.Services.Concrete.RefreshTokenService
 {
     public class RefreshTokenService : IRefreshTokenService
     {
         private readonly IUnitOfWork _uow;
-        private readonly IMapper _mapper;
-        private readonly TokenSettings _settings;
+        private readonly TokenSettings _tokenSettings;
 
-        public RefreshTokenService(IUnitOfWork unitOfWork, IMapper mapper, IConfiguration configuration)
+        public RefreshTokenService(IUnitOfWork unitOfWork, TokenSettings tokenSettings)
         {
             _uow = unitOfWork;
-            _mapper = mapper;
-            _settings = new TokenSettings
-            {
-                Audience = configuration["AppSettings:Audience"],
-                ExpireTime = TimeSpan.FromMinutes(Convert.ToDouble(60)),
-                Secret = configuration["AppSettings:Secret"],
-                Site = configuration["AppSettings:Site"]
-            };
+            _tokenSettings = tokenSettings;
         }
 
-        public async Task CreateAsync(RefreshTokenDto tokenDto)
-        {
-            var token = _mapper.Map<RefreshToken>(tokenDto);
-
-            await _uow.RefreshTokens.CreateOrUpdate(token);
-            await _uow.CommitAsync();
-        }
-
-        public async Task DeleteAsync(int id)
-        {
-            await _uow.RefreshTokens.DeleteAsync(id);
-            await _uow.CommitAsync();
-        }
-
-        public async Task DeleteRangeAsync(int userId)
-        {
-            await _uow.RefreshTokens.DeleteUserTokensAsync(userId);
-            await _uow.CommitAsync();
-        }
-
-        public async Task<RefreshTokenDto> GetAsync(int id)
-        {
-            var token = await _uow.RefreshTokens.GetByIdAsync(id);
-
-            return _mapper.Map<RefreshTokenDto>(token);
-        }
-
-        public IQueryable<RefreshTokenDto> GetRangeAsync(int id)
-        {
-            var tokens = _uow.RefreshTokens.GetUserTokensAsync(id);
-            var dto = new List<RefreshTokenDto>();
-
-            foreach (var item in tokens)
-            {
-                dto.Add(_mapper.Map<RefreshTokenDto>(item));
-            }
-
-            return dto.AsQueryable();
-        }
-
-        public async Task<RefreshTokenDto> GetByUserIdAsync(int userId, string refreshToken)
-        {
-            var token = await _uow.RefreshTokens.GetByUserIdAsync(userId, refreshToken);
-
-            return _mapper.Map<RefreshTokenDto>(token);
-        }
-
-        public async Task<ServiceResult> VerifyUser(LoginDto dto)
+        public async Task<ServiceResult> UserVerifyAsync(LoginDto dto)
         {
             var user = await _uow.AppUsers.GetByEmailAsync(dto.Email);
 
@@ -94,7 +36,7 @@ namespace WTP.BLL.Services.Concrete.RefreshTokenService
 
                 if (user.IsDeleted)
                 {
-                    return new ServiceResult(user.Email);
+                    return new ServiceResult("User is deleted.");
                 }
 
                 return new ServiceResult();
@@ -103,114 +45,83 @@ namespace WTP.BLL.Services.Concrete.RefreshTokenService
             return new ServiceResult("Incorrect email or password.");
         }
 
-        public async Task<AccessResponseDto> GetAccess(string email)
+        public async Task<string> GenerateRefreshTokenAsync(int userId)
         {
-            var userId = _uow.AppUsers.GetIdByCondition(u => u.Email == email);
-            if (userId == 0) return null;
+            // delete curren user tokens
+            await _uow.RefreshTokens.DeleteUserTokensAsync(userId);
 
-            var newRefreshToken = new RefreshTokenDto()
+            // create new token
+            var refreshToken = new RefreshToken
             {
                 Value = Guid.NewGuid().ToString("N"),
                 CreatedDate = DateTime.UtcNow,
                 UserId = userId,
-                ExpiryTime = DateTime.UtcNow.AddMinutes(60)
+                ExpiryTime = DateTime.UtcNow.Add(_tokenSettings.ExpireTime),
             };
 
-            var oldRefreshTokens = GetRangeAsync(userId);
+            await _uow.RefreshTokens.CreateOrUpdate(refreshToken);
+            await _uow.CommitAsync();
 
-            if (oldRefreshTokens != null)
-            {
-                await DeleteRangeAsync(userId);
-            }
-
-            await CreateAsync(newRefreshToken);
-
-            var accessToken = await CreateAccessToken(userId, newRefreshToken.Value);
-
-            return accessToken;
+            return refreshToken.Value;
         }
 
-        //
-
-        // warning. Indian programmers!
-
-        //
-
-        private async Task<AccessResponseDto> CreateAccessToken(int userId, string refreshToken)
+        public async Task<string> GenerateAccessTokenAsync(int userId)
         {
-            var user = await _uow.AppUsers.GetByIdAsync(userId);
-            if (user == null) return null;
-
-            var key = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_settings.Secret));
-
+            var secret = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_tokenSettings.Secret));
             var roles = await _uow.AppUsers.GetRolesAsync(userId);
-
             var tokenHandler = new JwtSecurityTokenHandler();
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new Claim[]
                     {
-                        new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
-                        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                        new Claim(ClaimTypes.NameIdentifier, userId.ToString()),
                         new Claim(ClaimTypes.Role, roles.FirstOrDefault()),
                         new Claim("LoggedOn", DateTime.Now.ToString()),
                         new Claim("UserID", userId.ToString())
-                     }),
+                    }),
 
-                SigningCredentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature),
-                Issuer = _settings.Site,
-                Audience = _settings.Audience,
-                Expires = DateTime.UtcNow.AddMinutes(60)
+                SigningCredentials = new SigningCredentials(secret, SecurityAlgorithms.HmacSha256Signature),
+                Expires = DateTime.UtcNow.Add(_tokenSettings.ExpireTime)
             };
 
             var newtoken = tokenHandler.CreateToken(tokenDescriptor);
             var encodedToken = tokenHandler.WriteToken(newtoken);
 
-            return new AccessResponseDto()
-            {
-                Token = encodedToken,
-                Expiration = newtoken.ValidTo,
-                Refresh_token = refreshToken,
-                Role = roles.FirstOrDefault(),
-                UserName = user.UserName,
-                Photo = user.Photo
-            };
+            return encodedToken;
         }
 
-        public async Task<ServiceResult> UpdateAccessToken(UpdateRefreshTokenDto dto)
+        public async Task<AccessDto> GetAccessAsync(string email)
         {
-            var refreshToken = await GetByUserIdAsync(dto.UserId, dto.RefreshToken);
+            var access = new AccessDto();
 
-            if (refreshToken == null)
-                return new ServiceResult("Refresh token not found.");
-            if (refreshToken.ExpiryTime < DateTime.UtcNow)
-                return new ServiceResult("Token expiration date.");
+            var userId = _uow.AppUsers.AsQueryable()
+                                      .Where(u => u.Email == email)
+                                      .Select(u => u.Id)
+                                      .FirstOrDefault();
 
-            var refreshTokenNew = new RefreshTokenDto()
-            {
-                Value = Guid.NewGuid().ToString("N"),
-                CreatedDate = DateTime.UtcNow,
-                UserId = dto.UserId,
-                ExpiryTime = DateTime.UtcNow.AddMinutes(60)
-            };
+            if (userId == 0) return access;
 
-            await DeleteAsync(refreshToken.Id);
+            access.RefreshToken = await GenerateRefreshTokenAsync(userId);
+            access.Token = await GenerateAccessTokenAsync(userId);
 
-            await CreateAsync(refreshTokenNew);
-
-            var accessToken = await CreateAccessToken(dto.UserId, refreshTokenNew.Value);
-
-            return new ServiceResult();
+            return access;
         }
 
-        public string GetCurrentTokenByUserId(int userId)
+        public async Task<AccessDto> UpdateAccessAsync(AccessOperationDto dto)
         {
-            return _uow.RefreshTokens.AsQueryable()
-                                     .Where(t => t.UserId == userId)
-                                     .Select(x => x.Value)
-                                     .FirstOrDefault();
+            var access = new AccessDto();
+
+            var exist = _uow.RefreshTokens.AsQueryable()
+                                          .Any(t => t.UserId == dto.UserId &&
+                                                    t.Value == dto.RefreshToken);
+
+            if (exist)
+            {
+                access.RefreshToken = await GenerateRefreshTokenAsync(dto.UserId);
+                access.Token = await GenerateAccessTokenAsync(dto.UserId);
+            }
+
+            return access;
         }
     }
 }

@@ -28,6 +28,7 @@ using WTP.BLL.Services.Concrete.PlayerSrvice;
 using WTP.DAL.Entities.AppUserEntities;
 using WTP.BLL.Services.Concrete.TeamService;
 using WTP.BLL.DTOs.ServicesDTOs;
+using System.Threading.Tasks;
 
 namespace WTP.WebAPI
 {
@@ -51,7 +52,7 @@ namespace WTP.WebAPI
             services.AddAutoMapper();
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
-
+            services.AddSingleton<TokenSettings>();
             services.AddScoped<IAppUserService, AppUserService>();
             services.AddScoped<IRefreshTokenService, RefreshTokenService>();
             services.AddScoped<IDeleteService, DeleteService>();
@@ -117,23 +118,31 @@ namespace WTP.WebAPI
             var key = Encoding.ASCII.GetBytes(appSettings.Secret);
 
             // Authentication Middleware
-            services.AddAuthentication(o =>
+            services.AddAuthentication(options =>
             {
-                o.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                o.DefaultSignInScheme = JwtBearerDefaults.AuthenticationScheme;
-                o.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-
-            }).AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+                options.DefaultAuthenticateScheme = "bearer";
+                options.DefaultChallengeScheme = "bearer";
+            }).AddJwtBearer("bearer", options =>
             {
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
+                    ValidateAudience = false,
+                    ValidateIssuer = false,
                     ValidateIssuerSigningKey = true,
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidIssuer = appSettings.Site,
-                    ValidAudience = appSettings.Audience,
-                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Token:Key"])),
+                    ValidateLifetime = true,
                     ClockSkew = TimeSpan.Zero
+                };
+                options.Events = new JwtBearerEvents
+                {
+                    OnAuthenticationFailed = context =>
+                    {
+                        if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
+                        {
+                            context.Response.Headers.Add("Token-Expired", "true");
+                        }
+                        return Task.CompletedTask;
+                    }
                 };
             });
 
