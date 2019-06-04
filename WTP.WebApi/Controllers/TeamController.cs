@@ -180,7 +180,6 @@ namespace WTP.WebAPI.Controllers
         /// <returns>IList<TeamListItemDto></returns>
         [HttpGet("[action]")]
         [ProducesResponseType(typeof(IList<TeamListItemDto>), 200)]
-        [ProducesResponseType(typeof(ResponseDto), 400)]
         public async Task<IList<TeamListItemDto>> ListByUserId(int userId)
         {
             return await _teamService.GetListByUserIdAsync(userId);
@@ -282,6 +281,30 @@ namespace WTP.WebAPI.Controllers
             return fileDataModel != null
                 ? File(fileDataModel.Stream, fileDataModel.Type, fileDataModel.Name)
                 : (IActionResult)BadRequest(new ResponseDto(404, "Logo not found."));
+        }
+
+        /// <summary>
+        /// Get list of player's invitations
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        [HttpGet("[action]")]
+        [ProducesResponseType(typeof(IList<InvitationListItemDto>), 200)]
+        public async Task<IList<InvitationListItemDto>> InvitationPlayerListByUserId(int userId)
+        {
+            return await _teamService.GetAllPlayerInvitetionByUserId(userId);
+        }
+
+        /// <summary>
+        /// Get list of team's invitations
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        [HttpGet("[action]")]
+        [ProducesResponseType(typeof(IList<InvitationListItemDto>), 200)]
+        public async Task<IList<InvitationListItemDto>> InvitationTeamListByUserId(int userId)
+        {
+            return await _teamService.GetAllTeamInvitetionByUserId(userId);
         }
     }
 }

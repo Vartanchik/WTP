@@ -101,10 +101,10 @@ namespace WTP.BLL.Services.Concrete.TeamService
                                                   .AnyAsync(p => p.Id == dto.PlayerId);
 
             if (!existedPlayer) return new ServiceResult("Player not found.");
-            
+
             // check team
             var existedTeam = await _uow.Teams.AsQueryable()
-                                              .AnyAsync(t => t.Id == dto.TeamId && 
+                                              .AnyAsync(t => t.Id == dto.TeamId &&
                                                              t.CoachId == dto.UserId);
 
             if (!existedTeam) return new ServiceResult("Team not found.");
@@ -127,7 +127,7 @@ namespace WTP.BLL.Services.Concrete.TeamService
         {
             // check player
             var existedPlayer = await _uow.Players.AsQueryable()
-                                                  .AnyAsync(p => p.Id == dto.PlayerId && 
+                                                  .AnyAsync(p => p.Id == dto.PlayerId &&
                                                                  p.AppUserId == dto.UserId);
 
             if (!existedPlayer) return new ServiceResult("Player not found.");
@@ -279,6 +279,56 @@ namespace WTP.BLL.Services.Concrete.TeamService
                     break;
             }
             return false;
+        }
+
+        public async Task<IList<InvitationListItemDto>> GetAllPlayerInvitetionByUserId(int userId)
+        {
+            var listOfPlayerId = await _uow.Players.AsQueryable()
+                                                   .Where(p => p.AppUserId == userId)
+                                                   .Select(p => p.Id)
+                                                   .ToListAsync();
+
+            if (listOfPlayerId == null) return null;
+
+            var listOfInvitations = new List<InvitationListItemDto>();
+
+            foreach (var playerId in listOfPlayerId)
+            {
+                var invitationsOfPlayer = await _uow.Invitations.AsQueryable()
+                                                                .Include(i => i.Player)
+                                                                .Include(i => i.Team)
+                                                                .Where(i => i.PlayerId == playerId)
+                                                                .ToListAsync();
+
+                listOfInvitations.AddRange(_mapper.Map<List<InvitationListItemDto>>(invitationsOfPlayer));
+            }
+
+            return listOfInvitations;
+        }
+
+        public async Task<IList<InvitationListItemDto>> GetAllTeamInvitetionByUserId(int userId)
+        {
+            var listOfTeamId = await _uow.Players.AsQueryable()
+                                                 .Where(t => t.AppUserId == userId)
+                                                 .Select(t => t.Id)
+                                                 .ToListAsync();
+
+            if (listOfTeamId == null) return null;
+
+            var listOfInvitations = new List<InvitationListItemDto>();
+
+            foreach (var teamId in listOfTeamId)
+            {
+                var invitationsOfTeams = await _uow.Invitations.AsQueryable()
+                                                               .Include(i => i.Player)
+                                                               .Include(i => i.Team)
+                                                               .Where(i => i.TeamId == teamId)
+                                                               .ToListAsync();
+
+                listOfInvitations.AddRange(_mapper.Map<List<InvitationListItemDto>>(invitationsOfTeams));
+            }
+
+            return listOfInvitations;
         }
     }
 }

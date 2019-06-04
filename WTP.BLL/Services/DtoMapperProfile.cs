@@ -75,6 +75,11 @@ namespace WTP.BLL.Services.Concrete
                            config => config.MapFrom(src => src.Goal.Name))
                 .ForMember(dest => dest.Photo,
                            config => config.MapFrom(src => TeamLogoToView(src)));
+            CreateMap<Invitation, InvitationListItemDto>()
+                .ForMember(dest => dest.PlayerName,
+                           config => config.MapFrom(src => src.Player.Name))
+                .ForMember(dest => dest.TeamName,
+                           config => config.MapFrom(src => src.Team.Name));
         }
 
         private string PhotoToView(AppUser user)
