@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using WTP.DAL.Entities.AppUserEntities;
@@ -35,6 +36,14 @@ namespace WTP.DAL.Repositories.ConcreteRepositories.RefreshTokenRepository
         public IQueryable<RefreshToken> GetUserTokensAsync(int id)
         {
             return _context.RefreshTokens.Where(_ => _.UserId == id).AsQueryable();
+        }
+
+        public virtual int GetIdByCondition(Func<RefreshToken, bool> condition)
+        {
+            return base.AsQueryable()
+                       .Where(condition)
+                       .Select(x => x.Id)
+                       .FirstOrDefault();
         }
     }
 }

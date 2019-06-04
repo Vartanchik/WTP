@@ -27,6 +27,7 @@ using WTP.BLL.Services.Concrete.GameService;
 using WTP.BLL.Services.Concrete.PlayerSrvice;
 using WTP.DAL.Entities.AppUserEntities;
 using WTP.BLL.Services.Concrete.TeamService;
+using WTP.BLL.DTOs.ServicesDTOs;
 
 namespace WTP.WebAPI
 {
@@ -51,24 +52,6 @@ namespace WTP.WebAPI
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-            /*
-            services.AddScoped<UserCachingRepository>();
-
-            //injection depends on situation 
-            services.AddScoped<Func<string, IAppUserRepository>>(ServiceProvider => _key => 
-            {
-                switch (_key)
-                {
-                    case "CACHE":
-                        return ServiceProvider.GetService<UserCachingRepository>();
-                    case "BASE":
-                        return ServiceProvider.GetService<AppUserRepository>();
-                    default:
-                        throw new KeyNotFoundException();
-                }
-            });
-            */
-
             services.AddScoped<IAppUserService, AppUserService>();
             services.AddScoped<IRefreshTokenService, RefreshTokenService>();
             services.AddScoped<IDeleteService, DeleteService>();
@@ -81,11 +64,6 @@ namespace WTP.WebAPI
                 config.AddProfile(new DtoMapperProfile(Configuration["Photo:DefaultPhoto"]));
             }).CreateMapper());
 
-            //// In production, the Angular files will be served from this directory
-            //services.AddSpaStaticFiles(configuration =>
-            //{
-            //    configuration.RootPath = "ClientApp/dist";
-            //});
             services.AddScoped<IEmailService, EmailService>();
             services.AddSingleton<ILog, SerilogLog>();
             services.AddScoped<IAzureBlobStorageService, AzureBlobStorageService>();
@@ -131,14 +109,12 @@ namespace WTP.WebAPI
             }).AddRoles<IdentityRole<int>>()
               .AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
 
-
             // Configure strongly typed settings objects
             var appSettingsSection = Configuration.GetSection("AppSettings");
             services.Configure<AppSettings>(appSettingsSection);
 
             var appSettings = appSettingsSection.Get<AppSettings>();
             var key = Encoding.ASCII.GetBytes(appSettings.Secret);
-
 
             // Authentication Middleware
             services.AddAuthentication(o =>
@@ -225,16 +201,6 @@ namespace WTP.WebAPI
                     name: "default",
                     template: "{controller}/{action=Index}/{id?}");
             });
-
-            //app.UseSpa(spa =>
-            //{
-            //    spa.Options.SourcePath = "ClientApp";
-
-            //    if (env.IsDevelopment())
-            //    {
-            //        spa.UseAngularCliServer(npmScript: "start");
-            //    }
-            //});
 
             // Enable middleware to serve generated Swagger as a JSON endpoint.
             app.UseSwagger();

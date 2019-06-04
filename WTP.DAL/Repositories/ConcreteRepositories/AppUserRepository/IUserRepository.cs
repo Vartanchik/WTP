@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using WTP.DAL.Entities.AppUserEntities;
@@ -21,5 +22,7 @@ namespace WTP.DAL.Repositories.ConcreteRepositories.AppUserRepository
         Task<string> GenerateEmailConfirmationTokenAsync(AppUser appUser);
         Task<AppUser> GetByIdAsync(string userId);
         Task<IdentityResult> ConfirmEmailAsync(int userId, string token);
+        Task<IList<string>> GetRolesAsync(int userId);
+        int GetIdByCondition(Func<TEntity, bool> condition);
     }
 }
