@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WTP.BLL.DTOs.PlayerDTOs;
 using WTP.BLL.DTOs.ServicesDTOs;
+using WTP.BLL.DTOs.TeamDTOs;
 using WTP.BLL.Services.Concrete.PlayerSrvice;
 using WTP.WebAPI.Utility.Extensions;
 
@@ -146,6 +147,18 @@ namespace WTP.WebAPI.Controllers
             };
 
             return viewModel;
+        }
+
+        /// <summary>
+        /// Get list of player's invitations
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        [HttpGet("[action]")]
+        [ProducesResponseType(typeof(IList<InvitationListItemDto>), 200)]
+        public async Task<IList<InvitationListItemDto>> InvitationPlayerListByUserId(int userId)
+        {
+            return await _playerService.GetAllPlayerInvitetionByUserId(userId);
         }
     }
 }

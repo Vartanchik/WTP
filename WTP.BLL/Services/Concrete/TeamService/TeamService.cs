@@ -281,41 +281,16 @@ namespace WTP.BLL.Services.Concrete.TeamService
             return false;
         }
 
-        public async Task<IList<InvitationListItemDto>> GetAllPlayerInvitetionByUserId(int userId)
-        {
-            var listOfPlayerId = await _uow.Players.AsQueryable()
-                                                   .Where(p => p.AppUserId == userId)
-                                                   .Select(p => p.Id)
-                                                   .ToListAsync();
-
-            if (listOfPlayerId == null) return null;
-
-            var listOfInvitations = new List<InvitationListItemDto>();
-
-            foreach (var playerId in listOfPlayerId)
-            {
-                var invitationsOfPlayer = await _uow.Invitations.AsQueryable()
-                                                                .Include(i => i.Player)
-                                                                .Include(i => i.Team)
-                                                                .Where(i => i.PlayerId == playerId)
-                                                                .ToListAsync();
-
-                listOfInvitations.AddRange(_mapper.Map<List<InvitationListItemDto>>(invitationsOfPlayer));
-            }
-
-            return listOfInvitations;
-        }
-
         public async Task<IList<InvitationListItemDto>> GetAllTeamInvitetionByUserId(int userId)
         {
-            var listOfTeamId = await _uow.Players.AsQueryable()
-                                                 .Where(t => t.AppUserId == userId)
+            var listOfTeamId = await _uow.Teams.AsQueryable()
+                                                 .Where(t => t.CoachId == userId)
                                                  .Select(t => t.Id)
                                                  .ToListAsync();
 
             if (listOfTeamId == null) return null;
 
-            var listOfInvitations = new List<InvitationListItemDto>();
+            var listOfInvitations = new List<Invitation>();
 
             foreach (var teamId in listOfTeamId)
             {
@@ -325,10 +300,10 @@ namespace WTP.BLL.Services.Concrete.TeamService
                                                                .Where(i => i.TeamId == teamId)
                                                                .ToListAsync();
 
-                listOfInvitations.AddRange(_mapper.Map<List<InvitationListItemDto>>(invitationsOfTeams));
+                listOfInvitations.AddRange(invitationsOfTeams);
             }
 
-            return listOfInvitations;
+            return _mapper.Map<List<InvitationListItemDto>>(listOfInvitations);
         }
     }
 }

@@ -284,18 +284,6 @@ namespace WTP.WebAPI.Controllers
         }
 
         /// <summary>
-        /// Get list of player's invitations
-        /// </summary>
-        /// <param name="userId"></param>
-        /// <returns></returns>
-        [HttpGet("[action]")]
-        [ProducesResponseType(typeof(IList<InvitationListItemDto>), 200)]
-        public async Task<IList<InvitationListItemDto>> InvitationPlayerListByUserId(int userId)
-        {
-            return await _teamService.GetAllPlayerInvitetionByUserId(userId);
-        }
-
-        /// <summary>
         /// Get list of team's invitations
         /// </summary>
         /// <param name="userId"></param>

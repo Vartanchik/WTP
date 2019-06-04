@@ -6,7 +6,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using WTP.BLL.DTOs.PlayerDTOs;
 using WTP.BLL.DTOs.ServicesDTOs;
+using WTP.BLL.DTOs.TeamDTOs;
 using WTP.DAL.Entities;
+using WTP.DAL.Entities.TeamEntities;
 using WTP.DAL.UnitOfWork;
 
 namespace WTP.BLL.Services.Concrete.PlayerSrvice
@@ -229,6 +231,31 @@ namespace WTP.BLL.Services.Concrete.PlayerSrvice
                                                   .ToListAsync();
 
             return _mapper.Map<IList<PlayerListItemDto>>(listOfPlayers);
+        }
+
+        public async Task<IList<InvitationListItemDto>> GetAllPlayerInvitetionByUserId(int userId)
+        {
+            var listOfPlayerId = await _uow.Players.AsQueryable()
+                                                   .Where(p => p.AppUserId == userId)
+                                                   .Select(p => p.Id)
+                                                   .ToListAsync();
+
+            if (listOfPlayerId == null) return null;
+
+            var listOfInvitations = new List<Invitation>();
+
+            foreach (var playerId in listOfPlayerId)
+            {
+                var invitationsOfPlayer = await _uow.Invitations.AsQueryable()
+                                                                .Include(i => i.Player)
+                                                                .Include(i => i.Team)
+                                                                .Where(i => i.PlayerId == playerId)
+                                                                .ToListAsync();
+
+                listOfInvitations.AddRange(invitationsOfPlayer);
+            }
+
+            return _mapper.Map<List<InvitationListItemDto>>(listOfInvitations);
         }
     }
 }

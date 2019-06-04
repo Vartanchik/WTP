@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using WTP.BLL.DTOs.PlayerDTOs;
 using WTP.BLL.DTOs.ServicesDTOs;
+using WTP.BLL.DTOs.TeamDTOs;
 
 namespace WTP.BLL.Services.Concrete.PlayerSrvice
 {
@@ -19,5 +20,6 @@ namespace WTP.BLL.Services.Concrete.PlayerSrvice
         Task<IList<PlayerListItemDto>> GetPlayersList();
         Task<IList<PlayerListItemDto>> GetListByTeamIdAsync(int teamId);
         Task<PlayerPaginationDto> GetFilteredPlayersByGameIdAsync(PlayerInputValuesModelDto inputValues);
+        Task<IList<InvitationListItemDto>> GetAllPlayerInvitetionByUserId(int userId);
     }
 }
