@@ -347,60 +347,53 @@ namespace WTP.BLL.Services.Concrete.AppUserService
             return await _uow.AppUsers.UnLockAsync(id);
         }
 
-        public List<AppUserDto> FilterByName(List<AppUserDto> users, string name)
+        public IQueryable<AppUser> FilterByName(string name, IQueryable<AppUser> baseQuery)
         {
-            if (users == null)
-                return null;
-            //return null;
-
             if (!String.IsNullOrEmpty(name))
-            {
-                users = users.Where(p => p.UserName.Contains(name)).ToList();
-            }
+                return baseQuery.Where(p => p.UserName.Contains(name));
 
-            return users;
+            return null;
         }
 
-        public List<AppUserDto> SortByParam(List<AppUserDto> users, SortState sortOrder, bool enableDeleted, bool enableLocked)
+        public IQueryable<AppUser> SortByParam(SortState sortOrder, bool enableDeleted, bool enableLocked, IQueryable<AppUser> baseQuery)
         {
-            if (users == null)
-                return null;
-
+            IQueryable<AppUser> query = Enumerable.Empty<AppUser>().AsQueryable();
             switch (sortOrder)
             {
                 case SortState.NameDesc:
-                    users = users.OrderByDescending(s => s.UserName).ToList();
+                    query = baseQuery.OrderByDescending(s => s.UserName);
                     break;
                 case SortState.EmailAsc:
-                    users = users.OrderBy(s => s.Email).ToList();
+                    query = baseQuery.OrderBy(s => s.Email);
                     break;
                 case SortState.EmailDesc:
-                    users = users.OrderByDescending(s => s.Email).ToList();
+                    query = baseQuery.OrderByDescending(s => s.Email);
                     break;
                 case SortState.IdAsc:
-                    users = users.OrderBy(s => s.Id).ToList();
+                    query = baseQuery.OrderBy(s => s.Id);
                     break;
                 case SortState.IdDesc:
-                    users = users.OrderByDescending(s => s.Id).ToList();
+                    query = baseQuery.OrderByDescending(s => s.Id);
                     break;
                 default:
-                    users = users.OrderBy(s => s.UserName).ToList();
+                    query = baseQuery.OrderBy(s => s.UserName);
                     break;
             }
 
             if (!enableDeleted)
-                users = users.Where(s => s.IsDeleted == false).ToList();
+                query = query.Where(s => s.IsDeleted == false);
 
             if (!enableLocked)
-                users = users.Where(s => s.LockoutEnd == null).ToList();
+                query = query.Where(s => s.LockoutEnd == null);
 
-            return users;
+            return query;
         }
 
-        public async Task<List<AppUserDto>> GetItemsOnPage(int page,int pageSize)
+        public IQueryable<AppUser> GetItemsOnPage(int page,int pageSize, IQueryable<AppUser> baseQuery)
         {
-            var items = await _uow.AppUsers.AsQueryable().Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
-            return _mapper.Map<List<AppUserDto>>(items);
+            IQueryable<AppUser> query = Enumerable.Empty<AppUser>().AsQueryable();
+            query = baseQuery.Skip((page - 1) * pageSize).Take(pageSize);
+            return query;
         }
 
         public async Task<int> GetCountOfPlayers()
@@ -411,17 +404,29 @@ namespace WTP.BLL.Services.Concrete.AppUserService
         public async Task<UserIndexDto> GetPageInfo(string name, int page, int pageSize,
             SortState sortOrder, bool enableDeleted, bool enableLocked)
         {
-            //int pageSize = 3;
-            var items = await this.GetItemsOnPage(page, pageSize);
+            IQueryable<AppUser> query = _uow.AppUsers.AsQueryable();
+            IEnumerable<AppUserDto> items = Enumerable.Empty<AppUserDto>();
+
+            try
+            {
+                var newQuery = FilterByName(name, query);
+                newQuery = SortByParam(sortOrder,enableDeleted,enableLocked, newQuery);
+                newQuery = GetItemsOnPage(page, pageSize, newQuery);
+
+                items = _mapper.Map<List<AppUserDto>>(newQuery.ToList());
+            }
+            catch (ArgumentNullException ex)
+            {
+                //TODO
+                //_log.Error(ex.Message);
+            }
+
             var count = await this.GetCountOfPlayers();
-            items = this.FilterByName(items, name);
-            items = this.SortByParam(items, sortOrder, enableDeleted, enableLocked);
 
             UserIndexDto viewModel = new UserIndexDto
             {
                 PageViewModel = new PageDto(count, page, pageSize),
                 SortViewModel = new UserSortDto(sortOrder),
-                //FilterViewModel = new UserFilterViewModel(users/*(List<AppUserDto>)await _appUserService.GetAllUsersAsync()*/, name),
                 Users = items
             };
             return viewModel;

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using WTP.BLL.DTOs.AppUserDTOs;
 using WTP.BLL.DTOs.ServicesDTOs;
 using WTP.BLL.Shared;
+using WTP.DAL.Entities.AppUserEntities;
 
 namespace WTP.BLL.Services.Concrete.AppUserService
 {
@@ -36,10 +37,10 @@ namespace WTP.BLL.Services.Concrete.AppUserService
         Task<bool> LockAsync(int id, int? days, int? adminId = null);
         Task<bool> UnLockAsync(int id, int? adminId = null);
 
-        Task<List<AppUserDto>> GetItemsOnPage(int page, int pageSize);
+        IQueryable<AppUser> GetItemsOnPage(int page, int pageSize, IQueryable<AppUser> baseQuery);
         Task<int> GetCountOfPlayers();
-        List<AppUserDto> FilterByName(List<AppUserDto> users, string name);
-        List<AppUserDto> SortByParam(List<AppUserDto> users, SortState sortOrder, bool enableDeleted, bool enableLocked);
+        IQueryable<AppUser> FilterByName(string name, IQueryable<AppUser> baseQuery);
+        IQueryable<AppUser> SortByParam(SortState sortOrder, bool enableDeleted, bool enableLocked, IQueryable<AppUser> baseQuery);
         Task<UserIndexDto> GetPageInfo(string name, int page, int pageSize,
             SortState sortOrder, bool enableDeleted, bool enableLocked);
     }
