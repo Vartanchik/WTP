@@ -29,7 +29,7 @@ namespace WTP.WebAPI.Controllers
         //Create Admin account
         [HttpPost]
         [Route("profiles")]
-        //[Authorize(Policy = "RequireAdministratorRole")]
+        [Authorize(Policy = "RequireAdministratorRole")]
         public async Task<IActionResult> CreateAdminAccount([FromBody] RegisterDto formdata)
         {
             string errorResult = "";
@@ -265,45 +265,19 @@ namespace WTP.WebAPI.Controllers
         [HttpGet]
         [Authorize(Policy = "RequireAdministratorRole")]
         [Route("users/pagination")]
-        public async Task<UserIndexDto> UserIndex(string name, int page = 1,
+        public async Task<UserIndexDto> UserIndex(string name, int page = 1, int pageSize=3,
             SortState sortOrder = SortState.NameAsc, bool enableDeleted = true, bool enableLocked = true)
         {
-            int pageSize = 3;
-            var items = await _appUserService.GetItemsOnPage(page, pageSize);
-            var count = await _appUserService.GetCountOfPlayers();
-            items = _appUserService.FilterByName(items, name);
-            items = _appUserService.SortByParam(items, sortOrder, enableDeleted, enableLocked);
-
-            UserIndexDto viewModel = new UserIndexDto
-            {
-                PageViewModel = new PageDto(count, page, pageSize),
-                SortViewModel = new UserSortDto(sortOrder),
-                //FilterViewModel = new UserFilterViewModel(users/*(List<AppUserDto>)await _appUserService.GetAllUsersAsync()*/, name),
-                Users = items
-            };
-            return viewModel;
+            return await _appUserService.GetPageInfo(name,page,pageSize,sortOrder,enableDeleted,enableLocked);
         }
 
         [HttpGet]
         [Authorize(Policy = "RequireAdministratorRole")]
         [Route("history")]
-        public async Task<HistoryIndexDto> HistoryIndex(string name, int page = 1,
+        public async Task<HistoryIndexDto> HistoryIndex(string name, int page = 1, int pageSize = 3,
             HistorySortState sortOrder = HistorySortState.DateDesc)
         {
-            int pageSize = 3;
-            var items = await _historyService.GetItemsOnPage(page, pageSize);
-            var count = await _historyService.GetCountOfRecords();
-            items = _historyService.FilterByUserName(items, name).ToList();
-            items = _historyService.SortByParam(items, sortOrder).ToList();
-
-            HistoryIndexDto viewModel = new HistoryIndexDto
-            {
-                PageViewModel = new PageDto(count, page, pageSize),
-                SortViewModel = new HistorySortDto(sortOrder),
-                //FilterViewModel = new UserFilterViewModel(users/*(List<AppUserDto>)await _appUserService.GetAllUsersAsync()*/, name),
-                Histories = items
-            };
-            return viewModel;
+            return await _historyService.GetPageInfo(name, page, pageSize, sortOrder);
         }
 
 

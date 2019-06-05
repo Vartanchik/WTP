@@ -40,5 +40,7 @@ namespace WTP.BLL.Services.Concrete.AppUserService
         Task<int> GetCountOfPlayers();
         List<AppUserDto> FilterByName(List<AppUserDto> users, string name);
         List<AppUserDto> SortByParam(List<AppUserDto> users, SortState sortOrder, bool enableDeleted, bool enableLocked);
+        Task<UserIndexDto> GetPageInfo(string name, int page, int pageSize,
+            SortState sortOrder, bool enableDeleted, bool enableLocked);
     }
 }

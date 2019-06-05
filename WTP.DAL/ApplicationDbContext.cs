@@ -98,9 +98,12 @@ namespace WTP.DAL
                     new { Id = 5, OperationName = "UnLock" } //OperationName = OperationEnum.UnLock }
             );
 
-            //builder.Entity<AppUser>().HasData(
-            //        new AppUser { Id = 1, Email="admin@gmail.com", }
-            //    );
+            //"email":"superAdmin@gmail.com",
+            //"userName":"superAdmin",
+            //"password":"123456"
+            builder.Entity<AppUser>().HasData(
+                    new AppUser { Id = 1, Email = "superAdmin@gmail.com", UserName="superAdmin", PasswordHash = "AQAAAAEAACcQAAAAEJoMQ0ORW/30m0eVPZIwxJaTQ9nRyY63AriZTgxrk/xCv32Ewm03oMWQGpzz5CYpuw==" }
+                );
 
             builder.Entity<AppUserLanguage>()
                 .HasKey(_ => new { _.AppUserId, _.LanguageId });

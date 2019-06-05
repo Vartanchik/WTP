@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using WTP.BLL.DTOs.AppUserDTOs;
+using WTP.BLL.DTOs.ServicesDTOs;
 using WTP.BLL.Shared;
 
 namespace WTP.BLL.Services.HistoryService
@@ -19,6 +20,8 @@ namespace WTP.BLL.Services.HistoryService
         Task<int> GetCountOfRecords();
         IList<HistoryDto> FilterByUserName(List<HistoryDto> histories, string name);
         IList<HistoryDto> SortByParam(List<HistoryDto> histories, HistorySortState sortOrder);
+        Task<HistoryIndexDto> GetPageInfo(string name, int page, int pageSize,
+            HistorySortState sortOrder);
 
     }
 }

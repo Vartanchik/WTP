@@ -407,5 +407,24 @@ namespace WTP.BLL.Services.Concrete.AppUserService
         {
             return await _uow.AppUsers.AsQueryable().CountAsync();
         }
+
+        public async Task<UserIndexDto> GetPageInfo(string name, int page, int pageSize,
+            SortState sortOrder, bool enableDeleted, bool enableLocked)
+        {
+            //int pageSize = 3;
+            var items = await this.GetItemsOnPage(page, pageSize);
+            var count = await this.GetCountOfPlayers();
+            items = this.FilterByName(items, name);
+            items = this.SortByParam(items, sortOrder, enableDeleted, enableLocked);
+
+            UserIndexDto viewModel = new UserIndexDto
+            {
+                PageViewModel = new PageDto(count, page, pageSize),
+                SortViewModel = new UserSortDto(sortOrder),
+                //FilterViewModel = new UserFilterViewModel(users/*(List<AppUserDto>)await _appUserService.GetAllUsersAsync()*/, name),
+                Users = items
+            };
+            return viewModel;
+        }
     }
 }

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WTP.BLL.DTOs.AppUserDTOs;
+using WTP.BLL.DTOs.ServicesDTOs;
 using WTP.BLL.Shared;
 using WTP.DAL.Entities.AppUserEntities;
 using WTP.DAL.UnitOfWork;
@@ -126,6 +127,25 @@ namespace WTP.BLL.Services.HistoryService
         public async Task<int> GetCountOfRecords()
         {
             return await _uow.Histories.AsQueryable().CountAsync();
+        }
+
+        public async Task<HistoryIndexDto> GetPageInfo(string name, int page, int pageSize,
+            HistorySortState sortOrder)
+        {
+            //int pageSize = 3;
+            var items = await this.GetItemsOnPage(page, pageSize);
+            var count = await this.GetCountOfRecords();
+            items = this.FilterByUserName(items, name).ToList();
+            items = this.SortByParam(items, sortOrder).ToList();
+
+            HistoryIndexDto viewModel = new HistoryIndexDto
+            {
+                PageViewModel = new PageDto(count, page, pageSize),
+                SortViewModel = new HistorySortDto(sortOrder),
+                //FilterViewModel = new UserFilterViewModel(users/*(List<AppUserDto>)await _appUserService.GetAllUsersAsync()*/, name),
+                Histories = items
+            };
+            return viewModel;
         }
     }
 }
