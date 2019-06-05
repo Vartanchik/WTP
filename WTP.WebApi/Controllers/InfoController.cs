@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using WTP.BLL.DTOs.PlayerDTOs;
 using WTP.BLL.DTOs.ServicesDTOs;
 using WTP.BLL.Services.Concrete.AppUserService;
@@ -15,11 +16,13 @@ namespace WTP.WebAPI.Controllers
     {
         private readonly IGameService _gameService;
         private readonly IAppUserService _appUserService;
+        private readonly IConfiguration _configuration;
 
-        public InfoController(IGameService gameService, IAppUserService appUserService)
+        public InfoController(IGameService gameService, IAppUserService appUserService, IConfiguration configuration)
         {
             _gameService = gameService;
             _appUserService = appUserService;
+            _configuration = configuration;
         }
 
         /// <summary>
@@ -43,11 +46,18 @@ namespace WTP.WebAPI.Controllers
 
         [HttpGet("[action]/{userId}")]
         [ProducesResponseType(typeof(UserIconDto), 200)]
-        public UserIconDto UserIcon([FromRoute] int userId)
+        public IActionResult UserIcon([FromRoute] int userId)
         {
             var icon = _appUserService.GetUserIconAsync(userId);
 
-            return icon;
+            switch (icon)
+            {
+                case null:
+                    return NoContent();
+                default:
+                    if (icon.Photo == null) icon.Photo = _configuration["Photo:DefaultPhoto"];
+                    return Ok(icon);
+            }
         }
     }
 }
