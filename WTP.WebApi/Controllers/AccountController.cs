@@ -5,7 +5,6 @@ using System.Linq;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
-using WTP.Logging;
 using WTP.BLL.Services.Concrete.AppUserService;
 using WTP.BLL.Services.EmailService;
 using WTP.WebAPI.Utility.Extensions;
@@ -21,13 +20,11 @@ namespace WTP.WebAPI.Controllers
     {
         private readonly IAppUserService _appUserService;
         private readonly IEmailService _emailService;
-        private readonly ILog _log;
         private readonly IConfiguration _configuration;
 
-        public AccountController(IAppUserService appUserService, IEmailService emailService, ILog log, IConfiguration configuration)
+        public AccountController(IAppUserService appUserService, IEmailService emailService, IConfiguration configuration)
         {
             _emailService = emailService;
-            _log = log;
             _appUserService = appUserService;
             _configuration = configuration;
         }

@@ -25,5 +25,6 @@ namespace WTP.BLL.Services.Concrete.AppUserService
         Task DeleteAccountAsync(int userId);
         Task<string> CreateRestoreAccountToken(int userId);
         Task<bool> RestoreAccountAsync(int userId, string token);
+        UserIconDto GetUserIconAsync(int userId);
     }
 }

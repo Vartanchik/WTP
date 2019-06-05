@@ -28,7 +28,7 @@ namespace WTP.WebAPI.Controllers
         [HttpPost("[action]")]
         [ProducesResponseType(typeof(AccessDto), 200)]
         [ProducesResponseType(typeof(ResponseDto), 400)]
-        public async Task<IActionResult> GetToken([FromBody] LoginDto dto)
+        public async Task<IActionResult> GetAccess([FromBody] LoginDto dto)
         {
             if (!ModelState.IsValid)
             {
@@ -54,9 +54,10 @@ namespace WTP.WebAPI.Controllers
         [HttpPost("[action]")]
         [Authorize(Policy = "RequireLoggedIn")]
         [ProducesResponseType(typeof(AccessDto), 200)]
-        public async Task<IActionResult> Refresh(string refreshToken)
+        public async Task<IActionResult> RefreshAccess([FromBody] string refreshToken)
         {
             var userId = this.GetCurrentUserId();
+
             var newAccess = await _refreshTokenService.UpdateAccessAsync(
                 new AccessOperationDto
                 {

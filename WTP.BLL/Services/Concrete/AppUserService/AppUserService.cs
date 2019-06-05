@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using WTP.BLL.DTOs.AppUserDTOs;
 using WTP.BLL.DTOs.ServicesDTOs;
@@ -211,6 +212,18 @@ namespace WTP.BLL.Services.Concrete.AppUserService
             await _uow.CommitAsync();
 
             return true;
+        }
+
+        public UserIconDto GetUserIconAsync(int userId)
+        {
+            var info = new UserIconDto();
+
+            info = _uow.AppUsers.AsQueryable()
+                                .Where(u => u.Id == userId)
+                                .Select(x => new UserIconDto { UserName = x.UserName, Photo = x.Photo })
+                                .FirstOrDefault();
+
+            return info;
         }
     }
 }

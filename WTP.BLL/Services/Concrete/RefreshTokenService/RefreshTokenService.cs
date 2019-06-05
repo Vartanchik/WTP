@@ -76,7 +76,6 @@ namespace WTP.BLL.Services.Concrete.RefreshTokenService
                 Subject = new ClaimsIdentity(new Claim[]
                     {
                         new Claim(ClaimTypes.Role, roles.FirstOrDefault()),
-                        new Claim("LoggedOn", DateTime.Now.ToString()),
                         new Claim("UserID", userId.ToString())
                     }),
 

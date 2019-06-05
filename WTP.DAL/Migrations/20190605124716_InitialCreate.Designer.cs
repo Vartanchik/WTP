@@ -10,8 +10,8 @@ using WTP.DAL;
 namespace WTP.DAL.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20190603142634_TeamFunctionality")]
-    partial class TeamFunctionality
+    [Migration("20190605124716_InitialCreate")]
+    partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
