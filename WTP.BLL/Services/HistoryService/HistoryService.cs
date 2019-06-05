@@ -10,6 +10,7 @@ using WTP.BLL.DTOs.ServicesDTOs;
 using WTP.BLL.Shared;
 using WTP.DAL.Entities.AppUserEntities;
 using WTP.DAL.UnitOfWork;
+using WTP.Logging;
 
 namespace WTP.BLL.Services.HistoryService
 {
@@ -17,11 +18,13 @@ namespace WTP.BLL.Services.HistoryService
     {
         private IUnitOfWork _uow;
         private readonly IMapper _mapper;
+        private readonly ILog _log;
 
-        public HistoryService(IUnitOfWork uow, IMapper mapper)
+        public HistoryService(IUnitOfWork uow, IMapper mapper, ILog log)
         {
             _uow = uow;
             _mapper = mapper;
+            _log =log;
         }
 
         public async Task CreateAsync(HistoryDto historyDto)
@@ -57,71 +60,65 @@ namespace WTP.BLL.Services.HistoryService
             return _mapper.Map<IList<HistoryDto>>(records);
         }
 
-        public IList<HistoryDto> FilterByUserName(List<HistoryDto> histories, string name)
-        {
-            if (histories == null)
-                return null;
-
+        public IQueryable<History> FilterByUserName(string name, IQueryable<History> baseQuery)
+        {            
             if (!String.IsNullOrEmpty(name))
-            {
-                histories = histories.Where(p => p.NewUserName.Contains(name)).ToList();
-            }
+                return baseQuery.Where(p => p.NewUserName.Contains(name));
 
-            return histories;
+            return null;
         }
 
-        public IList<HistoryDto> SortByParam(List<HistoryDto> histories, HistorySortState sortOrder)
+        public IQueryable<History> SortByParam(HistorySortState sortOrder, IQueryable<History> baseQuery)
         {
-            if (histories == null)
-                return null;
-
+            IQueryable<History> query = Enumerable.Empty<History>().AsQueryable();
             switch (sortOrder)
             {
                 case HistorySortState.NameDesc:
-                    histories = histories.OrderByDescending(s => s.NewUserName).ToList();
+                    query = baseQuery.OrderByDescending(s => s.NewUserName);
                     break;
                 case HistorySortState.EmailAsc:
-                    histories = histories.OrderBy(s => s.NewUserEmail).ToList();
+                    query = baseQuery.OrderBy(s => s.NewUserEmail);
                     break;
                 case HistorySortState.EmailDesc:
-                    histories = histories.OrderByDescending(s => s.NewUserEmail).ToList();
+                    query = baseQuery.OrderByDescending(s => s.NewUserEmail);
                     break;
                 case HistorySortState.IdAsc:
-                    histories = histories.OrderBy(s => s.Id).ToList();
+                    query = baseQuery.OrderBy(s => s.Id);
                     break;
                 case HistorySortState.IdDesc:
-                    histories = histories.OrderByDescending(s => s.Id).ToList();
+                    query = baseQuery.OrderByDescending(s => s.Id);
                     break;
                 case HistorySortState.UserIdAsc:
-                    histories = histories.OrderBy(s => s.AppUserId).ToList();
+                    query = baseQuery.OrderBy(s => s.AppUserId);
                     break;
                 case HistorySortState.UserIdDesc:
-                    histories = histories.OrderByDescending(s => s.AppUserId).ToList();
+                    query = baseQuery.OrderByDescending(s => s.AppUserId);
                     break;
                 case HistorySortState.AdminIdAsc:
-                    histories = histories.OrderBy(s => s.AdminId).ToList();
+                    query = baseQuery.OrderBy(s => s.AdminId);
                     break;
                 case HistorySortState.AdminIdDesc:
-                    histories = histories.OrderByDescending(s => s.AdminId).ToList();
+                    query = baseQuery.OrderByDescending(s => s.AdminId);
                     break;
                 case HistorySortState.DateAsc:
-                    histories = histories.OrderBy(s => s.DateOfOperation).ToList();
+                    query = baseQuery.OrderBy(s => s.DateOfOperation);
                     break;
                 case HistorySortState.NameAsc:
-                    histories = histories.OrderBy(s => s.NewUserName).ToList();
+                    query = baseQuery.OrderBy(s => s.NewUserName);
                     break;
                 default:
-                    histories = histories.OrderByDescending(s => s.DateOfOperation).ToList();
+                    query = baseQuery.OrderByDescending(s => s.DateOfOperation);
                     break;
             }
 
-            return histories;
+            return query;
         }
 
-        public async Task<List<HistoryDto>> GetItemsOnPage(int page, int pageSize)
+        public IQueryable<History> GetItemsOnPage(int page, int pageSize, IQueryable<History> baseQuery)
         {
-            var items = await _uow.Histories.AsQueryable().Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
-            return _mapper.Map<List<HistoryDto>>(items);
+            IQueryable<History> query = Enumerable.Empty<History>().AsQueryable();
+            query = baseQuery.Skip((page - 1) * pageSize).Take(pageSize);
+            return query;
         }
 
         public async Task<int> GetCountOfRecords()
@@ -132,17 +129,29 @@ namespace WTP.BLL.Services.HistoryService
         public async Task<HistoryIndexDto> GetPageInfo(string name, int page, int pageSize,
             HistorySortState sortOrder)
         {
-            //int pageSize = 3;
-            var items = await this.GetItemsOnPage(page, pageSize);
+            IQueryable<History> query = _uow.Histories.AsQueryable();//Enumerable.Empty<History>().AsQueryable();
+            IEnumerable<HistoryDto> items = Enumerable.Empty<HistoryDto>();
+
+            try
+            {
+                var newQuery = FilterByUserName(name, query);
+                newQuery = SortByParam(sortOrder, newQuery);
+                newQuery = GetItemsOnPage(page, pageSize, newQuery);
+
+                items = _mapper.Map<List<HistoryDto>>(newQuery.ToList());
+            }
+            catch(ArgumentNullException ex)
+            {
+                //TODO
+                //_log.Error(ex.Message);
+            }
+            
             var count = await this.GetCountOfRecords();
-            items = this.FilterByUserName(items, name).ToList();
-            items = this.SortByParam(items, sortOrder).ToList();
 
             HistoryIndexDto viewModel = new HistoryIndexDto
             {
                 PageViewModel = new PageDto(count, page, pageSize),
                 SortViewModel = new HistorySortDto(sortOrder),
-                //FilterViewModel = new UserFilterViewModel(users/*(List<AppUserDto>)await _appUserService.GetAllUsersAsync()*/, name),
                 Histories = items
             };
             return viewModel;

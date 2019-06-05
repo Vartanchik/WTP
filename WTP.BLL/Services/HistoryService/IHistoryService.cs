@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WTP.BLL.DTOs.AppUserDTOs;
 using WTP.BLL.DTOs.ServicesDTOs;
 using WTP.BLL.Shared;
+using WTP.DAL.Entities.AppUserEntities;
 
 namespace WTP.BLL.Services.HistoryService
 {
@@ -16,10 +18,10 @@ namespace WTP.BLL.Services.HistoryService
         Task<HistoryDto> GetAsync(int id);
         Task<IList<HistoryDto>> GetHistoryList();
 
-        Task<List<HistoryDto>> GetItemsOnPage(int page, int pageSize);
+        IQueryable<History> GetItemsOnPage(int page, int pageSize, IQueryable<History> baseQuery);
         Task<int> GetCountOfRecords();
-        IList<HistoryDto> FilterByUserName(List<HistoryDto> histories, string name);
-        IList<HistoryDto> SortByParam(List<HistoryDto> histories, HistorySortState sortOrder);
+        IQueryable<History> FilterByUserName(string name, IQueryable<History> baseQuery);
+        IQueryable<History> SortByParam(HistorySortState sortOrder, IQueryable<History> baseQuery);
         Task<HistoryIndexDto> GetPageInfo(string name, int page, int pageSize,
             HistorySortState sortOrder);
 

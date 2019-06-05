@@ -272,7 +272,7 @@ namespace WTP.WebAPI.Controllers
         }
 
         [HttpGet]
-        [Authorize(Policy = "RequireAdministratorRole")]
+        //[Authorize(Policy = "RequireAdministratorRole")]
         [Route("history")]
         public async Task<HistoryIndexDto> HistoryIndex(string name, int page = 1, int pageSize = 3,
             HistorySortState sortOrder = HistorySortState.DateDesc)
