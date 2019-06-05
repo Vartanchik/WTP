@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -188,22 +189,13 @@ namespace WTP.BLL.Services.Concrete.AppUserService
         {
             var user = await _uow.AppUsers.GetByIdAsync(userId);
 
-            if (user == null)
-            {
-                return false;
-            }
+            if (user == null) return false;
 
             var currentToken = await _uow.RestoreTokens.GetByUserId(userId);
 
-            if (currentToken != null && token != currentToken.Value)
-            {
-                return false;
-            }
+            if (currentToken != null && token != currentToken.Value) return false;
 
-            if (currentToken.ExpiryDate < DateTime.Now)
-            {
-                return false;
-            }
+            if (currentToken.ExpiryDate < DateTime.Now) return false;
 
             user.IsDeleted = false;
 
@@ -214,16 +206,12 @@ namespace WTP.BLL.Services.Concrete.AppUserService
             return true;
         }
 
-        public UserIconDto GetUserIconAsync(int userId)
+        public async Task<UserIconDto> GetUserIconAsync(int userId)
         {
-            var info = new UserIconDto();
-
-            info = _uow.AppUsers.AsQueryable()
+            return await _uow.AppUsers.AsQueryable()
                                 .Where(u => u.Id == userId)
                                 .Select(x => new UserIconDto { UserName = x.UserName, Photo = x.Photo })
-                                .FirstOrDefault();
-
-            return info;
+                                .FirstOrDefaultAsync();
         }
     }
 }

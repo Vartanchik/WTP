@@ -46,9 +46,10 @@ namespace WTP.WebAPI.Controllers
 
         [HttpGet("[action]/{userId}")]
         [ProducesResponseType(typeof(UserIconDto), 200)]
-        public IActionResult UserIcon([FromRoute] int userId)
+        [ProducesResponseType(204)]
+        public async Task<IActionResult> UserIcon([FromRoute] int userId)
         {
-            var icon = _appUserService.GetUserIconAsync(userId);
+            var icon = await _appUserService.GetUserIconAsync(userId);
 
             switch (icon)
             {
