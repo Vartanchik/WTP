@@ -11,11 +11,10 @@ namespace WTP.BLL.Services.Concrete.TeamService
         Task<ServiceResult> CreateAsync(CreateTeamDto dto, int userId);
         Task<ServiceResult> UpdateAsync(UpdateTeamDto dto, int userId);
         Task<ServiceResult> DeleteAsync(int teamId, int userId);
-        IList<PlayerListItemDto> GetPlayers(int teamId);
-        Task<ServiceResult> InviteToPlayerAsync(TeamActionDto dto);
-        Task<ServiceResult> InviteToTeamAsync(TeamActionDto dto);
-        Task<ServiceResult> AcceptInvitationAsync(InviteActionDto dto);
+        IList<PlayerListItemDto> GetTeamPlayers(int teamId);
+        Task<ServiceResult> CreateInvitationAsync(TeamActionDto dto);
         Task<ServiceResult> DeclineInvitationAsync(InviteActionDto dto);
+        Task<ServiceResult> AcceptInvitationAsync(InviteActionDto dto);
         Task<ServiceResult> RemoveFromTeamAsync(TeamActionDto dto);
         Task<IList<TeamListItemDto>> GetListByUserIdAsync(int userId);
         Task<ServiceResult> UpdateLogoAsync(int userId, int teamId, string logo);

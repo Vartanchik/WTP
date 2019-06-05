@@ -9,6 +9,7 @@ using WTP.BLL.DTOs.TokensDTOs;
 using WTP.DAL.Entities.AppUserEntities;
 using WTP.DAL.UnitOfWork;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.EntityFrameworkCore;
 
 namespace WTP.BLL.Services.Concrete.RefreshTokenService
 {
@@ -34,10 +35,7 @@ namespace WTP.BLL.Services.Concrete.RefreshTokenService
                     return new ServiceResult("We sent you an confirmation email. Please confirm your registration.");
                 }
 
-                if (user.IsDeleted)
-                {
-                    return new ServiceResult("User is deleted.");
-                }
+                if (user.IsDeleted) return new ServiceResult("User is deleted.");
 
                 return new ServiceResult();
             }
@@ -93,10 +91,10 @@ namespace WTP.BLL.Services.Concrete.RefreshTokenService
         {
             var access = new AccessDto();
 
-            var userId = _uow.AppUsers.AsQueryable()
-                                      .Where(u => u.Email == email)
-                                      .Select(u => u.Id)
-                                      .FirstOrDefault();
+            var userId = await _uow.AppUsers.AsQueryable()
+                                            .Where(u => u.Email == email)
+                                            .Select(u => u.Id)
+                                            .FirstOrDefaultAsync();
 
             if (userId == 0) return access;
 
@@ -110,9 +108,9 @@ namespace WTP.BLL.Services.Concrete.RefreshTokenService
         {
             var access = new AccessDto();
 
-            var exist = _uow.RefreshTokens.AsQueryable()
-                                          .Any(t => t.UserId == dto.UserId &&
-                                                    t.Value == dto.RefreshToken);
+            var exist = await _uow.RefreshTokens.AsQueryable()
+                                                .AnyAsync(t => t.UserId == dto.UserId &&
+                                                               t.Value == dto.RefreshToken);
 
             if (exist)
             {
