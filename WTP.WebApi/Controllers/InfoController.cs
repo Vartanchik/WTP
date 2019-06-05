@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using WTP.BLL.DTOs.PlayerDTOs;
 using WTP.BLL.DTOs.ServicesDTOs;
+using WTP.BLL.Services.Concrete.AppUserService;
 using WTP.BLL.Services.Concrete.GameService;
 
 namespace WTP.WebAPI.Controllers
@@ -12,10 +14,12 @@ namespace WTP.WebAPI.Controllers
     public class InfoController : Controller
     {
         private readonly IGameService _gameService;
+        private readonly IAppUserService _appUserService;
 
-        public InfoController(IGameService gameService)
+        public InfoController(IGameService gameService, IAppUserService appUserService)
         {
             _gameService = gameService;
+            _appUserService = appUserService;
         }
 
         /// <summary>
@@ -35,6 +39,15 @@ namespace WTP.WebAPI.Controllers
             return listOfGames == null
                 ? BadRequest(new ResponseDto(400, "Get all games failed."))
                 : (IActionResult)Ok(listOfGames);
+        }
+
+        [HttpGet("[action]/{userId}")]
+        [ProducesResponseType(typeof(UserIconDto), 200)]
+        public UserIconDto UserIcon([FromRoute] int userId)
+        {
+            var icon = _appUserService.GetUserIconAsync(userId);
+
+            return icon;
         }
     }
 }

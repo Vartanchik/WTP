@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using WTP.DAL.Entities.AppUserEntities;
 using WTP.DAL.Repositories.GenericRepository;
@@ -56,6 +58,13 @@ namespace WTP.DAL.Repositories.ConcreteRepositories.AppUserRepository
         public async Task<IList<string>> GetRolesAsync(AppUser appUser)
         {
             return await _userManager.GetRolesAsync(appUser);
+        }
+
+        public async Task<IList<string>> GetRolesAsync(int userId)
+        {
+            var user = await _context.AppUsers.FirstOrDefaultAsync(u => u.Id == userId);
+
+            return await _userManager.GetRolesAsync(user);
         }
 
         public async Task<bool> CheckPasswordAsync(int userId, string password)
@@ -119,6 +128,14 @@ namespace WTP.DAL.Repositories.ConcreteRepositories.AppUserRepository
             var user = await GetByIdAsync(userId);
 
             return await _userManager.ConfirmEmailAsync(user, token);
+        }
+
+        public virtual int GetIdByCondition(Func<AppUser, bool> condition)
+        {
+            return base.AsQueryable()
+                       .Where(condition)
+                       .Select(x => x.Id)
+                       .FirstOrDefault();
         }
     }
 }

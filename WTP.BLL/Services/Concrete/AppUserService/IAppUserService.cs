@@ -18,12 +18,13 @@ namespace WTP.BLL.Services.Concrete.AppUserService
         Task<bool> IsEmailConfirmedAsync(int userId);
         Task<string> GeneratePasswordResetTokenAsync(AppUserDto appUserDto);
         Task<IdentityResult> ResetPasswordAsync(ResetPasswordDto resetPasswordDto);
-        Task<IdentityResult> ChangePasswordAsync(ChangePasswordDto changePasswordDto);
+        Task<IdentityResult> ChangePasswordAsync(ChangeUserPasswordDto changePasswordDto);
         Task<string> GenerateEmailConfirmationTokenAsync(AppUserDto appUserDto);
         Task<AppUserDto> FindByIdAsync(string userId);
         Task<IdentityResult> ConfirmEmailAsync(int userId, string token);
         Task DeleteAccountAsync(int userId);
         Task<string> CreateRestoreAccountToken(int userId);
         Task<bool> RestoreAccountAsync(int userId, string token);
+        UserIconDto GetUserIconAsync(int userId);
     }
 }

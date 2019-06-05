@@ -8,7 +8,6 @@ namespace WTP.BLL.DTOs.AppUserDTOs
         public string Value { get; set; }
         public DateTime CreatedDate { get; set; }
         public int UserId { get; set; }
-        public AppUserDto AppUser { get; set; }
         public DateTime ExpiryTime { get; set; }
     }
 }
