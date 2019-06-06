@@ -42,6 +42,34 @@ namespace WTP.WebAPI.Controllers
         }
 
         /// <summary>
+        /// Get team id
+        /// </summary>
+        /// <param name="gameId"></param>
+        /// <returns></returns>
+        [HttpGet("[action]")]
+        [ProducesResponseType(typeof(int), 200)]
+        public int GetTeamIdByGameId(int gameId)
+        {
+            var userId = this.GetCurrentUserId();
+
+            return _teamService.GetTeamIdByGameId(userId, gameId);
+        }
+
+        /// <summary>
+        /// Get team players quantity
+        /// </summary>
+        /// <param name="gameId"></param>
+        /// <returns>Quantity of players or -1 if this game's team isn't exist</returns>
+        [HttpGet("[action]")]
+        [ProducesResponseType(typeof(int), 200)]
+        public async Task<int> GetTeamPlayersQuantityByGame(int gameId)
+        {
+            var userId = this.GetCurrentUserId();
+
+            return await _teamService.GetPlayersQuantityAsync(userId, gameId);
+        }
+
+        /// <summary>
         /// Create team
         /// </summary>
         /// <param name="dto"></param>
@@ -289,9 +317,12 @@ namespace WTP.WebAPI.Controllers
         /// <param name="userId"></param>
         /// <returns></returns>
         [HttpGet("[action]")]
+        [Authorize(Policy = "RequireLoggedIn")]
         [ProducesResponseType(typeof(IList<InvitationListItemDto>), 200)]
-        public async Task<IList<InvitationListItemDto>> InvitationTeamListByUserId(int userId)
+        public async Task<IList<InvitationListItemDto>> InvitationTeamListByUserId()
         {
+            var userId = this.GetCurrentUserId();
+
             return await _teamService.GetAllTeamInvitetionByUserId(userId);
         }
     }

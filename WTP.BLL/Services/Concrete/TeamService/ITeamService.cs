@@ -20,5 +20,7 @@ namespace WTP.BLL.Services.Concrete.TeamService
         Task<IList<TeamListItemDto>> GetListByUserIdAsync(int userId);
         Task<ServiceResult> UpdateLogoAsync(int userId, int teamId, string logo);
         Task<IList<InvitationListItemDto>> GetAllTeamInvitetionByUserId(int userId);
+        int GetTeamIdByGameId(int userId, int gameId);
+        Task<int> GetPlayersQuantityAsync(int userId, int gameId);
     }
 }

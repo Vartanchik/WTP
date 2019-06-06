@@ -94,6 +94,28 @@ namespace WTP.BLL.Services.Concrete.TeamService
                 : _mapper.Map<IList<PlayerListItemDto>>(players);
         }
 
+        public int GetTeamIdByGameId(int userId, int gameId)
+        {
+            return _uow.Teams.AsQueryable()
+                             .FirstOrDefault(t => t.GameId == gameId && t.CoachId == userId)
+                             .Id;
+        }
+
+        public async Task<int> GetPlayersQuantityAsync(int userId, int gameId)
+        {
+            var isTeamExist = await _uow.Teams.AsQueryable()
+                                              .AnyAsync(t => t.GameId == gameId &&
+                                                             t.CoachId == userId);
+
+            if (!isTeamExist) return -1;
+
+            return _uow.Teams.AsQueryable()
+                             .Include(t => t.Players)
+                             .FirstOrDefault(t => t.GameId == gameId && t.CoachId == userId)
+                             .Players
+                             .Count;
+        }
+
         public async Task<ServiceResult> InviteToPlayerAsync(TeamActionDto dto)
         {
             // check player
