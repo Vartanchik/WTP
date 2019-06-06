@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using WTP.BLL.DTOs.PlayerDTOs;
 using WTP.BLL.DTOs.TeamDTOs;
+using WTP.DAL.Entities;
 using WTP.DAL.Entities.TeamEntities;
 using WTP.DAL.UnitOfWork;
 
@@ -35,12 +36,12 @@ namespace WTP.BLL.Services.Concrete.TeamService
             bool existedTeam = await _uow.Teams.AsQueryable()
                                                .AnyAsync(t => t.Name == dto.Name &&
                                                               t.GameId == dto.GameId &&
-                                                              t.CoachId != userId);
+                                                              t.AppUserId != userId);
 
             if (existedTeam) return new ServiceResult("Team already existed.");
 
             var team = _mapper.Map<Team>(dto);
-            team.CoachId = userId;
+            team.AppUserId = userId;
 
             await _uow.Teams.CreateOrUpdate(team);
             await _uow.CommitAsync();
@@ -52,7 +53,7 @@ namespace WTP.BLL.Services.Concrete.TeamService
         {
             var existedTeam = await _uow.Teams.AsQueryable()
                                               .FirstOrDefaultAsync(t => t.Id == dto.Id &&
-                                                                        t.CoachId == userId);
+                                                                        t.AppUserId == userId);
 
             if (existedTeam == null) return new ServiceResult("Team not found.");
 
@@ -70,11 +71,170 @@ namespace WTP.BLL.Services.Concrete.TeamService
         {
             var team = await _uow.Teams.AsQueryable()
                                        .FirstOrDefaultAsync(t => t.Id == teamId &&
-                                                                 t.CoachId == userId);
+                                                                 t.AppUserId == userId);
 
             if (team == null) return new ServiceResult("Team not found.");
 
             await _uow.Teams.DeleteAsync(team.Id);
+            await _uow.CommitAsync();
+
+            return new ServiceResult();
+        }
+
+        public async Task<ServiceResult> CreateInvitationAsync(TeamActionDto dto)
+        {
+            var playerUserId = _uow.Players.AsQueryable()
+                                           .Where(p => p.Id == dto.PlayerId)
+                                           .Select(p => p.AppUserId)
+                                           .FirstOrDefault();
+
+            if (playerUserId == 0) return new ServiceResult("Player not found.");
+
+            var teamCoachId = _uow.Teams.AsQueryable()
+                                        .Where(t => t.Id == dto.TeamId)
+                                        .Select(t => t.AppUserId)
+                                        .FirstOrDefault();
+
+            if (teamCoachId == 0) return new ServiceResult("Team not found.");
+
+            Author author;
+
+            if (playerUserId == dto.UserId) author = Author.Player;
+            else if (teamCoachId == dto.UserId) author = Author.Coach;
+            else return new ServiceResult("You do not have access to perform this operation.");
+
+            var invite = new Invitation
+            {
+                PlayerId = dto.PlayerId,
+                TeamId = dto.TeamId,
+                Author = author
+            };
+
+            await _uow.Invitations.CreateOrUpdate(invite);
+            await _uow.CommitAsync();
+
+            return new ServiceResult();
+        }
+
+        public async Task<ServiceResult> DeclineInvitationAsync(InviteActionDto dto)
+        {
+            var invitation = await _uow.Invitations.GetByIdAsync(dto.InvitationId);
+
+            if (invitation == null) return new ServiceResult("Invitation not found.");
+
+            var userIsPlayer = await _uow.Players.AsQueryable()
+                                                 .AnyAsync(p => p.Id == invitation.TeamId && 
+                                                                p.AppUserId == dto.UserId);
+
+            var userIsTeam = await _uow.Teams.AsQueryable()
+                                             .AnyAsync(t => t.Id == invitation.TeamId &&
+                                                            t.AppUserId == dto.UserId);
+
+            if (!userIsPlayer && !userIsTeam) return new ServiceResult("You do not have access to perform this operation.");
+
+            await _uow.Invitations.DeleteAsync(invitation.Id);
+            await _uow.CommitAsync();
+
+            return new ServiceResult();
+        }
+
+        public async Task<ServiceResult> RemoveFromTeamAsync(TeamActionDto dto)
+        {
+            var playerUserId = await _uow.Players.AsQueryable()
+                                                 .Where(p => p.Id == dto.PlayerId &&
+                                                             p.TeamId == dto.TeamId)
+                                                 .Select(p => p.AppUserId)
+                                                 .FirstOrDefaultAsync();
+
+            if (playerUserId == 0) return new ServiceResult("Player not found.");
+
+            var teamUserId = await _uow.Teams.AsQueryable()
+                                             .Where(t => t.Id == dto.TeamId)
+                                             .Select(t => t.AppUserId)
+                                             .FirstOrDefaultAsync();
+
+            if (teamUserId == 0) return new ServiceResult("Team not found.");
+
+            if (playerUserId != dto.UserId || teamUserId != dto.UserId)
+                return new ServiceResult("You do not have access to perform this operation.");
+
+            var playerToRemove = await _uow.Players.AsQueryable()
+                                                   .Where(p => p.Id == dto.PlayerId)
+                                                   .FirstOrDefaultAsync();
+            playerToRemove.TeamId = null;
+
+            await _uow.Players.CreateOrUpdate(playerToRemove);
+            await _uow.CommitAsync();
+
+            return new ServiceResult();
+        }
+
+        public async Task<ServiceResult> AcceptInvitationAsync(InviteActionDto dto)
+        {
+            var invitation = await _uow.Invitations.GetByIdAsync(dto.InvitationId);
+
+            if (invitation == null) return new ServiceResult("Invitation not found.");
+
+            var playerUserId = await _uow.Players.AsQueryable()
+                                                  .Where(p => p.AppUserId == invitation.PlayerId)
+                                                  .Select(p => p.AppUserId)
+                                                  .FirstOrDefaultAsync();
+
+            if (playerUserId == 0) return new ServiceResult("Player not found.");
+
+            var teamUserId = await _uow.Teams.AsQueryable()
+                                              .Where(t => t.Id == invitation.TeamId)
+                                              .Select(t => t.AppUserId)
+                                              .FirstOrDefaultAsync();
+
+            if (teamUserId == 0) return new ServiceResult("Team not found.");
+
+            if (playerUserId == dto.UserId && invitation.Author == Author.Coach ||
+                teamUserId == dto.UserId && invitation.Author == Author.Player)
+            {
+                return await AddToTeamAsync(invitation.PlayerId, invitation.TeamId);
+            }
+            else
+            {
+                return new ServiceResult("You do not have access to perform this operation.");
+            }
+        }
+
+        private async Task<ServiceResult> AddToTeamAsync(int playerId, int teamId)
+        {
+            var team = await _uow.Teams.GetByIdAsync(teamId);
+
+            if (team == null) return new ServiceResult("Team not found.");
+
+            if (team.Players == null) team.Players = new List<Player>();
+            else if (team.Players.Count >= 5) return new ServiceResult("Team is fuel.");
+
+            var player = await _uow.Players.GetByIdAsync(playerId);
+
+            if (player == null) return new ServiceResult("Player not found.");
+
+            if (player.TeamId.GetValueOrDefault() != 0)
+                return new ServiceResult("In order to state part of the team you must exit the current one.");
+
+            player.Team = team;
+
+            await _uow.Players.CreateOrUpdate(player);
+            await _uow.CommitAsync();
+
+            return new ServiceResult();
+        }
+
+        public async Task<ServiceResult> UpdateLogoAsync(int userId, int teamId, string logo)
+        {
+            var team = await _uow.Teams.AsQueryable()
+                                       .Where(t => t.AppUserId == userId && t.Id == teamId)
+                                       .FirstOrDefaultAsync();
+
+            if (team == null) return new ServiceResult("Team not found.");
+
+            team.Photo = logo;
+
+            await _uow.Teams.CreateOrUpdate(team);
             await _uow.CommitAsync();
 
             return new ServiceResult();
@@ -99,96 +259,16 @@ namespace WTP.BLL.Services.Concrete.TeamService
                                               .Include(t => t.Server)
                                               .Include(t => t.Goal)
                                               .AsNoTracking()
-                                              .Where(p => p.CoachId == userId)
+                                              .Where(p => p.AppUserId == userId)
                                               .ToListAsync();
 
             return _mapper.Map<IList<TeamListItemDto>>(listOfTeams);
         }
 
-        public async Task<ServiceResult> UpdateLogoAsync(int userId, int teamId, string logo)
-        {
-            var team = await _uow.Teams.AsQueryable()
-                                       .Where(t => t.CoachId == userId && t.Id == teamId)
-                                       .FirstOrDefaultAsync();
-
-            if (team == null) return new ServiceResult("Team not found.");
-
-            team.Photo = logo;
-
-            await _uow.Teams.CreateOrUpdate(team);
-            await _uow.CommitAsync();
-
-            return new ServiceResult();
-        }
-
-        public async Task<ServiceResult> DeclineInvitationAsync(InviteActionDto dto)
-        {
-            var invitation = await _uow.Invitations.GetByIdAsync(dto.InvitationId);
-
-            if (invitation == null) return new ServiceResult("Invitation not found.");
-
-            if (!ValideResponde(dto.UserId, invitation)) return new ServiceResult("Error access.");
-
-            await _uow.Invitations.DeleteAsync(invitation.Id);
-            await _uow.CommitAsync();
-
-            return new ServiceResult();
-        }
-
-        private async Task<ServiceResult> AddToTeamAsync(int playerId, int teamId)
-        {
-            var team = await _uow.Teams.GetByIdAsync(teamId);
-
-            if (team == null) return new ServiceResult("Team not found.");
-
-            if (team.Players.Count >= 5) return new ServiceResult("Team is fuel.");
-
-            var player = await _uow.Players.GetByIdAsync(playerId);
-
-            if (player == null) return new ServiceResult("Player not found.");
-
-            if (player.TeamId.GetValueOrDefault() != 0)
-                return new ServiceResult("In order to state part of the team you must exit the current one.");
-
-            player.Team = team;
-
-            await _uow.Players.CreateOrUpdate(player);
-            await _uow.CommitAsync();
-
-            return new ServiceResult();
-        }
-
-        public async Task<ServiceResult> RemoveFromTeamAsync(TeamActionDto dto)
-        {
-            var existedPlayer = await _uow.Players.AsQueryable()
-                                                  .AnyAsync(p => p.Id == dto.PlayerId &&
-                                                                 p.TeamId == dto.TeamId);
-
-            if (!existedPlayer) return new ServiceResult("Player not found.");
-
-            // info about access to delete
-            var existedTeam = await _uow.Teams.AsQueryable()
-                                              .AnyAsync(t => t.Id == dto.TeamId &&
-                                                             t.CoachId == dto.UserId);
-
-            if (!existedTeam) return new ServiceResult("Team not found.");
-
-            var playerToModify = await _uow.Players.AsQueryable()
-                                                   .Where(p => p.Id == dto.PlayerId)
-                                                   .FirstOrDefaultAsync();
-            playerToModify.TeamId = null;
-            // ?
-            // @Vardan CreateOrUpdate ? 
-            await _uow.CommitAsync();
-
-            return new ServiceResult();
-
-        }
-
         public async Task<IList<InvitationListItemDto>> GetAllTeamInvitetionByUserId(int userId)
         {
             var listOfTeamId = await _uow.Teams.AsQueryable()
-                                                 .Where(t => t.CoachId == userId)
+                                                 .Where(t => t.AppUserId == userId)
                                                  .Select(t => t.Id)
                                                  .ToListAsync();
 
@@ -208,80 +288,6 @@ namespace WTP.BLL.Services.Concrete.TeamService
             }
 
             return _mapper.Map<List<InvitationListItemDto>>(listOfInvitations);
-        }
-
-        public async Task<ServiceResult> CreateInvitationAsync(TeamActionDto dto)
-        {
-            var playerUserId = _uow.Players.AsQueryable()
-                                           .Where(p => p.Id == dto.PlayerId)
-                                           .Select(p => p.AppUserId)
-                                           .FirstOrDefault();
-
-            if (playerUserId == 0) return new ServiceResult("Player not found.");
-
-            var teamCoachId = _uow.Teams.AsQueryable()
-                                           .Where(t => t.Id == dto.TeamId)
-                                           .Select(t => t.CoachId)
-                                           .FirstOrDefault();
-
-            if (teamCoachId == 0) return new ServiceResult("Team not found.");
-
-            Author author;
-
-            if (playerUserId == dto.UserId) author = Author.Player;
-            else if (teamCoachId == dto.UserId) author = Author.Coach;
-            else return new ServiceResult("No access.");
-
-            var invite = new Invitation
-            {
-                PlayerId = dto.PlayerId,
-                TeamId = dto.TeamId,
-                Author = author
-            };
-
-            await _uow.Invitations.CreateOrUpdate(invite);
-            await _uow.CommitAsync();
-
-            return new ServiceResult();
-        }
-
-        public async Task<ServiceResult> AcceptInvitationAsync(InviteActionDto dto)
-        {
-            var invitation = await _uow.Invitations.GetByIdAsync(dto.InvitationId);
-
-            if (invitation == null) return new ServiceResult("Invitation not found.");
-
-            // invitation => author => check => accept
-            
-            // !
-            // same query to diff repositories:
-            var playerUserId = _uow.Players.AsQueryable()
-                                           .Select(p => p.AppUserId)
-                                           .FirstOrDefault(id => id == dto.UserId);
-
-            if (playerUserId == 0) return new ServiceResult("Player not found.");
-
-            var teamCoachId = _uow.Teams.AsQueryable()
-                                        .Select(t => t.CoachId)
-                                        .FirstOrDefault(id => id == dto.UserId);
-
-            if (teamCoachId == 0) return new ServiceResult("Team not found.");
-
-            if (dto.UserId == playerUserId && invitation.Author == Author.Coach ||
-                dto.UserId == teamCoachId && invitation.Author == Author.Player)
-            {
-                return await AddToTeamAsync(invitation.PlayerId, invitation.TeamId);
-            }
-            else
-            {
-                return new ServiceResult("Error access.");
-            }
-        }
-
-        private bool ValideResponde(int userId, Invitation invitation)
-        {
-            return userId == invitation.PlayerId && invitation.Author == Author.Coach ||
-                   userId == invitation.TeamId && invitation.Author == Author.Player;
         }
     }
 }
