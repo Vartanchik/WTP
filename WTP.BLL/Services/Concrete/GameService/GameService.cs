@@ -53,5 +53,11 @@ namespace WTP.BLL.Services.Concrete.GameService
         {
             return _mapper.Map<GameDto>(await _uow.Games.GetByIdAsync(gameId));
         }
+
+        public async Task<GameDto> GetByIdAsync(int gameId)
+        {
+            var game = await _uow.Games.GetByIdAsync(gameId);
+            return _mapper.Map<GameDto>(game);
+        }
     }
 }

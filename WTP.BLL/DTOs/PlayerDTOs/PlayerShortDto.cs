@@ -11,18 +11,19 @@ namespace WTP.BLL.DTOs.PlayerDTOs
         public int Id { get; set; }
         public string Name { get; set; }
         public int AppUserId { get; set; }
-        public ShortUserFormDto AppUser { get; set; }
+        public string AppUserName { get; set; }
+        public string AppUserEmail { get; set; }
         public int GameId { get; set; }
-        public GameDto Game { get; set; }
+        public string GameName { get; set; }
         public int ServerId { get; set; }
-        public ServerDto Server { get; set; }
+        public string ServerName { get; set; }
         public int GoalId { get; set; }
-        public GoalDto Goal { get; set; }
+        public string GoalName { get; set; }
         public string About { get; set; }
         public int RankId { get; set; }
-        public RankDto Rank { get; set; }
+        public string RankName { get; set; }
         public int Decency { get; set; }
         public int TeamId { get; set; }
-        public TeamDto Team { get; set; }
+        public string TeamName { get; set; }
     }
 }

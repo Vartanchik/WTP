@@ -14,5 +14,6 @@ namespace WTP.BLL.Services.Concrete.GameService
         Task CreateOrUpdateAsync(GameDto dto, int? adminId = null);
         Task DeleteAsync(int gameId, int? adminId = null);
         Task<GameDto> FindAsync(int gameId);
+        Task<GameDto> GetByIdAsync(int gameId);
     }
 }

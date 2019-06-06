@@ -3,6 +3,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using WTP.BLL.DTOs.PlayerDTOs;
 using WTP.BLL.DTOs.ServicesDTOs;
+using WTP.BLL.Shared;
+using WTP.DAL.Entities;
 
 namespace WTP.BLL.Services.Concrete.PlayerSrvices
 {
@@ -16,6 +18,14 @@ namespace WTP.BLL.Services.Concrete.PlayerSrvices
         Task<IList<PlayerListItemDto>> GetListByUserIdAsync(int userId);
         Task<IList<PlayerListItemDto>> GetPlayersList();
         Task<IList<PlayerListItemDto>> GetListByGameIdAsync(int gameId);
-        Task<IList<PlayerDto>> GetPlayers();
+
+        Task<IList<PlayerShortDto>> GetJoinedPlayersListAsync();
+
+        IQueryable<Player> GetItemsOnPage(int page, int pageSize, IQueryable<Player> baseQuery);
+        Task<int> GetCountOfPlayers();
+        IQueryable<Player> FilterByName(string name, IQueryable<Player> baseQuery);
+        IQueryable<Player> SortByParam(PlayerSortState sortOrder, IQueryable<Player> baseQuery);
+        Task<PlayerManageDto> GetPageInfo(string name, int page, int pageSize,
+            PlayerSortState sortOrder);
     }
 }

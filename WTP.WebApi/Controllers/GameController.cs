@@ -31,6 +31,12 @@ namespace WTP.WebAPI.Controllers
             return listOfGames.ToArray();
         }
 
+        [HttpGet("item/{gameId}")]
+        [Authorize(Policy = "RequireLoggedIn")]
+        public async Task<GameDto> GetGameItem([FromRoute]int gameId)
+        {
+            return await _gameService.GetByIdAsync(gameId);
+        }
 
         [HttpPost("item")]
         [Authorize(Policy = "RequireLoggedIn")]

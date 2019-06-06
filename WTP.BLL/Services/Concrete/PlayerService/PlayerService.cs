@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,6 +9,7 @@ using WTP.BLL.DTOs.AppUserDTOs;
 using WTP.BLL.DTOs.PlayerDTOs;
 using WTP.BLL.DTOs.ServicesDTOs;
 using WTP.BLL.Services.Concrete.PlayerSrvices;
+using WTP.BLL.Shared;
 using WTP.DAL.Entities;
 using WTP.DAL.UnitOfWork;
 
@@ -130,44 +132,116 @@ namespace WTP.BLL.Services.Concrete.PlayerSrvice
             return _mapper.Map<IList<PlayerListItemDto>>(listOfPlayers);
         }
 
-        //public async Task<IQueryable<PlayerJoinedDto>> GetPlayersList()
-        //{
-        //    var allPlayers = from player in await _uow.Players.AsQueryable().ToListAsync()
-        //                     join game in await _uow.Games.AsQueryable().ToListAsync() on player.GameId equals game.Id
-        //                     join team in await _uow.Teams.AsQueryable().ToListAsync() on player.TeamId equals team.Id
-        //                     join rank in await _uow.Ranks.AsQueryable().ToListAsync() on player.RankId equals rank.Id
-        //                     join goal in await _uow.Goals.AsQueryable().ToListAsync() on player.GoalId equals goal.Id
-        //                     join server in await _uow.Servers.AsQueryable().ToListAsync() on player.ServerId equals server.Id
-        //                     join user in await _uow.AppUsers.AsQueryable().ToListAsync() on player.AppUserId equals user.Id
-        //                     select _mapper.Map<PlayerJoinedDto>(player);
-
-        //    return allPlayers.AsQueryable();
-        //}
-
-        //public async Task<IList<PlayerJoinedDto>> GetAllPlayersList()
-        //{
-        //    var allPlayers = from user in await _uow.AppUsers.AsQueryable().ToListAsync()
-        //                     join player in await _uow.Players.AsQueryable().ToListAsync() on user.Id equals player.AppUserId
-        //                     join team in await _uow.Teams.AsQueryable().ToListAsync() on player.TeamId equals team.Id
-        //                     join rank in await _uow.Ranks.AsQueryable().ToListAsync() on player.RankId equals rank.Id
-        //                     join game in await _uow.Games.AsQueryable().ToListAsync() on player.GameId/*player.GameId*/ equals game.Id
-        //                     join server in await _uow.Servers.AsQueryable().ToListAsync() on player.ServerId equals server.Id
-        //                     join goal in await _uow.Goals.AsQueryable().ToListAsync() on player.GoalId equals goal.Id
-        //                     select _mapper.Map<PlayerJoinedDto>(player);
-
-        //    return allPlayers.GroupBy(x => x.Id).Select(x => x.FirstOrDefault()).ToList();
-        //}
-
-        public async Task<IList<PlayerDto>> GetPlayers()
+        public async Task<IList<PlayerShortDto>> GetJoinedPlayersListAsync()
         {
             var allPlayers = await _uow.Players.AsQueryable().ToListAsync();
-            return _mapper.Map<IList<PlayerDto>>(allPlayers);
+            return _mapper.Map<IList<PlayerShortDto>>(allPlayers);
         }
 
-        //public async Task<PlayerJoinedDto> GetPlayerInfo(int playerId)
-        //{
-        //    var player = await GetAllPlayersList();
-        //    return player.SingleOrDefault(p => p.Id == playerId);
-        //}
+        public IQueryable<Player> FilterByName(string name, IQueryable<Player> baseQuery)
+        {
+            if (!String.IsNullOrEmpty(name))
+                return baseQuery.Where(p => p.Name.Contains(name));
+
+            return null;
+        }
+
+        public IQueryable<Player> SortByParam(PlayerSortState sortOrder, IQueryable<Player> baseQuery)
+        {
+            IQueryable<Player> query = Enumerable.Empty<Player>().AsQueryable();
+            switch (sortOrder)
+            {
+                case PlayerSortState.NameDesc:
+                    query = baseQuery.OrderByDescending(s => s.Name);
+                    break;
+                case PlayerSortState.NameAsc:
+                    query = baseQuery.OrderBy(s => s.Name);
+                    break;
+                case PlayerSortState.EmailAsc:
+                    query = baseQuery.OrderBy(s => s.AppUser.Email);
+                    break;
+                case PlayerSortState.EmailDesc:
+                    query = baseQuery.OrderByDescending(s => s.AppUser.Email);
+                    break;
+                case PlayerSortState.IdAsc:
+                    query = baseQuery.OrderBy(s => s.Id);
+                    break;
+                case PlayerSortState.IdDesc:
+                    query = baseQuery.OrderByDescending(s => s.Id);
+                    break;
+                case PlayerSortState.UserIdAsc:
+                    query = baseQuery.OrderBy(s => s.AppUserId);
+                    break;
+                case PlayerSortState.UserIdDesc:
+                    query = baseQuery.OrderByDescending(s => s.AppUserId);
+                    break;
+                case PlayerSortState.UserNameAsc:
+                    query = baseQuery.OrderBy(s => s.AppUser.UserName);
+                    break;
+                case PlayerSortState.UserNameDesc:
+                    query = baseQuery.OrderByDescending(s => s.AppUser.UserName);
+                    break;
+                case PlayerSortState.TeamNameAsc:
+                    query = baseQuery.OrderBy(s => s.Team.Name);
+                    break;
+                case PlayerSortState.TeamNameDesc:
+                    query = baseQuery.OrderByDescending(s => s.Team.Name);
+                    break;
+                case PlayerSortState.GameNameAsc:
+                    query = baseQuery.OrderBy(s => s.Game.Name);
+                    break;
+                case PlayerSortState.GameNameDesc:
+                    query = baseQuery.OrderByDescending(s => s.Game.Name);
+                    break;
+                default:
+                    query = baseQuery.OrderBy(s => s.Id);
+                    break;
+            }
+
+            return query;
+        }
+
+        public IQueryable<Player> GetItemsOnPage(int page, int pageSize, IQueryable<Player> baseQuery)
+        {
+            IQueryable<Player> query = Enumerable.Empty<Player>().AsQueryable();
+            query = baseQuery.Skip((page - 1) * pageSize).Take(pageSize);
+            return query;
+        }
+
+        public async Task<int> GetCountOfPlayers()
+        {
+            return await _uow.Players.AsQueryable().CountAsync();
+        }
+
+        public async Task<PlayerManageDto> GetPageInfo(string name, int page, int pageSize,
+            PlayerSortState sortOrder)
+        {
+            IQueryable<Player> query = _uow.Players.AsQueryable();
+            IEnumerable<PlayerShortDto> items = Enumerable.Empty<PlayerShortDto>();
+
+            try
+            {
+                var newQuery = FilterByName(name, query);
+                newQuery = SortByParam(sortOrder, newQuery);
+                newQuery = GetItemsOnPage(page, pageSize, newQuery);
+
+                items = _mapper.Map<List<PlayerShortDto>>(newQuery.ToList());
+            }
+            catch (ArgumentNullException ex)
+            {
+                //TODO
+                //_log.Error(ex.Message);
+            }
+
+            var count = await this.GetCountOfPlayers();
+
+            PlayerManageDto viewModel = new PlayerManageDto
+            {
+                PageViewModel = new PageDto(count, page, pageSize),
+                SortViewModel = new PlayerManageSortDto(sortOrder),
+                Players = items
+            };
+            return viewModel;
+        }
     }
 }
