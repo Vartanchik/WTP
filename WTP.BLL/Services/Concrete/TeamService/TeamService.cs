@@ -5,8 +5,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using WTP.BLL.DTOs.PlayerDTOs;
 using WTP.BLL.DTOs.TeamDTOs;
-using WTP.DAL;
-using WTP.DAL.Entities;
 using WTP.DAL.Entities.TeamEntities;
 using WTP.DAL.UnitOfWork;
 
@@ -34,10 +32,10 @@ namespace WTP.BLL.Services.Concrete.TeamService
 
         public async Task<ServiceResult> CreateAsync(CreateTeamDto dto, int userId)
         {
-            bool existedTeam = _uow.Teams.AsQueryable()
-                                         .Any(t => t.Name == dto.Name &&
-                                                   t.GameId == dto.GameId &&
-                                                   t.CoachId != userId);
+            bool existedTeam = await _uow.Teams.AsQueryable()
+                                               .AnyAsync(t => t.Name == dto.Name &&
+                                                              t.GameId == dto.GameId &&
+                                                              t.CoachId != userId);
 
             if (existedTeam) return new ServiceResult("Team already existed.");
 
@@ -52,9 +50,9 @@ namespace WTP.BLL.Services.Concrete.TeamService
 
         public async Task<ServiceResult> UpdateAsync(UpdateTeamDto dto, int userId)
         {
-            var existedTeam = _uow.Teams.AsQueryable()
-                                        .FirstOrDefault(t => t.Id == dto.Id &&
-                                                             t.CoachId == userId);
+            var existedTeam = await _uow.Teams.AsQueryable()
+                                              .FirstOrDefaultAsync(t => t.Id == dto.Id &&
+                                                                        t.CoachId == userId);
 
             if (existedTeam == null) return new ServiceResult("Team not found.");
 
@@ -82,11 +80,12 @@ namespace WTP.BLL.Services.Concrete.TeamService
             return new ServiceResult();
         }
 
-        public IList<PlayerListItemDto> GetTeamPlayers(int teamId)
+        public async Task<IList<PlayerListItemDto>> GetTeamPlayers(int teamId)
         {
-            var players = _uow.Teams.AsQueryable()
-                                    .FirstOrDefault(t => t.Id == teamId)
-                                    .Players;
+            var players = await _uow.Teams.AsQueryable()
+                                          .Where(t => t.Id == teamId)
+                                          .Select(t => t.Players)
+                                          .FirstOrDefaultAsync();
 
             return players == null
                 ? null
@@ -128,11 +127,7 @@ namespace WTP.BLL.Services.Concrete.TeamService
 
             if (invitation == null) return new ServiceResult("Invitation not found.");
 
-            if (!(dto.UserId == invitation.PlayerId && invitation.Author == Author.Coach ||
-                dto.UserId == invitation.TeamId && invitation.Author == Author.Player))
-            {
-                return new ServiceResult("Error access.");
-            }
+            if (!ValideResponde(dto.UserId, invitation)) return new ServiceResult("Error access.");
 
             await _uow.Invitations.DeleteAsync(invitation.Id);
             await _uow.CommitAsync();
@@ -217,8 +212,6 @@ namespace WTP.BLL.Services.Concrete.TeamService
 
         public async Task<ServiceResult> CreateInvitationAsync(TeamActionDto dto)
         {
-            // !
-            // same query to diff repositories:
             var playerUserId = _uow.Players.AsQueryable()
                                            .Where(p => p.Id == dto.PlayerId)
                                            .Select(p => p.AppUserId)
@@ -227,7 +220,7 @@ namespace WTP.BLL.Services.Concrete.TeamService
             if (playerUserId == 0) return new ServiceResult("Player not found.");
 
             var teamCoachId = _uow.Teams.AsQueryable()
-                                           .Where(t => t.Id == dto.PlayerId)
+                                           .Where(t => t.Id == dto.TeamId)
                                            .Select(t => t.CoachId)
                                            .FirstOrDefault();
 
@@ -258,6 +251,8 @@ namespace WTP.BLL.Services.Concrete.TeamService
 
             if (invitation == null) return new ServiceResult("Invitation not found.");
 
+            // invitation => author => check => accept
+            
             // !
             // same query to diff repositories:
             var playerUserId = _uow.Players.AsQueryable()
@@ -283,15 +278,10 @@ namespace WTP.BLL.Services.Concrete.TeamService
             }
         }
 
-        /*
-         * create IOwner interface { int AppUserId }
-         * 
-        private async int GetOwnerId(IQueryable<IEntity> entities)
+        private bool ValideResponde(int userId, Invitation invitation)
         {
-            return entities.Select(x => x.OWNER_ID)
+            return userId == invitation.PlayerId && invitation.Author == Author.Coach ||
+                   userId == invitation.TeamId && invitation.Author == Author.Player;
         }
-        */
-
-        // FirstOrDefauldAsync
     }
 }

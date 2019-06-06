@@ -182,7 +182,7 @@ namespace WTP.WebAPI.Controllers
         [Authorize(Policy = "RequireLoggedIn")]
         [ProducesResponseType(typeof(ResponseDto), 200)]
         [ProducesResponseType(typeof(ResponseDto), 400)]
-        public async Task<IActionResult> UpdateLogo([FromForm]PhotoFormDataDto formData, int teamId)
+        public async Task<IActionResult> UpdateLogo([FromForm] PhotoFormDataDto formData, int teamId)
         {
             var azureStorageConfig = new AzureBlobStorageConfigDto(_configuration["AzureBlobStorage:AccountName"],
                                                                    _configuration["AzureBlobStorage:AccountKey"],
