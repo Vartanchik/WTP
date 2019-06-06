@@ -101,6 +101,7 @@ namespace WTP.WebAPI.Controllers
             return await _playerService.GetListByUserIdAsync(userId);
         }
 
+
         /// <summary>
         /// Get list players by team
         /// </summary>
