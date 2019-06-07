@@ -16,7 +16,7 @@ namespace WTP.DAL.Entities.AppUserEntities
         public DateTime CreatedDate { get; set; }
 
         [Required]
-        public int UserId { get; set; }
+        public int AppUserId { get; set; }
 
         [ForeignKey("UserId")]
         public AppUser AppUser { get; set; }

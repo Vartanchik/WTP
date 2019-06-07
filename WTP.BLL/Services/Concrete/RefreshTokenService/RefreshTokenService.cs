@@ -53,7 +53,7 @@ namespace WTP.BLL.Services.Concrete.RefreshTokenService
             {
                 Value = Guid.NewGuid().ToString("N"),
                 CreatedDate = DateTime.UtcNow,
-                UserId = userId,
+                AppUserId = userId,
                 ExpiryTime = DateTime.UtcNow.Add(_tokenSettings.ExpireTime),
             };
 
@@ -110,7 +110,7 @@ namespace WTP.BLL.Services.Concrete.RefreshTokenService
             var access = new AccessDto();
 
             var exist = await _uow.RefreshTokens.AsQueryable()
-                                                .AnyAsync(t => t.UserId == dto.UserId &&
+                                                .AnyAsync(t => t.AppUserId == dto.UserId &&
                                                                t.Value == dto.RefreshToken);
 
             return exist

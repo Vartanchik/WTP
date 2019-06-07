@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace WTP.DAL.Migrations
 {
-    public partial class SomeFixTeam : Migration
+    public partial class Try1 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -298,7 +298,8 @@ namespace WTP.DAL.Migrations
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     Value = table.Column<string>(nullable: false),
                     CreatedDate = table.Column<DateTime>(nullable: false),
-                    UserId = table.Column<int>(nullable: false),
+                    AppUserId = table.Column<int>(nullable: false),
+                    UserId = table.Column<int>(nullable: true),
                     ExpiryTime = table.Column<DateTime>(nullable: false)
                 },
                 constraints: table =>
@@ -309,7 +310,7 @@ namespace WTP.DAL.Migrations
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
