@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using WTP.BLL.DTOs.PlayerDTOs;
 
 namespace WTP.BLL.Services.Concrete.GameService
 {
     public interface IGameService
     {
-        IEnumerable<GameDto> GetAllGames();
+        Task<IList<GameDto>> GetAllGamesAsync();
     }
 }

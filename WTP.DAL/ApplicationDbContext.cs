@@ -50,7 +50,7 @@ namespace WTP.DAL
                 .Property(_ => _.Id)
                 .ValueGeneratedOnAdd();
             builder.Entity<Invitation>()
-                .HasKey(_ => new { _.Id, _.PlayerId, _.TeamId });
+                .HasKey(_ => new { _.PlayerId, _.TeamId });
             builder.Entity<Invitation>()
                 .HasOne(_ => _.Player)
                 .WithMany(_ => _.Invitations)

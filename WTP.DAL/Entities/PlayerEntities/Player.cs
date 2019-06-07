@@ -19,7 +19,7 @@ namespace WTP.DAL.Entities
         public string About { get; set; }
         public int RankId { get; set; }
         public Rank Rank { get; set; }
-        public int? Decency { get; set; }
+        public int Decency { get; set; }
         public int? TeamId { get; set; }
         public Team Team { get; set; }
         public ICollection<Invitation> Invitations { get; set; }

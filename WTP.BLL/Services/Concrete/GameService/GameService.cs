@@ -1,8 +1,7 @@
 ﻿using AutoMapper;
-using System;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Threading.Tasks;
 using WTP.BLL.DTOs.PlayerDTOs;
 using WTP.DAL.UnitOfWork;
 
@@ -19,11 +18,11 @@ namespace WTP.BLL.Services.Concrete.GameService
             _mapper = mapper;
         }
 
-        public IEnumerable<GameDto> GetAllGames()
+        public async Task<IList<GameDto>> GetAllGamesAsync()
         {
-            var listOfGames =  _ouw.Games.AsQueryable().ToList();
+            var listOfGames = await _ouw.Games.AsQueryable().ToListAsync();
 
-            return _mapper.Map<IEnumerable<GameDto>>(listOfGames);
+            return _mapper.Map<IList<GameDto>>(listOfGames);
         }
     }
 }

@@ -24,7 +24,6 @@ namespace WTP.WebAPI.Controllers
         /// Get access and refresh tokens
         /// </summary>
         /// <param name="dto"></param>
-        /// <returns></returns>
         [HttpPost("[action]")]
         [ProducesResponseType(typeof(AccessDto), 200)]
         [ProducesResponseType(typeof(ResponseDto), 400)]
@@ -50,11 +49,10 @@ namespace WTP.WebAPI.Controllers
         /// Update access and refresh tokens
         /// </summary>
         /// <param name="refreshToken"></param>
-        /// <returns></returns>
         [HttpPost("[action]")]
         [Authorize(Policy = "RequireLoggedIn")]
         [ProducesResponseType(typeof(AccessDto), 200)]
-        public async Task<IActionResult> RefreshAccess([FromBody] string refreshToken)
+        public async Task<IActionResult> RefreshAccess([FromForm] string refreshToken)
         {
             var userId = this.GetCurrentUserId();
 

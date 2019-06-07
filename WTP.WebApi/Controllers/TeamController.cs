@@ -1,20 +1,21 @@
-using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Collections.Generic;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http.Extensions;
 using WTP.BLL.DTOs.AzureDTOs;
 using WTP.BLL.DTOs.ServicesDTOs;
 using WTP.BLL.DTOs.TeamDTOs;
 using WTP.BLL.Services.AzureBlobStorageService;
 using WTP.BLL.Services.Concrete.TeamService;
 using WTP.WebAPI.Utility.Extensions;
-using Microsoft.AspNetCore.Http.Extensions;
 
 namespace WTP.WebAPI.Controllers
 {
-    [ApiController]
+    [Produces("application/json")]
     [Route("api/[controller]")]
+    [ApiController]
     public class TeamController : Controller
     {
         private readonly ITeamService _teamService;
@@ -29,16 +30,17 @@ namespace WTP.WebAPI.Controllers
         }
 
         /// <summary>
-        /// Get team
+        /// Get team DTO by team Id
         /// </summary>
         /// <param name="teamId"></param>
-        /// <returns></returns>
-        [HttpGet]
-        [ProducesResponseType(typeof(ResponseDto), 200)]
-        [ProducesResponseType(typeof(ResponseDto), 400)]
-        public async Task<TeamDto> Get(int teamId)
+        [HttpGet("[action]/{teamId}")]
+        [ProducesResponseType(typeof(TeamDto), 200)]
+        [ProducesResponseType(204)]
+        public async Task<IActionResult> Get([FromRoute] int teamId)
         {
-            return await _teamService.GetTeamAsync(teamId);
+            var team = await _teamService.GetTeamAsync(teamId);
+
+            return team == null ? NoContent() : (IActionResult)Ok(team);
         }
 
         /// <summary>
@@ -73,9 +75,9 @@ namespace WTP.WebAPI.Controllers
 
         /// <summary>
         /// Create team
+        /// Create team for current user
         /// </summary>
         /// <param name="dto"></param>
-        /// <returns></returns>
         [HttpPost]
         [Authorize(Policy = "RequireLoggedIn")]
         [ProducesResponseType(typeof(ResponseDto), 200)]
@@ -91,10 +93,9 @@ namespace WTP.WebAPI.Controllers
         }
 
         /// <summary>
-        /// Update team
+        /// Update team of current user
         /// </summary>
         /// <param name="dto"></param>
-        /// <returns></returns>
         [HttpPut]
         [Authorize(Policy = "RequireLoggedIn")]
         [ProducesResponseType(typeof(ResponseDto), 200)]
@@ -110,10 +111,9 @@ namespace WTP.WebAPI.Controllers
         }
 
         /// <summary>
-        /// Delete current user team by game id
+        /// Delete curren user team by Id
         /// </summary>
-        /// <param name="gameId"></param>
-        /// <returns>IActionResult</returns>
+        /// <param name="teamId"></param>
         [HttpDelete]
         [Authorize(Policy = "RequireLoggedIn")]
         [ProducesResponseType(typeof(ResponseDto), 200)]
@@ -129,19 +129,18 @@ namespace WTP.WebAPI.Controllers
         }
 
         /// <summary>
-        /// Invite player to team
+        /// Create an invitation to join the team
         /// </summary>
         /// <param name="playerId"></param>
         /// <param name="teamId"></param>
-        /// <returns></returns>
         [HttpPost("[action]")]
         [Authorize(Policy = "RequireLoggedIn")]
         [ProducesResponseType(typeof(ResponseDto), 200)]
         [ProducesResponseType(typeof(ResponseDto), 400)]
-        public async Task<IActionResult> InvitePlayer(int playerId, int teamId)
+        public async Task<IActionResult> Invite(int playerId, int teamId)
         {
             var userId = this.GetCurrentUserId();
-            var result = await _teamService.InviteToPlayerAsync(new TeamActionDto
+            var result = await _teamService.CreateInvitationAsync(new TeamActionDto
             {
                 PlayerId = playerId,
                 TeamId = teamId,
@@ -154,12 +153,38 @@ namespace WTP.WebAPI.Controllers
         }
 
         /// <summary>
+        /// Accept invitations to join the team
+        /// </summary>
+        /// <param name="dto"></param>
+        [HttpPut("[action]")]
+        [Authorize(Policy = "RequireLoggedIn")]
+        [ProducesResponseType(typeof(ResponseDto), 200)]
+        [ProducesResponseType(typeof(ResponseDto), 400)]
+        public async Task<IActionResult> AcceptInvitation(InvitationResponseDto dto)
+        {
+            var userId = this.GetCurrentUserId();
+
+            var invitation = new InviteActionDto
+            {
+                InvitationId = dto.InvitationId,
+                UserId = userId
+            };
+
+            var result = dto.Accept 
+                ? await _teamService.AcceptInvitationAsync(invitation)
+                : await _teamService.DeclineInvitationAsync(invitation);
+
+            return result.Succeeded
+                ? Ok(new ResponseDto(200, "Completed.", "Invite accept."))
+                : (IActionResult)BadRequest(new ResponseDto(400, "Failed.", result.Error));
+        }
+
+        /// <summary>
         /// Remove player from team
         /// </summary>
         /// <param name="playerId"></param>
         /// <param name="teamId"></param>
-        /// <returns>IActionResult</returns>
-        [HttpPut("[action]")]
+        [HttpDelete("[action]")]
         [Authorize(Policy = "RequireLoggedIn")]
         [ProducesResponseType(typeof(ResponseDto), 200)]
         [ProducesResponseType(typeof(ResponseDto), 400)]
@@ -180,94 +205,15 @@ namespace WTP.WebAPI.Controllers
         }
 
         /// <summary>
-        /// 
+        /// Update team logo
         /// </summary>
-        /// <param name="playerId"></param>
+        /// <param name="formData"></param>
         /// <param name="teamId"></param>
-        /// <returns></returns>
         [HttpPost("[action]")]
         [Authorize(Policy = "RequireLoggedIn")]
         [ProducesResponseType(typeof(ResponseDto), 200)]
         [ProducesResponseType(typeof(ResponseDto), 400)]
-        public async Task<IActionResult> InviteTeam(int playerId, int teamId)
-        {
-            var userId = this.GetCurrentUserId();
-            var result = await _teamService.InviteToTeamAsync(new TeamActionDto
-            {
-                PlayerId = playerId,
-                TeamId = teamId,
-                UserId = userId
-            });
-
-            return result.Succeeded
-                ? Ok(new ResponseDto(200, "Completed.", "Invite created."))
-                : (IActionResult)BadRequest(new ResponseDto(400, "Failed.", result.Error));
-        }
-
-        /// Get list of teams
-        /// </summary>
-        /// <param name="userId"></param>
-        /// <returns>IList<TeamListItemDto></returns>
-        [HttpGet("[action]")]
-        [ProducesResponseType(typeof(IList<TeamListItemDto>), 200)]
-        public async Task<IList<TeamListItemDto>> ListByUserId(int userId)
-        {
-            return await _teamService.GetListByUserIdAsync(userId);
-        }
-
-        /// <summary>
-        /// Update current team logo
-        /// </summary>
-        /// <param name="formData"></param>
-        /// <returns>Response DTO (with or without url)</returns>
-        [HttpPost("[action]")]
-        [Authorize(Policy = "RequireLoggedIn")]
-        [ProducesResponseType(typeof(ResponseDto), 200)]
-        [ProducesResponseType(typeof(ResponseDto), 400)]
-        public async Task<IActionResult> AcceptInvitation(int invitationId)
-        {
-            var userId = this.GetCurrentUserId();
-            var result = await _teamService.AcceptInvitationAsync(new InviteActionDto
-            {
-                InviteId = invitationId,
-                UserId = userId
-            });
-
-            return result.Succeeded
-                ? Ok(new ResponseDto(200, "Completed.", "Invite accept."))
-                : (IActionResult)BadRequest(new ResponseDto(400, "Failed.", result.Error));
-        }
-
-        [HttpPost("[action]")]
-        [Authorize(Policy = "RequireLoggedIn")]
-        [ProducesResponseType(typeof(ResponseDto), 200)]
-        [ProducesResponseType(typeof(ResponseDto), 400)]
-        public async Task<IActionResult> DeclineInvitation(int invitationId)
-        {
-            var userId = this.GetCurrentUserId();
-            var result = await _teamService.DeclineInvitationAsync(new InviteActionDto
-            {
-                InviteId = invitationId,
-                UserId = userId
-            });
-
-            return result.Succeeded
-                ? Ok(new ResponseDto(200, "Completed.", "Invite decline."))
-                : (IActionResult)BadRequest(new ResponseDto(400, "Failed.", result.Error));
-        }
-
-        /// <summary>
-        /// Update current team logo
-        /// </summary>
-        /// <param name="formData"></param>
-        /// <returns>Response DTO (with or without url)</returns>
-        /// <response code="200">Successful performance</response>
-        /// <response code="400">The action failed</response>
-        [HttpPost("[action]")]
-        [Authorize(Policy = "RequireLoggedIn")]
-        [ProducesResponseType(typeof(ResponseDto), 200)]
-        [ProducesResponseType(typeof(ResponseDto), 400)]
-        public async Task<IActionResult> UpdateLogo([FromForm]PhotoFormDataDto formData, int teamId)
+        public async Task<IActionResult> UpdateLogo([FromForm] PhotoFormDataDto formData, int teamId)
         {
             var azureStorageConfig = new AzureBlobStorageConfigDto(_configuration["AzureBlobStorage:AccountName"],
                                                                    _configuration["AzureBlobStorage:AccountKey"],
@@ -288,12 +234,8 @@ namespace WTP.WebAPI.Controllers
         }
 
         /// <summary>
-        /// Get logo by url
+        /// Get team logo
         /// </summary>
-        /// <returns>FileStreamResult</returns>
-        /// <returns>Response DTO</returns>
-        /// <response code="200">Returns logo</response>
-        /// <response code="404">Logo not found</response>
         [HttpGet("[action]/{logoId:minlength(1)}")]
         [ProducesResponseType(typeof(FileStreamResult), 200)]
         [ProducesResponseType(typeof(ResponseDto), 404)]
@@ -314,10 +256,9 @@ namespace WTP.WebAPI.Controllers
         }
 
         /// <summary>
-        /// Get list of team's invitations
+        /// Get all invitations associated with the user
         /// </summary>
         /// <param name="userId"></param>
-        /// <returns></returns>
         [HttpGet("[action]")]
         [Authorize(Policy = "RequireLoggedIn")]
         [ProducesResponseType(typeof(IList<InvitationListItemDto>), 200)]
@@ -326,6 +267,17 @@ namespace WTP.WebAPI.Controllers
             var userId = this.GetCurrentUserId();
 
             return await _teamService.GetAllTeamInvitetionByUserId(userId);
+        }
+
+        /// <summary>
+        /// Get all user teams
+        /// </summary>
+        /// <param name="userId"></param>
+        [HttpGet("[action]")]
+        [ProducesResponseType(typeof(IList<TeamListItemDto>), 200)]
+        public async Task<IList<TeamListItemDto>> ListByUserId(int userId)
+        {
+            return await _teamService.GetListByUserIdAsync(userId);
         }
     }
 }

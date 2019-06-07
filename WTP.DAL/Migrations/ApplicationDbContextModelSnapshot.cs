@@ -493,7 +493,7 @@ namespace WTP.DAL.Migrations
 
                     b.Property<int>("AppUserId");
 
-                    b.Property<int?>("Decency");
+                    b.Property<int>("Decency");
 
                     b.Property<int>("GameId");
 
@@ -636,19 +636,17 @@ namespace WTP.DAL.Migrations
 
             modelBuilder.Entity("WTP.DAL.Entities.TeamEntities.Invitation", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
                     b.Property<int>("PlayerId");
 
                     b.Property<int>("TeamId");
 
                     b.Property<int>("Author");
 
-                    b.HasKey("Id", "PlayerId", "TeamId");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.HasIndex("PlayerId");
+                    b.HasKey("PlayerId", "TeamId");
 
                     b.HasIndex("TeamId");
 
@@ -661,7 +659,7 @@ namespace WTP.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("CoachId");
+                    b.Property<int>("AppUserId");
 
                     b.Property<int>("GameId");
 
@@ -678,7 +676,7 @@ namespace WTP.DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CoachId");
+                    b.HasIndex("AppUserId");
 
                     b.HasIndex("GameId");
 
@@ -821,9 +819,9 @@ namespace WTP.DAL.Migrations
 
             modelBuilder.Entity("WTP.DAL.Entities.TeamEntities.Team", b =>
                 {
-                    b.HasOne("WTP.DAL.Entities.AppUserEntities.AppUser", "Coach")
+                    b.HasOne("WTP.DAL.Entities.AppUserEntities.AppUser", "AppUser")
                         .WithMany("Teams")
-                        .HasForeignKey("CoachId")
+                        .HasForeignKey("AppUserId")
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("WTP.DAL.Entities.Game", "Game")

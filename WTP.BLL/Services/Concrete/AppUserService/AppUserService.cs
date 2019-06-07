@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -59,11 +60,11 @@ namespace WTP.BLL.Services.Concrete.AppUserService
             return appUserDto;
         }
                      
-        public async Task<IdentityResult> UpdateAsync(AppUserDto appUserDto)
+        public async Task<IdentityResult> UpdateAsync(AppUserDto dto)
         {
-            if (await _uow.AppUsers.GetByIdAsync(appUserDto.Id) != null)
+            if (await _uow.AppUsers.AsQueryable().AnyAsync(u => u.Id == dto.Id))
             {
-                var appUser = _mapper.Map<AppUser>(appUserDto);
+                var appUser = _mapper.Map<AppUser>(dto);
 
                 return await _uow.AppUsers.UpdateAsync(appUser);
             }
@@ -71,9 +72,9 @@ namespace WTP.BLL.Services.Concrete.AppUserService
             return IdentityResult.Failed();
         }
 
-        public async Task<IList<string>> GetRolesAsync(AppUserDto appUserDto)
+        public async Task<IList<string>> GetRolesAsync(AppUserDto dto)
         {
-            var appUser = _mapper.Map<AppUser>(appUserDto);
+            var appUser = _mapper.Map<AppUser>(dto);
 
             return await _uow.AppUsers.GetRolesAsync(appUser);
         }
@@ -88,20 +89,20 @@ namespace WTP.BLL.Services.Concrete.AppUserService
             return await _uow.AppUsers.IsEmailConfirmedAsync(userId);
         }
 
-        public async Task<string> GeneratePasswordResetTokenAsync(AppUserDto appUserDto)
+        public async Task<string> GeneratePasswordResetTokenAsync(AppUserDto dto)
         {
-            var appUser = _mapper.Map<AppUser>(appUserDto);
+            var appUser = _mapper.Map<AppUser>(dto);
 
             return await _uow.AppUsers.GeneratePasswordResetTokenAsync(appUser);
         }
 
         public async Task<IdentityResult> ResetPasswordAsync(ResetPasswordDto dto)
         {
-            var appUser = _uow.AppUsers.GetByIdAsync(dto.Id);
+            var appUser = await _uow.AppUsers.GetByIdAsync(dto.Id);
 
             return appUser == null
                 ? IdentityResult.Failed()
-                : await _uow.AppUsers.ResetPasswordAsync(appUser.Result,
+                : await _uow.AppUsers.ResetPasswordAsync(appUser,
                                                          dto.Token,
                                                          dto.NewPassword);
         }
@@ -119,13 +120,13 @@ namespace WTP.BLL.Services.Concrete.AppUserService
             }
 
             return await _uow.AppUsers.ChangePasswordAsync(dto.UserId,
-                                                                dto.CurrentPassword,
-                                                                dto.NewPassword);
+                                                           dto.CurrentPassword,
+                                                           dto.NewPassword);
         }
 
-        public async Task<string> GenerateEmailConfirmationTokenAsync(AppUserDto appUserDto)
+        public async Task<string> GenerateEmailConfirmationTokenAsync(AppUserDto dto)
         {
-            var appUser = _mapper.Map<AppUser>(appUserDto);
+            var appUser = _mapper.Map<AppUser>(dto);
 
             return await _uow.AppUsers.GenerateEmailConfirmationTokenAsync(appUser);
         }
@@ -139,7 +140,9 @@ namespace WTP.BLL.Services.Concrete.AppUserService
 
         public async Task<IdentityResult> ConfirmEmailAsync(int userId, string token)
         {
-            return _uow.AppUsers.GetByIdAsync(userId) == null || token == null
+            var existed = await _uow.AppUsers.AsQueryable().AnyAsync(u => u.Id == userId);
+
+            return !existed || token == null
                 ? IdentityResult.Failed() 
                 : await _uow.AppUsers.ConfirmEmailAsync(userId, token);
         }
@@ -162,17 +165,11 @@ namespace WTP.BLL.Services.Concrete.AppUserService
         {
             var user = await _uow.AppUsers.GetByIdAsync(userId);
 
-            if (user == null)
-            {
-                return string.Empty;
-            }
+            if (user == null) return string.Empty;
 
             var token = await _uow.RestoreTokens.GetByUserId(userId);
 
-            if (token == null)
-            {
-                token = new RestoreToken { AppUserId = userId, AppUser = user };
-            }
+            if (token == null) token = new RestoreToken { AppUserId = userId, AppUser = user };
 
             token.Value = Guid.NewGuid().ToString();
             token.CreateDate = DateTime.Now;
@@ -188,22 +185,13 @@ namespace WTP.BLL.Services.Concrete.AppUserService
         {
             var user = await _uow.AppUsers.GetByIdAsync(userId);
 
-            if (user == null)
-            {
-                return false;
-            }
+            if (user == null) return false;
 
             var currentToken = await _uow.RestoreTokens.GetByUserId(userId);
 
-            if (currentToken != null && token != currentToken.Value)
-            {
-                return false;
-            }
+            if (currentToken != null && token != currentToken.Value) return false;
 
-            if (currentToken.ExpiryDate < DateTime.Now)
-            {
-                return false;
-            }
+            if (currentToken.ExpiryDate < DateTime.Now) return false;
 
             user.IsDeleted = false;
 
@@ -214,16 +202,12 @@ namespace WTP.BLL.Services.Concrete.AppUserService
             return true;
         }
 
-        public UserIconDto GetUserIconAsync(int userId)
+        public async Task<UserIconDto> GetUserIconAsync(int userId)
         {
-            var info = new UserIconDto();
-
-            info = _uow.AppUsers.AsQueryable()
+            return await _uow.AppUsers.AsQueryable()
                                 .Where(u => u.Id == userId)
                                 .Select(x => new UserIconDto { UserName = x.UserName, Photo = x.Photo })
-                                .FirstOrDefault();
-
-            return info;
+                                .FirstOrDefaultAsync();
         }
     }
 }

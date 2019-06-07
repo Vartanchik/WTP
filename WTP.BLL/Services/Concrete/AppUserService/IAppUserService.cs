@@ -8,23 +8,23 @@ namespace WTP.BLL.Services.Concrete.AppUserService
 {
     public interface IAppUserService
     {
-        Task<IdentityResult> CreateAsync(AppUserDto appUserDto, string password);
+        Task<IdentityResult> CreateAsync(AppUserDto dto, string password);
         Task<AppUserDto> GetByIdAsync(int userId);
         Task<AppUserDto> GetByEmailAsync(string email);
         Task<AppUserDto> GetByNameAsync(string userName);
-        Task<IdentityResult> UpdateAsync(AppUserDto appUserDto);
-        Task<IList<string>> GetRolesAsync(AppUserDto appUserDto);
+        Task<IdentityResult> UpdateAsync(AppUserDto dto);
+        Task<IList<string>> GetRolesAsync(AppUserDto dto);
         Task<bool> CheckPasswordAsync(int userId, string password);
         Task<bool> IsEmailConfirmedAsync(int userId);
-        Task<string> GeneratePasswordResetTokenAsync(AppUserDto appUserDto);
-        Task<IdentityResult> ResetPasswordAsync(ResetPasswordDto resetPasswordDto);
-        Task<IdentityResult> ChangePasswordAsync(ChangeUserPasswordDto changePasswordDto);
-        Task<string> GenerateEmailConfirmationTokenAsync(AppUserDto appUserDto);
+        Task<string> GeneratePasswordResetTokenAsync(AppUserDto dto);
+        Task<IdentityResult> ResetPasswordAsync(ResetPasswordDto dto);
+        Task<IdentityResult> ChangePasswordAsync(ChangeUserPasswordDto dto);
+        Task<string> GenerateEmailConfirmationTokenAsync(AppUserDto dto);
         Task<AppUserDto> FindByIdAsync(string userId);
         Task<IdentityResult> ConfirmEmailAsync(int userId, string token);
         Task DeleteAccountAsync(int userId);
         Task<string> CreateRestoreAccountToken(int userId);
         Task<bool> RestoreAccountAsync(int userId, string token);
-        UserIconDto GetUserIconAsync(int userId);
+        Task<UserIconDto> GetUserIconAsync(int userId);
     }
 }
