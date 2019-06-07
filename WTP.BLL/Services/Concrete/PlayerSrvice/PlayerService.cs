@@ -118,15 +118,14 @@ namespace WTP.BLL.Services.Concrete.PlayerSrvice
 
         public async Task<IList<PlayerListItemDto>> GetListByUserIdAsync(int userId)
         {
-            var listOfPlayers = await _uow.Players
-                .AsQueryable()
-                .Include(p => p.Game)
-                .Include(p => p.Server)
-                .Include(p => p.Goal)
-                .Include(p => p.Rank)
-                .AsNoTracking()
-                .Where(p => p.AppUserId == userId)
-                .ToListAsync();
+            var listOfPlayers = await _uow.Players.AsQueryable()
+                                                  .Include(p => p.Game)
+                                                  .Include(p => p.Server)
+                                                  .Include(p => p.Goal)
+                                                  .Include(p => p.Rank)
+                                                  .AsNoTracking()
+                                                  .Where(p => p.AppUserId == userId)
+                                                  .ToListAsync();
 
             return _mapper.Map<IList<PlayerListItemDto>>(listOfPlayers);
         }
@@ -232,6 +231,7 @@ namespace WTP.BLL.Services.Concrete.PlayerSrvice
         public async Task<IList<PlayerListItemDto>> GetListByTeamIdAsync(int teamId)
         {
             var listOfPlayers = await _uow.Players.AsQueryable()
+                                                  .Include(p => p.AppUser)
                                                   .Include(p => p.Game)
                                                   .Include(p => p.Server)
                                                   .Include(p => p.Goal)

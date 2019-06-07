@@ -77,6 +77,8 @@ namespace WTP.BLL.Services.Concrete
                 .ForMember(dest => dest.Languages,
                            config => config.MapFrom(src => GetPlayerLanguages(src.AppUser)));
             CreateMap<Player, PlayerListItemDto>()
+                .ForMember(dest => dest.Photo,
+                           config => config.MapFrom(src => PhotoToView(src.AppUser)))
                 .ForMember(dest => dest.Game,
                            config => config.MapFrom(src => src.Game.Name))
                 .ForMember(dest => dest.Rank,
