@@ -63,7 +63,9 @@ namespace WTP.WebAPI.Controllers
                     RefreshToken = refreshToken
                 });
 
-            return Ok(newAccess);
+            return newAccess == null
+                ? (IActionResult)NoContent()
+                : Ok(newAccess);
         }
     }
 }

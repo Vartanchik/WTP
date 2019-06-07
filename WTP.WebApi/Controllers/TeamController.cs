@@ -95,58 +95,7 @@ namespace WTP.WebAPI.Controllers
             return result.Succeeded
                 ? Ok(new ResponseDto(200, "Completed.", "Team deleted."))
                 : (IActionResult)BadRequest(new ResponseDto(400, "Failed.", result.Error));
-        }
-
-        /// <summary>
-        /// Create an invitation to join the team
-        /// </summary>
-        /// <param name="playerId"></param>
-        /// <param name="teamId"></param>
-        [HttpPost("[action]")]
-        [Authorize(Policy = "RequireLoggedIn")]
-        [ProducesResponseType(typeof(ResponseDto), 200)]
-        [ProducesResponseType(typeof(ResponseDto), 400)]
-        public async Task<IActionResult> Invite(int playerId, int teamId)
-        {
-            var userId = this.GetCurrentUserId();
-            var result = await _teamService.CreateInvitationAsync(new TeamActionDto
-            {
-                PlayerId = playerId,
-                TeamId = teamId,
-                UserId = userId
-            });
-
-            return result.Succeeded
-                ? Ok(new ResponseDto(200, "Completed.", "Invite created."))
-                : (IActionResult)BadRequest(new ResponseDto(400, "Failed.", result.Error));
-        }
-
-        /// <summary>
-        /// Accept invitations to join the team
-        /// </summary>
-        /// <param name="dto"></param>
-        [HttpPut("[action]")]
-        [Authorize(Policy = "RequireLoggedIn")]
-        [ProducesResponseType(typeof(ResponseDto), 200)]
-        [ProducesResponseType(typeof(ResponseDto), 400)]
-        public async Task<IActionResult> AcceptInvitation(InvitationResponseDto dto)
-        {
-            var userId = this.GetCurrentUserId();
-
-            var invitation = new InviteActionDto
-            {
-                InvitationId = dto.InvitationId,
-                UserId = userId
-            };
-
-            var result = dto.Accept 
-                ? await _teamService.AcceptInvitationAsync(invitation)
-                : await _teamService.DeclineInvitationAsync(invitation);
-
-            return result.Succeeded
-                ? Ok(new ResponseDto(200, "Completed.", "Invite accept."))
-                : (IActionResult)BadRequest(new ResponseDto(400, "Failed.", result.Error));
-        }
+        } 
 
         /// <summary>
         /// Remove player from team

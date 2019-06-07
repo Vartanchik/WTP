@@ -96,12 +96,13 @@ namespace WTP.BLL.Services.Concrete.RefreshTokenService
                                             .Select(u => u.Id)
                                             .FirstOrDefaultAsync();
 
-            if (userId == 0) return access;
-
-            access.RefreshToken = await GenerateRefreshTokenAsync(userId);
-            access.Token = await GenerateAccessTokenAsync(userId);
-
-            return access;
+            return userId == 0
+                ? null
+                : new AccessDto
+                {
+                    Token = await GenerateAccessTokenAsync(userId),
+                    RefreshToken = await GenerateRefreshTokenAsync(userId)
+                };
         }
 
         public async Task<AccessDto> UpdateAccessAsync(AccessOperationDto dto)
@@ -112,13 +113,13 @@ namespace WTP.BLL.Services.Concrete.RefreshTokenService
                                                 .AnyAsync(t => t.UserId == dto.UserId &&
                                                                t.Value == dto.RefreshToken);
 
-            if (exist)
-            {
-                access.RefreshToken = await GenerateRefreshTokenAsync(dto.UserId);
-                access.Token = await GenerateAccessTokenAsync(dto.UserId);
-            }
-
-            return access;
+            return exist
+                ? new AccessDto
+                {
+                    Token = await GenerateAccessTokenAsync(dto.UserId),
+                    RefreshToken = await GenerateRefreshTokenAsync(dto.UserId)
+                }
+                : null;
         }
     }
 }
