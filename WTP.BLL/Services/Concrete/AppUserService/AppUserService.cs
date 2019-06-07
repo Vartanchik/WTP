@@ -347,7 +347,7 @@ namespace WTP.BLL.Services.Concrete.AppUserService
             return await _uow.AppUsers.UnLockAsync(id);
         }
 
-        public IQueryable<AppUser> FilterByName(string name, IQueryable<AppUser> baseQuery)
+        public async Task<IQueryable<AppUser>> FilterByName(string name, IQueryable<AppUser> baseQuery)
         {
             if (!String.IsNullOrEmpty(name))
                 return baseQuery.Where(p => p.UserName.Contains(name));
@@ -355,7 +355,7 @@ namespace WTP.BLL.Services.Concrete.AppUserService
             return null;
         }
 
-        public IQueryable<AppUser> SortByParam(SortState sortOrder, bool enableDeleted, bool enableLocked, IQueryable<AppUser> baseQuery)
+        public async Task<IQueryable<AppUser>> SortByParam(SortState sortOrder, bool enableDeleted, bool enableLocked, IQueryable<AppUser> baseQuery)
         {
             IQueryable<AppUser> query = Enumerable.Empty<AppUser>().AsQueryable();
             switch (sortOrder)
@@ -389,7 +389,7 @@ namespace WTP.BLL.Services.Concrete.AppUserService
             return query;
         }
 
-        public IQueryable<AppUser> GetItemsOnPage(int page,int pageSize, IQueryable<AppUser> baseQuery)
+        public async Task<IQueryable<AppUser>> GetItemsOnPage(int page,int pageSize, IQueryable<AppUser> baseQuery)
         {
             IQueryable<AppUser> query = Enumerable.Empty<AppUser>().AsQueryable();
             query = baseQuery.Skip((page - 1) * pageSize).Take(pageSize);
@@ -406,12 +406,14 @@ namespace WTP.BLL.Services.Concrete.AppUserService
         {
             IQueryable<AppUser> query = _uow.AppUsers.AsQueryable();
             IEnumerable<AppUserDto> items = Enumerable.Empty<AppUserDto>();
+            int count = 0;
 
             try
             {
-                var newQuery = FilterByName(name, query);
-                newQuery = SortByParam(sortOrder,enableDeleted,enableLocked, newQuery);
-                newQuery = GetItemsOnPage(page, pageSize, newQuery);
+                var newQuery = await FilterByName(name, query);
+                count = await query.CountAsync();
+                newQuery = await SortByParam(sortOrder,enableDeleted,enableLocked, newQuery);
+                newQuery = await GetItemsOnPage(page, pageSize, newQuery);
 
                 items = _mapper.Map<List<AppUserDto>>(newQuery.ToList());
             }
@@ -421,7 +423,7 @@ namespace WTP.BLL.Services.Concrete.AppUserService
                 //_log.Error(ex.Message);
             }
 
-            var count = await this.GetCountOfPlayers();
+            //var count = await this.GetCountOfPlayers();
 
             UserIndexDto viewModel = new UserIndexDto
             {

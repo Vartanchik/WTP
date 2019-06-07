@@ -18,10 +18,10 @@ namespace WTP.BLL.Services.HistoryService
         Task<HistoryDto> GetAsync(int id);
         Task<IList<HistoryDto>> GetHistoryList();
 
-        IQueryable<History> GetItemsOnPage(int page, int pageSize, IQueryable<History> baseQuery);
+        Task<IQueryable<History>> GetItemsOnPage(int page, int pageSize, IQueryable<History> baseQuery);
         Task<int> GetCountOfRecords();
-        IQueryable<History> FilterByUserName(string name, IQueryable<History> baseQuery);
-        IQueryable<History> SortByParam(HistorySortState sortOrder, IQueryable<History> baseQuery);
+        Task<IQueryable<History>> FilterByUserName(string name, IQueryable<History> baseQuery);
+        Task<IQueryable<History>> SortByParam(HistorySortState sortOrder, IQueryable<History> baseQuery);
         Task<HistoryIndexDto> GetPageInfo(string name, int page, int pageSize,
             HistorySortState sortOrder);
 

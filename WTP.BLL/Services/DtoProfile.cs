@@ -87,8 +87,11 @@ namespace WTP.BLL.Services.Concrete
                 .ForMember(dest => dest.AppUserEmail,
                            config => config.MapFrom(src => src.AppUser.Email))
                 .ForMember(dest => dest.GoalName,
-                           config => config.MapFrom(src => src.Goal.Name));            
+                           config => config.MapFrom(src => src.Goal.Name));
 
+
+            CreateMap<PlayerShortDto, CreateUpdatePlayerDto>();
+            
             CreateMap<History, HistoryDto>();
             CreateMap<HistoryDto, History>();
             CreateMap<PlayerJoinedDto, PlayerDto>();

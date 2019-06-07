@@ -60,7 +60,7 @@ namespace WTP.BLL.Services.HistoryService
             return _mapper.Map<IList<HistoryDto>>(records);
         }
 
-        public IQueryable<History> FilterByUserName(string name, IQueryable<History> baseQuery)
+        public async Task<IQueryable<History>> FilterByUserName(string name, IQueryable<History> baseQuery)
         {            
             if (!String.IsNullOrEmpty(name))
                 return baseQuery.Where(p => p.NewUserName.Contains(name));
@@ -68,7 +68,7 @@ namespace WTP.BLL.Services.HistoryService
             return null;
         }
 
-        public IQueryable<History> SortByParam(HistorySortState sortOrder, IQueryable<History> baseQuery)
+        public async Task<IQueryable<History>> SortByParam(HistorySortState sortOrder, IQueryable<History> baseQuery)
         {
             IQueryable<History> query = Enumerable.Empty<History>().AsQueryable();
             switch (sortOrder)
@@ -114,7 +114,7 @@ namespace WTP.BLL.Services.HistoryService
             return query;
         }
 
-        public IQueryable<History> GetItemsOnPage(int page, int pageSize, IQueryable<History> baseQuery)
+        public async Task<IQueryable<History>> GetItemsOnPage(int page, int pageSize, IQueryable<History> baseQuery)
         {
             IQueryable<History> query = Enumerable.Empty<History>().AsQueryable();
             query = baseQuery.Skip((page - 1) * pageSize).Take(pageSize);
@@ -131,12 +131,13 @@ namespace WTP.BLL.Services.HistoryService
         {
             IQueryable<History> query = _uow.Histories.AsQueryable();//Enumerable.Empty<History>().AsQueryable();
             IEnumerable<HistoryDto> items = Enumerable.Empty<HistoryDto>();
-
+            int count = 0;
             try
             {
-                var newQuery = FilterByUserName(name, query);
-                newQuery = SortByParam(sortOrder, newQuery);
-                newQuery = GetItemsOnPage(page, pageSize, newQuery);
+                var newQuery = await FilterByUserName(name, query);
+                count = await newQuery.CountAsync();
+                newQuery = await SortByParam(sortOrder, newQuery);
+                newQuery = await GetItemsOnPage(page, pageSize, newQuery);
 
                 items = _mapper.Map<List<HistoryDto>>(newQuery.ToList());
             }
@@ -146,7 +147,7 @@ namespace WTP.BLL.Services.HistoryService
                 //_log.Error(ex.Message);
             }
             
-            var count = await this.GetCountOfRecords();
+            //count = await this.GetCountOfRecords();
 
             HistoryIndexDto viewModel = new HistoryIndexDto
             {
