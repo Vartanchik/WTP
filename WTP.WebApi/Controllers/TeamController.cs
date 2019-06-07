@@ -73,6 +73,16 @@ namespace WTP.WebAPI.Controllers
             return await _teamService.GetPlayersQuantityAsync(userId, gameId);
         }
 
+        //[HttpGet("[action]")]
+        //[Authorize(Policy = "RequireLoggedIn")]
+        //[ProducesResponseType(typeof(int), 200)]
+        //public async Task<int> GetTeamSize(int gameId)
+        //{
+        //    var userId = this.GetCurrentUserId();
+
+        //    return await _teamService.GetPlayersQuantityAsync(userId, gameId);
+        //}
+
         /// <summary>
         /// Create team
         /// Create team for current user

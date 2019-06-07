@@ -21,5 +21,6 @@ namespace WTP.BLL.Services.Concrete.PlayerSrvice
         Task<IList<PlayerListItemDto>> GetListByTeamIdAsync(int teamId);
         Task<PlayerPaginationDto> GetFilteredPlayersByGameIdAsync(PlayerInputValuesModelDto inputValues);
         Task<IList<InvitationListItemDto>> GetAllPlayerInvitetionByUserId(int userId);
+        TeamSizeDto GetTeamSizeByGameIdAsync(int userId, int gameId);
     }
 }

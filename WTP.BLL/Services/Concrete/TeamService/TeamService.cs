@@ -139,6 +139,24 @@ namespace WTP.BLL.Services.Concrete.TeamService
                              .Count;
         }
 
+        public TeamSizeDto GetTeamSizeByGameIdAsync(int userId, int gameId)
+        {
+            var teamId = _uow.Teams.AsQueryable()
+                             .FirstOrDefault(t => t.GameId == gameId && t.AppUserId == userId)
+                             .Id;
+
+            if (teamId == 0) return null;
+
+            var playerQuantity = _uow.Teams.AsQueryable()
+                                           .Include(t => t.Players)
+                                           .FirstOrDefault(t => t.GameId == gameId && t.AppUserId == userId)
+                                           .Players
+                                           .Count;
+
+            return new TeamSizeDto { TeamId = teamId, PlayerQuantity = playerQuantity };
+        }
+
+
         public async Task<ServiceResult> DeclineInvitationAsync(InviteActionDto dto)
         {
             var invitation = await _uow.Invitations.GetByIdAsync(dto.InvitationId);
