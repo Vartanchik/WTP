@@ -21,6 +21,13 @@ namespace WTP.WebAPI.Controllers
             _playerService = playerService;
         }
 
+        [HttpGet]
+        [ProducesResponseType(typeof(PlayerDto), 200)]
+        public async Task<PlayerDto> Get (int playerId)
+        {
+            return await _playerService.GetPlayerAsync(playerId);
+        }
+
         /// <summary>
         /// Create new player
         /// </summary>

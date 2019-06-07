@@ -26,7 +26,17 @@ namespace WTP.BLL.Services.Concrete.PlayerSrvice
 
         public async Task<PlayerDto> GetPlayerAsync(int playerId)
         {
-            var player = await _uow.Players.GetByIdAsync(playerId);
+            var player = await _uow.Players.AsQueryable()
+                                           .Include(p => p.AppUser)
+                                              .ThenInclude(u => u.Country)
+                                           .Include(p => p.AppUser)
+                                              .ThenInclude(u => u.AppUserLanguages)
+                                                 .ThenInclude(l => l.Language)
+                                           .Include(p => p.Server)
+                                           .Include(p => p.Goal)
+                                           .Include(p => p.Rank)
+                                           .Include(p => p.Team)
+                                           .FirstOrDefaultAsync(p => p.Id == playerId);
 
             return _mapper.Map<PlayerDto>(player);
         }

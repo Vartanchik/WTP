@@ -47,6 +47,7 @@ namespace WTP.WebAPI.Controllers
         /// <param name="gameId"></param>
         /// <returns></returns>
         [HttpGet("[action]")]
+        [Authorize(Policy = "RequireLoggedIn")]
         [ProducesResponseType(typeof(int), 200)]
         public int GetTeamIdByGameId(int gameId)
         {
@@ -61,6 +62,7 @@ namespace WTP.WebAPI.Controllers
         /// <param name="gameId"></param>
         /// <returns>Quantity of players or -1 if this game's team isn't exist</returns>
         [HttpGet("[action]")]
+        [Authorize(Policy = "RequireLoggedIn")]
         [ProducesResponseType(typeof(int), 200)]
         public async Task<int> GetTeamPlayersQuantityByGame(int gameId)
         {
