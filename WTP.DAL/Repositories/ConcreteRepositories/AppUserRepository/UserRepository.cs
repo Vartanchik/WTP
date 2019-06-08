@@ -137,5 +137,65 @@ namespace WTP.DAL.Repositories.ConcreteRepositories.AppUserRepository
                        .Select(x => x.Id)
                        .FirstOrDefault();
         }
+
+        private async Task<IdentityResult> CreatePersonAsync(AppUser appUser, string password, string role)
+        {
+            var result = await _userManager.CreateAsync(appUser, password);
+
+            await _userManager.AddToRoleAsync(appUser, role);
+
+            return result;
+        }
+
+        public async Task<IdentityResult> CreateAdminAsync(AppUser appUser, string password)
+        {
+            return await CreatePersonAsync(appUser, password, "Admin");
+        }
+
+        public async Task<IdentityResult> CreateModeratorAsync(AppUser appUser, string password)
+        {
+            return await CreatePersonAsync(appUser, password, "Moderator");
+        }
+
+        public new async Task<bool> DeleteAsync(int id)
+        {
+            var user = await GetByIdAsync(id);
+
+            if (user == null || user.IsDeleted)
+                return false;
+
+            user.IsDeleted = true;
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> LockAsync(int id, int? days)
+        {
+            var user = await GetByIdAsync(id);
+            if (user == null)
+                return false;
+
+            if (user.IsDeleted)
+                return false;
+
+            await _userManager.SetLockoutEnabledAsync(user, true);
+
+            if (days == null)
+                await _userManager.SetLockoutEndDateAsync(user, null);
+            else
+            {
+                if (days < 0)
+                    days = 0;
+                await _userManager.SetLockoutEndDateAsync(user, DateTimeOffset.UtcNow.AddDays(days.Value));
+            }
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+
+        public async Task<bool> UnLockAsync(int id)
+        {
+            return await LockAsync(id, null);
+        }
     }
 }

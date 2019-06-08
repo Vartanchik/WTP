@@ -22,6 +22,8 @@ namespace WTP.DAL
         public DbSet<Rank> Ranks { get; set; }
         public DbSet<RestoreToken> RestoreTokens { get; set; }
         public DbSet<Invitation> Invitations { get; set; }
+        public DbSet<Operation> Operations { get; set; }
+        public DbSet<History> Histories { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -132,6 +134,27 @@ namespace WTP.DAL
                     new Rank { Id = 7, Name = "Divine", Value = 70 },
                     new Rank { Id = 8, Name = "Immortal", Value = 80 }
                 );
+
+            //For Admin
+            builder.Entity<Operation>().HasData(
+                    new { Id = 1, OperationName = "Create" },
+                    new { Id = 2, OperationName = "Update" },
+                    new { Id = 3, OperationName = "Delete" },
+                    new { Id = 4, OperationName = "Lock" },
+                    new { Id = 5, OperationName = "UnLock" }
+            );
+
+            //"email":"superAdmin@gmail.com",
+            //"userName":"superAdmin",
+            //"password":"123456"
+            builder.Entity<AppUser>().HasData(
+                    new AppUser { Id = 1, Email = "superAdmin@gmail.com", UserName = "superAdmin", PasswordHash = "AQAAAAEAACcQAAAAEJoMQ0ORW/30m0eVPZIwxJaTQ9nRyY63AriZTgxrk/xCv32Ewm03oMWQGpzz5CYpuw==",EmailConfirmed=true }
+                );
+
+            builder.Entity<History>()
+                .HasOne(p => p.Operation)
+                .WithMany(b => b.Histories)
+                .HasForeignKey(p => p.OperationId);
         }
     }
 }

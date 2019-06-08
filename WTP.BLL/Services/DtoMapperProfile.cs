@@ -80,7 +80,32 @@ namespace WTP.BLL.Services.Concrete
                            config => config.MapFrom(src => src.Player.Name))
                 .ForMember(dest => dest.TeamName,
                            config => config.MapFrom(src => src.Team.Name));
+
+            CreateMap<Player, PlayerShortDto>()
+               .ForMember(dest => dest.GameName,
+                          config => config.MapFrom(src => src.Game.Name))
+               .ForMember(dest => dest.RankName,
+                          config => config.MapFrom(src => src.Rank.Name))
+               .ForMember(dest => dest.ServerName,
+                          config => config.MapFrom(src => src.Server.Name))
+               .ForMember(dest => dest.TeamName,
+                          config => config.MapFrom(src => src.Team.Name))
+               .ForMember(dest => dest.AppUserName,
+                          config => config.MapFrom(src => src.AppUser.UserName))
+               .ForMember(dest => dest.AppUserEmail,
+                          config => config.MapFrom(src => src.AppUser.Email))
+               .ForMember(dest => dest.GoalName,
+                          config => config.MapFrom(src => src.Goal.Name));
+
+            CreateMap<PlayerShortDto, CreatePlayerDto>();
+            CreateMap<PlayerShortDto, UpdatePlayerDto>();
+            CreateMap<History, HistoryDto>();
+            CreateMap<HistoryDto, History>();
+            CreateMap<AppUserDto, ShortUserFormDto>();
+            CreateMap<ShortUserFormDto, AppUserDto>();
         }
+
+
 
         private string PhotoToView(AppUser user)
         {
