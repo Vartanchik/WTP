@@ -44,44 +44,20 @@ namespace WTP.WebAPI.Controllers
         }
 
         /// <summary>
-        /// Get team id
+        /// Get team size by game id
         /// </summary>
         /// <param name="gameId"></param>
         /// <returns></returns>
         [HttpGet("[action]")]
         [Authorize(Policy = "RequireLoggedIn")]
-        [ProducesResponseType(typeof(int), 200)]
-        public int GetTeamIdByGameId(int gameId)
+        [ProducesResponseType(typeof(TeamSizeDto), 200)]
+        public async Task<TeamSizeDto> GetTeamSizeByGame(int gameId)
         {
             var userId = this.GetCurrentUserId();
 
-            return _teamService.GetTeamIdByGameId(userId, gameId);
+            return await _teamService.GetTeamSizeByGameIdAsync(userId, gameId);
+
         }
-
-        /// <summary>
-        /// Get team players quantity
-        /// </summary>
-        /// <param name="gameId"></param>
-        /// <returns>Quantity of players or -1 if this game's team isn't exist</returns>
-        [HttpGet("[action]")]
-        [Authorize(Policy = "RequireLoggedIn")]
-        [ProducesResponseType(typeof(int), 200)]
-        public async Task<int> GetTeamPlayersQuantityByGame(int gameId)
-        {
-            var userId = this.GetCurrentUserId();
-
-            return await _teamService.GetPlayersQuantityAsync(userId, gameId);
-        }
-
-        //[HttpGet("[action]")]
-        //[Authorize(Policy = "RequireLoggedIn")]
-        //[ProducesResponseType(typeof(int), 200)]
-        //public async Task<int> GetTeamSize(int gameId)
-        //{
-        //    var userId = this.GetCurrentUserId();
-
-        //    return await _teamService.GetPlayersQuantityAsync(userId, gameId);
-        //}
 
         /// <summary>
         /// Create team

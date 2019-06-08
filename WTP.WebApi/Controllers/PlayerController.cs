@@ -156,20 +156,5 @@ namespace WTP.WebAPI.Controllers
 
             return viewModel;
         }
-
-        /// <summary>
-        /// Get list of player's invitations
-        /// </summary>
-        /// <param name="userId"></param>
-        /// <returns></returns>
-        [HttpGet("[action]")]
-        [Authorize(Policy = "RequireLoggedIn")]
-        [ProducesResponseType(typeof(IList<InvitationListItemDto>), 200)]
-        public async Task<IList<InvitationListItemDto>> InvitationPlayerListByUserId()
-        {
-            var userId = this.GetCurrentUserId();
-
-            return await _playerService.GetAllPlayerInvitetionByUserId(userId);
-        }
     }
 }

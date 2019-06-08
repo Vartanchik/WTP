@@ -123,9 +123,38 @@ namespace WTP.BLL.Services.Concrete.PlayerSrvice
                                                   .Include(p => p.Server)
                                                   .Include(p => p.Goal)
                                                   .Include(p => p.Rank)
-                                                  .AsNoTracking()
+                                                  .Include(p => p.Invitations)
+                                                    .ThenInclude(i => i.Player)
+                                                  .Include(p => p.Invitations)
+                                                    .ThenInclude(i => i.Team)
                                                   .Where(p => p.AppUserId == userId)
+                                                  .AsNoTracking()
                                                   .ToListAsync();
+
+            // TODO: consider this variant of query
+            //var listOfPlayers2 = await _uow.Players.AsQueryable()
+            //                             .Where(p => p.AppUserId == userId)
+            //                             .Select(p => new PlayerListItemDto
+            //                             {
+            //                                 Id = p.Id,
+            //                                 Photo = p.AppUser.Photo,
+            //                                 Name = p.Name,
+            //                                 Game = p.Game.Name,
+            //                                 Rank = p.Rank.Name,
+            //                                 Server = p.Server.Name,
+            //                                 Goal = p.Goal.Name,
+            //                                 About = p.About,
+            //                                 Decency = p.Decency,
+            //                                 Invitations = p.Invitations.Select(i => new InvitationListItemDto
+            //                                 {
+            //                                     Id = i.Id,
+            //                                     PlayerName = i.Player.Name,
+            //                                     TeamName = i.Team.Name,
+            //                                     Author = i.Author.ToString()
+            //                                 }).ToList()
+            //                             })
+            //                             .AsNoTracking()
+            //                             .ToListAsync();
 
             return _mapper.Map<IList<PlayerListItemDto>>(listOfPlayers);
         }
@@ -241,31 +270,6 @@ namespace WTP.BLL.Services.Concrete.PlayerSrvice
                                                   .ToListAsync();
 
             return _mapper.Map<IList<PlayerListItemDto>>(listOfPlayers);
-        }
-
-        public async Task<IList<InvitationListItemDto>> GetAllPlayerInvitetionByUserId(int userId)
-        {
-            var listOfPlayerId = await _uow.Players.AsQueryable()
-                                                   .Where(p => p.AppUserId == userId)
-                                                   .Select(p => p.Id)
-                                                   .ToListAsync();
-
-            if (listOfPlayerId == null) return null;
-
-            var listOfInvitations = new List<Invitation>();
-
-            foreach (var playerId in listOfPlayerId)
-            {
-                var invitationsOfPlayer = await _uow.Invitations.AsQueryable()
-                                                                .Include(i => i.Player)
-                                                                .Include(i => i.Team)
-                                                                .Where(i => i.PlayerId == playerId)
-                                                                .ToListAsync();
-
-                listOfInvitations.AddRange(invitationsOfPlayer);
-            }
-
-            return _mapper.Map<List<InvitationListItemDto>>(listOfInvitations);
         }
     }
 }

@@ -117,43 +117,17 @@ namespace WTP.BLL.Services.Concrete.TeamService
 
         }
 
-        public int GetTeamIdByGameId(int userId, int gameId)
+        public async Task<TeamSizeDto> GetTeamSizeByGameIdAsync(int userId, int gameId)
         {
-            return _uow.Teams.AsQueryable()
-                             .FirstOrDefault(t => t.GameId == gameId && t.AppUserId == userId)
-                             .Id;
-        }
-
-        public async Task<int> GetPlayersQuantityAsync(int userId, int gameId)
-        {
-            var isTeamExist = await _uow.Teams.AsQueryable()
-                                              .AnyAsync(t => t.GameId == gameId &&
-                                                             t.AppUserId == userId);
-
-            if (!isTeamExist) return -1;
-
-            return _uow.Teams.AsQueryable()
-                             .Include(t => t.Players)
-                             .FirstOrDefault(t => t.GameId == gameId && t.AppUserId == userId)
-                             .Players
-                             .Count;
-        }
-
-        public TeamSizeDto GetTeamSizeByGameIdAsync(int userId, int gameId)
-        {
-            var teamId = _uow.Teams.AsQueryable()
-                             .FirstOrDefault(t => t.GameId == gameId && t.AppUserId == userId)
-                             .Id;
-
-            if (teamId == 0) return null;
-
-            var playerQuantity = _uow.Teams.AsQueryable()
-                                           .Include(t => t.Players)
-                                           .FirstOrDefault(t => t.GameId == gameId && t.AppUserId == userId)
-                                           .Players
-                                           .Count;
-
-            return new TeamSizeDto { TeamId = teamId, PlayerQuantity = playerQuantity };
+            return await _uow.Teams.AsQueryable()
+                                   .Where(t => t.GameId == gameId && 
+                                               t.AppUserId == userId)
+                                   .Select(t => new TeamSizeDto
+                                   {
+                                       TeamId = t.Id,
+                                       PlayerQuantity = t.Players.Count
+                                   })
+                                   .FirstOrDefaultAsync();
         }
 
 

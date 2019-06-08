@@ -86,7 +86,9 @@ namespace WTP.BLL.Services.Concrete
                 .ForMember(dest => dest.Server,
                            config => config.MapFrom(src => src.Server.Name))
                 .ForMember(dest => dest.Goal,
-                           config => config.MapFrom(src => src.Goal.Name));
+                           config => config.MapFrom(src => src.Goal.Name))
+                .ForMember(dest => dest.Invitations,
+                           config => config.MapFrom(src => GetListOfInvitations(src.Invitations)));
             CreateMap<CreateTeamDto, Team>();
             CreateMap<Team, TeamListItemDto>()
                 .ForMember(dest => dest.Game,
@@ -162,6 +164,19 @@ namespace WTP.BLL.Services.Concrete
                     Decency = (int)x.Decency
                 }));
         }
+
+        private List<InvitationListItemDto> GetListOfInvitations(ICollection<Invitation> invitations)
+        {
+            return new List<InvitationListItemDto>(invitations.Select(i =>
+                new InvitationListItemDto
+                {
+                    Id = i.Id,
+                    PlayerName = i.Player.Name,
+                    TeamName = i.Team.Name,
+                    Author = i.Author.ToString()
+                }));
+        }
+
         private IList<string> GetPlayerLanguages(AppUser user)
         {
             return new List<string>(user.AppUserLanguages.Select(x => x.Language.Name));
