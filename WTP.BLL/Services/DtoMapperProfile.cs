@@ -98,7 +98,9 @@ namespace WTP.BLL.Services.Concrete
                 .ForMember(dest => dest.Goal,
                            config => config.MapFrom(src => src.Goal.Name))
                 .ForMember(dest => dest.Photo,
-                           config => config.MapFrom(src => TeamPhotoToView(src)));
+                           config => config.MapFrom(src => TeamPhotoToView(src)))
+                .ForMember(dest => dest.Invitations,
+                           config => config.MapFrom(src => GetListOfInvitations(src.Invitations)));
             CreateMap<Invitation, InvitationListItemDto>()
                 .ForMember(dest => dest.PlayerName,
                            config => config.MapFrom(src => src.Player.Name))

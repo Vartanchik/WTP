@@ -242,20 +242,6 @@ namespace WTP.WebAPI.Controllers
         }
 
         /// <summary>
-        /// Get all invitations associated with the user
-        /// </summary>
-        /// <param name="userId"></param>
-        [HttpGet("[action]")]
-        [Authorize(Policy = "RequireLoggedIn")]
-        [ProducesResponseType(typeof(IList<InvitationListItemDto>), 200)]
-        public async Task<IList<InvitationListItemDto>> InvitationTeamListByUserId()
-        {
-            var userId = this.GetCurrentUserId();
-
-            return await _teamService.GetAllTeamInvitetionByUserId(userId);
-        }
-
-        /// <summary>
         /// Get all user teams
         /// </summary>
         /// <param name="userId"></param>

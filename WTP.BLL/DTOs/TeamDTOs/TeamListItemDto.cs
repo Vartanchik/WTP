@@ -1,4 +1,6 @@
-﻿namespace WTP.BLL.DTOs.TeamDTOs
+﻿using System.Collections.Generic;
+
+namespace WTP.BLL.DTOs.TeamDTOs
 {
     public class TeamListItemDto
     {
@@ -10,5 +12,7 @@
         public string Server { get; set; }
         public string Goal { get; set; }
         public int WinRate { get; set; }
+        public IList<InvitationListItemDto> Invitations { get; set; }
+
     }
 }
