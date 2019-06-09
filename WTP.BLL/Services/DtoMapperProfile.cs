@@ -187,6 +187,8 @@ namespace WTP.BLL.Services.Concrete
 
         private int AgeCalculation(AppUser user)
         {
+            if (user.DateOfBirth == null) return 0;
+
             var today = DateTime.Today;
 
             var birthday = user.DateOfBirth.Value;

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -110,8 +111,15 @@ namespace WTP.BLL.Services.Concrete.TeamService
                 Author = author
             };
 
-            await _uow.Invitations.CreateOrUpdate(invite);
-            await _uow.CommitAsync();
+            try
+            {
+                await _uow.Invitations.CreateOrUpdate(invite);
+                await _uow.CommitAsync();
+            }
+            catch (Exception ex)
+            {
+                return new ServiceResult("Invitation already sent.");
+            }
 
             return new ServiceResult();
 
@@ -120,7 +128,7 @@ namespace WTP.BLL.Services.Concrete.TeamService
         public async Task<TeamSizeDto> GetTeamSizeByGameIdAsync(int userId, int gameId)
         {
             return await _uow.Teams.AsQueryable()
-                                   .Where(t => t.GameId == gameId && 
+                                   .Where(t => t.GameId == gameId &&
                                                t.AppUserId == userId)
                                    .Select(t => new TeamSizeDto
                                    {
@@ -207,7 +215,9 @@ namespace WTP.BLL.Services.Concrete.TeamService
             if (playerUserId == dto.UserId && invitation.Author == Author.Coach ||
                 teamUserId == dto.UserId && invitation.Author == Author.Player)
             {
-                await AddToTeamAsync(invitation.PlayerId, invitation.TeamId);
+                var result = await AddToTeamAsync(invitation.PlayerId, invitation.TeamId);
+
+                if (!result.Succeeded) return result;
 
                 await _uow.Invitations.DeleteAsync(dto.InvitationId);
                 await _uow.CommitAsync();
