@@ -22,6 +22,23 @@ namespace WTP.WebAPI.Controllers
         }
 
         /// <summary>
+        /// Get player by id
+        /// </summary>
+        /// <param name="playerId"></param>
+        [HttpGet("{playerId}")]
+        [Authorize(Policy = "RequireLoggedIn")]
+        [ProducesResponseType(typeof(PlayerDto), 200)]
+        [ProducesResponseType(204)]
+        public async Task<IActionResult> Get([FromRoute] int playerId)
+        {
+            var player = await _playerService.GetPlayerAsync(playerId);
+
+            return player == null
+                ? (IActionResult)NoContent()
+                : Ok(player);
+        }
+
+        /// <summary>
         /// Create new player
         /// </summary>
         /// <param name="dto"></param>
@@ -147,18 +164,6 @@ namespace WTP.WebAPI.Controllers
             };
 
             return viewModel;
-        }
-
-        /// <summary>
-        /// Get list of player's invitations
-        /// </summary>
-        /// <param name="userId"></param>
-        /// <returns></returns>
-        [HttpGet("[action]")]
-        [ProducesResponseType(typeof(IList<InvitationListItemDto>), 200)]
-        public async Task<IList<InvitationListItemDto>> InvitationPlayerListByUserId(int userId)
-        {
-            return await _playerService.GetAllPlayerInvitetionByUserId(userId);
         }
     }
 }

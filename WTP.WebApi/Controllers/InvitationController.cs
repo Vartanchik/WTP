@@ -46,7 +46,7 @@ namespace WTP.WebAPI.Controllers
         [Authorize(Policy = "RequireLoggedIn")]
         [ProducesResponseType(typeof(List<InvitationListItemDto>), 200)]
         [ProducesResponseType(204)]
-        public async Task<IActionResult> GetPlayerInvitationById([FromRoute] int playerId)
+        public async Task<IActionResult> GetPlayerInvitationsById([FromRoute] int playerId)
         {
             var invitation = await _invitationService.GetPlayerInvitationsAsync(playerId);
 
@@ -63,7 +63,7 @@ namespace WTP.WebAPI.Controllers
         [Authorize(Policy = "RequireLoggedIn")]
         [ProducesResponseType(typeof(List<InvitationListItemDto>), 200)]
         [ProducesResponseType(204)]
-        public async Task<IActionResult> GetTeamInvitationById([FromRoute] int teamId)
+        public async Task<IActionResult> GetTeamInvitationsById([FromRoute] int teamId)
         {
             var invitation = await _invitationService.GetTeamInvitationsAsync(teamId);
 

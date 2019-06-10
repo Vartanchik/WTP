@@ -55,9 +55,6 @@ namespace WTP.WebAPI.Dto.Controllers
         /// Update current user Userprofile
         /// </summary>
         /// <param name="user"></param>
-        /// <returns>Response DTO</returns>
-        /// <response code="200">Successful performance</response>
-        /// <response code="400">The action failed</response>
         [HttpPut]
         [Authorize(Policy = "RequireLoggedIn")]
         [ProducesResponseType(typeof(ResponseDto), 200)]
@@ -121,10 +118,6 @@ namespace WTP.WebAPI.Dto.Controllers
         /// <summary>
         /// Get photo by url
         /// </summary>
-        /// <returns>FileStreamResult</returns>
-        /// <returns>Response DTO</returns>
-        /// <response code="200">Returns photo</response>
-        /// <response code="404">Photo not found</response>
         [HttpGet("[action]/{photoId:minlength(1)}")]
         [ProducesResponseType(typeof(FileStreamResult), 200)]
         [ProducesResponseType(typeof(ResponseDto), 404)]

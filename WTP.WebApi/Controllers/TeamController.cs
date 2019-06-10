@@ -40,7 +40,9 @@ namespace WTP.WebAPI.Controllers
         {
             var team = await _teamService.GetTeamAsync(teamId);
 
-            return team == null ? NoContent() : (IActionResult)Ok(team);
+            return team == null 
+                ? NoContent() 
+                : (IActionResult)Ok(team);
         }
 
         /// <summary>
@@ -174,25 +176,19 @@ namespace WTP.WebAPI.Controllers
         }
 
         /// <summary>
-        /// Get all invitations associated with the user
-        /// </summary>
-        /// <param name="userId"></param>
-        [HttpGet("[action]")]
-        [ProducesResponseType(typeof(IList<InvitationListItemDto>), 200)]
-        public async Task<IList<InvitationListItemDto>> InvitationTeamListByUserId(int userId)
-        {
-            return await _teamService.GetAllTeamInvitetionByUserId(userId);
-        }
-
-        /// <summary>
         /// Get all user teams
         /// </summary>
         /// <param name="userId"></param>
-        [HttpGet("[action]")]
+        [HttpGet("[action]/{userId}")]
         [ProducesResponseType(typeof(IList<TeamListItemDto>), 200)]
-        public async Task<IList<TeamListItemDto>> ListByUserId(int userId)
+        [ProducesResponseType(204)]
+        public async Task<IActionResult> UserTeams([FromRoute] int userId)
         {
-            return await _teamService.GetListByUserIdAsync(userId);
+            var list = await _teamService.GetListByUserIdAsync(userId);
+
+            return list == null
+                ? (IActionResult)NoContent()
+                : Ok(list);
         }
     }
 }
