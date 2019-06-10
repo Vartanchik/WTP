@@ -34,6 +34,13 @@ namespace WTP.BLL.Services.Concrete.InvitationService
         {
             var playerInvitations = await _uow.Invitations.AsQueryable()
                                                           .Where(i => i.PlayerId == playerId)
+                                                          .Select(i => new InvitationListItemDto
+                                                          {
+                                                              Id = i.Id,
+                                                              PlayerName = i.Player.Name,
+                                                              TeamName = i.Team.Name,
+                                                              Author = i.Author.ToString()
+                                                          })
                                                           .ToListAsync();
             return playerInvitations == null
                 ? null
@@ -53,24 +60,36 @@ namespace WTP.BLL.Services.Concrete.InvitationService
 
         public async Task<ServiceResult> CreateInvitationAsync(TeamActionDto dto)
         {
-            int playerUserId = await _uow.Players.AsQueryable()
+            var playerChecker = await _uow.Players.AsQueryable()
                                                  .Where(p => p.Id == dto.PlayerId)
-                                                 .Select(p => p.AppUserId)
+                                                 .Select(p => new { p.AppUserId, p.GameId })
                                                  .FirstOrDefaultAsync();
 
-            if (playerUserId == 0) return new ServiceResult("Player not found.");
+            if (playerChecker == null) return new ServiceResult("Player not found.");
 
-            var teamCoachId = await _uow.Teams.AsQueryable()
+            var teamChecker = await _uow.Teams.AsQueryable()
                                               .Where(t => t.Id == dto.TeamId)
-                                              .Select(t => t.AppUserId)
+                                              .Select(t => new { t.AppUserId, t.GameId, t.Players.Count })
                                               .FirstOrDefaultAsync();
 
-            if (teamCoachId == 0) return new ServiceResult("Team not found.");
+            if (teamChecker == null) return new ServiceResult("Team not found.");
+
+            if (playerChecker.GameId != teamChecker.GameId) return new ServiceResult("Player and team must be from same game.");
+
+            var exist = await _uow.Invitations.AsQueryable()
+                                              .AnyAsync(i => i.PlayerId == dto.PlayerId &&
+                                                             i.TeamId == dto.TeamId);
+
+            if (exist) return new ServiceResult("Invitation has already been sent.");
 
             Author author;
 
-            if (playerUserId == dto.UserId) author = Author.Player;
-            else if (teamCoachId == dto.UserId) author = Author.Coach;
+            if (playerChecker.AppUserId == dto.UserId) author = Author.Player;
+            else if (teamChecker.AppUserId == dto.UserId)
+            {
+                if (teamChecker.Count >= 5) return new ServiceResult("Team is full.");
+                author = Author.Coach;
+            }
             else return new ServiceResult("You do not have access to perform this operation.");
 
             var invite = new Invitation
