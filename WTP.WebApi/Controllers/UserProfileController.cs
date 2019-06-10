@@ -32,10 +32,6 @@ namespace WTP.WebAPI.Dto.Controllers
         /// <summary>
         /// Get Userprofile of current user
         /// </summary>
-        /// <returns>Current Userprofile</returns>
-        /// <returns>Response DTO</returns>
-        /// <response code="200">Returns AppUser DTO</response>
-        /// <response code="404">Userprofile not found</response>
         [HttpGet]
         [Authorize(Policy = "RequireLoggedIn")]
         [ProducesResponseType(typeof(AppUserDto), 200)]
@@ -77,9 +73,6 @@ namespace WTP.WebAPI.Dto.Controllers
         /// Update current user photo
         /// </summary>
         /// <param name="formData"></param>
-        /// <returns>Response DTO (with or without url)</returns>
-        /// <response code="200">Successful performance</response>
-        /// <response code="400">The action failed</response>
         [HttpPost("[action]")]
         [Authorize(Policy = "RequireLoggedIn")]
         [ProducesResponseType(typeof(ResponseDto), 200)]

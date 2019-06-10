@@ -174,7 +174,7 @@ namespace WTP.WebAPI.Controllers
         }
 
         /// <summary>
-        /// No description
+        /// Generate reset token and send it to user email
         /// </summary>
         /// <param name="userId"></param>
         /// <param name="code"></param>
@@ -304,7 +304,7 @@ namespace WTP.WebAPI.Controllers
         }
 
         /// <summary>
-        /// Restore your account by id & restore token
+        /// Restore your account by id and restore token
         /// </summary>
         /// <param name="userId"></param>
         /// <param name="token"></param>
