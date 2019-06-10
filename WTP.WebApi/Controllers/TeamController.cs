@@ -33,7 +33,7 @@ namespace WTP.WebAPI.Controllers
         /// Get team DTO by team Id
         /// </summary>
         /// <param name="teamId"></param>
-        [HttpGet("[action]/{teamId}")]
+        [HttpGet("{teamId}")]
         [ProducesResponseType(typeof(TeamDto), 200)]
         [ProducesResponseType(204)]
         public async Task<IActionResult> Get([FromRoute] int teamId)
@@ -41,22 +41,6 @@ namespace WTP.WebAPI.Controllers
             var team = await _teamService.GetTeamAsync(teamId);
 
             return team == null ? NoContent() : (IActionResult)Ok(team);
-        }
-
-        /// <summary>
-        /// Get team size by game id
-        /// </summary>
-        /// <param name="gameId"></param>
-        /// <returns></returns>
-        [HttpGet("[action]")]
-        [Authorize(Policy = "RequireLoggedIn")]
-        [ProducesResponseType(typeof(TeamSizeDto), 200)]
-        public async Task<TeamSizeDto> GetTeamSizeByGame(int gameId)
-        {
-            var userId = this.GetCurrentUserId();
-
-            return await _teamService.GetTeamSizeByGameIdAsync(userId, gameId);
-
         }
 
         /// <summary>
@@ -245,9 +229,9 @@ namespace WTP.WebAPI.Controllers
         /// Get all user teams
         /// </summary>
         /// <param name="userId"></param>
-        [HttpGet("[action]")]
+        [HttpGet("[action]/{userId}")]
         [ProducesResponseType(typeof(IList<TeamListItemDto>), 200)]
-        public async Task<IList<TeamListItemDto>> ListByUserId(int userId)
+        public async Task<IList<TeamListItemDto>> UserTeams([FromRoute] int userId)
         {
             return await _teamService.GetListByUserIdAsync(userId);
         }

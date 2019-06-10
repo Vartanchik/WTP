@@ -98,6 +98,12 @@ namespace WTP.BLL.Services.Concrete.TeamService
 
             if (teamCoachId == 0) return new ServiceResult("Team not found.");
 
+            var exist = await _uow.Invitations.AsQueryable()
+                                                   .AnyAsync(i => i.PlayerId == dto.PlayerId &&
+                                                                  i.TeamId == dto.TeamId);
+
+            if (exist) return new ServiceResult("Invitation already been sent.");
+
             Author author;
 
             if (playerUserId == dto.UserId) author = Author.Player;
@@ -111,31 +117,11 @@ namespace WTP.BLL.Services.Concrete.TeamService
                 Author = author
             };
 
-            try
-            {
-                await _uow.Invitations.CreateOrUpdate(invite);
-                await _uow.CommitAsync();
-            }
-            catch (Exception ex)
-            {
-                return new ServiceResult("Invitation already sent.");
-            }
+            await _uow.Invitations.CreateOrUpdate(invite);
+            await _uow.CommitAsync();
 
             return new ServiceResult();
 
-        }
-
-        public async Task<TeamSizeDto> GetTeamSizeByGameIdAsync(int userId, int gameId)
-        {
-            return await _uow.Teams.AsQueryable()
-                                   .Where(t => t.GameId == gameId &&
-                                               t.AppUserId == userId)
-                                   .Select(t => new TeamSizeDto
-                                   {
-                                       TeamId = t.Id,
-                                       PlayerQuantity = t.Players.Count
-                                   })
-                                   .FirstOrDefaultAsync();
         }
 
 
@@ -295,7 +281,7 @@ namespace WTP.BLL.Services.Concrete.TeamService
                                               .Where(t => t.AppUserId == userId)
                                               .AsNoTracking()
                                               .ToListAsync();
-
+            
             return _mapper.Map<IList<TeamListItemDto>>(listOfTeams);
         }
     }

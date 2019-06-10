@@ -21,7 +21,7 @@ namespace WTP.WebAPI.Controllers
             _playerService = playerService;
         }
 
-        [HttpGet]
+        [HttpGet("{playerId}")]
         [ProducesResponseType(typeof(PlayerDto), 200)]
         public async Task<PlayerDto> Get (int playerId)
         {
@@ -100,10 +100,10 @@ namespace WTP.WebAPI.Controllers
         /// </summary>
         /// <returns>List of players</returns>
         /// <returns>List<PlayerListItemDto></returns>
-        [HttpGet("[action]")]
+        [HttpGet("[action]/{userId}")]
         [ProducesResponseType(typeof(IList<PlayerListItemDto>), 200)]
         [ProducesResponseType(typeof(ResponseDto), 400)]
-        public async Task<IList<PlayerListItemDto>> GetPlayersByUser(int userId)
+        public async Task<IList<PlayerListItemDto>> UserPlayers([FromRoute] int userId)
         {
             return await _playerService.GetListByUserIdAsync(userId);
         }
@@ -114,10 +114,10 @@ namespace WTP.WebAPI.Controllers
         /// </summary>
         /// <param name="teamId"></param>
         /// <returns>List<PlayerListItemDto></returns>
-        [HttpGet("[action]")]
+        [HttpGet("[action]/{userId}")]
         [ProducesResponseType(typeof(IList<PlayerListItemDto>), 200)]
         [ProducesResponseType(typeof(ResponseDto), 400)]
-        public async Task<IList<PlayerListItemDto>> GetPlayersByTeam(int teamId)
+        public async Task<IList<PlayerListItemDto>> TeamPlayers([FromRoute]int teamId)
         {
             return await _playerService.GetListByTeamIdAsync(teamId);
         }
