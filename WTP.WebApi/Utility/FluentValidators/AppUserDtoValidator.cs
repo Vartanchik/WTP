@@ -24,10 +24,14 @@ namespace WTP.WebAPI.FluentValidators
 
         private bool IsValidDate(string value)
         {
-            string[] formats = new string[] { "yyyy-MM-dd", "dd-MM-yyyy", "dd.MM.yyyy", "yyyy.MM.dd" };
+            if (String.IsNullOrEmpty(value))
+            {
+                return true;
+            }
+            string[] formats = new string[] { "yyyy-MM-dd", "dd-MM-yyyy", "dd.MM.yyyy", "yyyy.MM.dd", "dd.MM.yy" };
             var result = DateTime.TryParseExact(value,
                                                 formats,
-                                                CultureInfo.InvariantCulture,
+                                                new CultureInfo("de-DE"),
                                                 DateTimeStyles.NoCurrentDateDefault,
                                                 result: out _);
             return result;
