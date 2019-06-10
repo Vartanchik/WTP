@@ -810,7 +810,7 @@ namespace WTP.DAL.Migrations
                     b.HasOne("WTP.DAL.Entities.Player", "Player")
                         .WithMany("Invitations")
                         .HasForeignKey("PlayerId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("WTP.DAL.Entities.TeamEntities.Team", "Team")
                         .WithMany("Invitations")

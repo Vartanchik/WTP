@@ -41,14 +41,14 @@ namespace WTP.WebAPI.Controllers
         /// <summary>
         /// Get invitations by player id
         /// </summary>
-        /// <param name="userId"></param>
-        [HttpGet("player/{userId}")]
+        /// <param name="playerId"></param>
+        [HttpGet("player/{playerId}")]
         [Authorize(Policy = "RequireLoggedIn")]
         [ProducesResponseType(typeof(List<InvitationListItemDto>), 200)]
         [ProducesResponseType(204)]
-        public async Task<IActionResult> GetUserInvitationById([FromRoute] int userId)
+        public async Task<IActionResult> GetPlayerInvitationById([FromRoute] int playerId)
         {
-            var invitation = await _invitationService.GetPlayerInvitationsAsync(userId);
+            var invitation = await _invitationService.GetPlayerInvitationsAsync(playerId);
 
             return invitation == null
                 ? (IActionResult)NoContent()

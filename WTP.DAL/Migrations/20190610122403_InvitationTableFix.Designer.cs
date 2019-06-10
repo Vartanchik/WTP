@@ -10,8 +10,8 @@ using WTP.DAL;
 namespace WTP.DAL.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20190607155947_Try1")]
-    partial class Try1
+    [Migration("20190610122403_InvitationTableFix")]
+    partial class InvitationTableFix
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -812,7 +812,7 @@ namespace WTP.DAL.Migrations
                     b.HasOne("WTP.DAL.Entities.Player", "Player")
                         .WithMany("Invitations")
                         .HasForeignKey("PlayerId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("WTP.DAL.Entities.TeamEntities.Team", "Team")
                         .WithMany("Invitations")

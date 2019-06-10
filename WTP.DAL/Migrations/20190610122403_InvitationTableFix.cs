@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace WTP.DAL.Migrations
 {
-    public partial class Try1 : Migration
+    public partial class InvitationTableFix : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -453,7 +453,7 @@ namespace WTP.DAL.Migrations
                         column: x => x.PlayerId,
                         principalTable: "Players",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Invitations_Team_TeamId",
                         column: x => x.TeamId,

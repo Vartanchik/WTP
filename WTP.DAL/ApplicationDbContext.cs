@@ -55,7 +55,7 @@ namespace WTP.DAL
                 .HasOne(_ => _.Player)
                 .WithMany(_ => _.Invitations)
                 .HasForeignKey(_ => _.PlayerId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Restrict);
             builder.Entity<Invitation>()
                 .HasOne(_ => _.Team)
                 .WithMany(_ => _.Invitations)
