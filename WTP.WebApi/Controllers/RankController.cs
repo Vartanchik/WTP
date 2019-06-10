@@ -24,11 +24,9 @@ namespace WTP.WebAPI.Controllers
 
         [HttpGet("list")]
         [Authorize(Policy = "RequireAdministratorRole")]
-        public async Task<RankDto[]> GetAllRanks()
+        public async Task<IList<RankDto>> GetAllRanks()
         {
-            var listOfranks = await _rankService.GetRanksListAsync();
-
-            return listOfranks.ToArray();
+            return await _rankService.GetRanksListAsync();
         }
 
 

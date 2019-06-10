@@ -14,7 +14,7 @@ namespace WTP.BLL.Services.Concrete.AdminPlayerService
         Task<IList<PlayerShortDto>> GetJoinedPlayersListAsync();
         IQueryable<Player> GetItemsOnPage(int page, int pageSize, IQueryable<Player> baseQuery);
         Task<int> GetCountOfPlayers();
-        IQueryable<Player> FilterByName(string name, IQueryable<Player> baseQuery);
+        IQueryable<Player> FilterByParam(Func<Player, bool> f, IQueryable<Player> baseQuery);
         IQueryable<Player> SortByParam(PlayerSortState sortOrder, IQueryable<Player> baseQuery);
         Task<PlayerManageDto> GetPageInfo(string name, int page, int pageSize,
             PlayerSortState sortOrder);

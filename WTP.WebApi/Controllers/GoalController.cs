@@ -24,15 +24,13 @@ namespace WTP.WebAPI.Controllers
 
         [HttpGet("list")]
         [Authorize(Policy = "RequireAdministratorRole")]
-        public async Task<GoalDto[]> GetAllGoals()
+        public async Task<IList<GoalDto>> GetAllGoals()
         {
-            var listOfGoals = await _goalService.GetGoalsListAsync();
-
-            return listOfGoals.ToArray();
+            return await _goalService.GetGoalsListAsync();
         }
 
 
-        [HttpPost("item")]
+        [HttpPost("")]
         [Authorize(Policy = "RequireAdministratorRole")]
         public async Task<IActionResult> CreateFoal([FromBody]GoalDto goalDto)
         {

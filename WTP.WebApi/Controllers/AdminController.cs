@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -32,7 +33,7 @@ namespace WTP.WebAPI.Controllers
         [Authorize(Policy = "RequireAdministratorRole")]
         public async Task<IActionResult> CreateAdminAccount([FromBody] RegisterDto formdata)
         {
-            string errorResult = "";
+            StringBuilder sb = new StringBuilder();
             var user = new AppUserDto
             {
                 Email = formdata.Email,
@@ -47,10 +48,13 @@ namespace WTP.WebAPI.Controllers
             else
             {
                 foreach (var error in result.Errors)
-                    errorResult += error.Code + " ";
+                {
+                    sb.Append(error.Code);
+                    sb.Append("/ ");
+                }
             }
 
-            return BadRequest(new ResponseDto(400, "Creating admin is failed.", errorResult));
+            return BadRequest(new ResponseDto(400, "Creating admin is failed.", sb.ToString()));
         }
 
         //Create User account
@@ -59,9 +63,8 @@ namespace WTP.WebAPI.Controllers
         [Authorize(Policy = "RequireAdministratorRole")]
         public async Task<IActionResult> CreateUserProfile([FromBody] RegisterDto formdata)
         {
-            //int userId = Convert.ToInt32(User.Claims.First(c => c.Type == "UserID").Value);
-            int adminId = 1;
-            string errorResult = "";
+            int adminId = Convert.ToInt32(User.Claims.First(c => c.Type == "UserID").Value);
+            StringBuilder sb = new StringBuilder();
 
             var user = new AppUserDto
             {
@@ -77,10 +80,13 @@ namespace WTP.WebAPI.Controllers
             else
             {
                 foreach (var error in result.Errors)
-                    errorResult += error.Code + " ";
+                {
+                    sb.Append(error.Code);
+                    sb.Append("/ ");
+                }
             }
 
-            return BadRequest(new ResponseDto(400, "Creating user account is failed.", errorResult));
+            return BadRequest(new ResponseDto(400, "Creating user account is failed.", sb.ToString()));
         }
 
         //Create User account
@@ -89,7 +95,7 @@ namespace WTP.WebAPI.Controllers
         [Authorize(Policy = "RequireAdministratorRole")]
         public async Task<IActionResult> CreateModeratorProfile([FromBody] RegisterDto formdata)
         {
-            string errorResult = "";
+            StringBuilder sb = new StringBuilder();
             var user = new AppUserDto
             {
                 Email = formdata.Email,
@@ -104,26 +110,23 @@ namespace WTP.WebAPI.Controllers
             else
             {
                 foreach (var error in result.Errors)
-                    errorResult += error.Code + " ";
+                {
+                    sb.Append(error.Code);
+                    sb.Append("/ ");
+                }
             }
 
-            return BadRequest(new ResponseDto(400, "Creating moderator account is failed.", errorResult));
+            return BadRequest(new ResponseDto(400, "Creating moderator account is failed.", sb.ToString()));
         }
 
 
         ////Get List of all Users
         [HttpGet]
         [Route("users")]
-        [Authorize(Policy = "RequireAdministratorRole")]
-        public async Task<AppUserDto[]> GetUsersProfile()
+        //[Authorize(Policy = "RequireAdministratorRole")]
+        public async Task<IList<AppUserDto>> GetUsersProfile()
         {
-            List<AppUserDto> result = new List<AppUserDto>();
-            var users = await _appUserService.GetUsersList();
-
-            if (users.Count() == 0)
-                return result.ToArray();
-
-            return users.ToArray();
+            return await _appUserService.GetUsersList();
         }
 
         //Update user's account
@@ -132,9 +135,8 @@ namespace WTP.WebAPI.Controllers
         [Route("users/{id}")]
         public async Task<IActionResult> UpdateUser([FromBody] AppUserDto formdata, [FromRoute]int id)
         {
-            //int userId = Convert.ToInt32(User.Claims.First(c => c.Type == "UserID").Value);
-            int adminId = 1;
-            string errorResult = "";
+            int adminId = Convert.ToInt32(User.Claims.First(c => c.Type == "UserID").Value);
+            StringBuilder sb = new StringBuilder();
 
             if (!ModelState.IsValid)
             {
@@ -174,7 +176,8 @@ namespace WTP.WebAPI.Controllers
             {
                 foreach (var error in result.Errors)
                 {
-                    errorResult += error.Code;
+                    sb.Append(error.Code);
+                    sb.Append("/ ");
                 }
             }
 
@@ -182,7 +185,7 @@ namespace WTP.WebAPI.Controllers
             {
                 StatusCode = 404,
                 Message = "User with id:" + id + " wasnt found.",
-                Info = errorResult
+                Info = sb.ToString()
             });
         }
 
@@ -192,18 +195,17 @@ namespace WTP.WebAPI.Controllers
         [Route("users/{id}")]
         public async Task<IActionResult> DeleteUser([FromRoute]int id)
         {
-            //int userId = Convert.ToInt32(User.Claims.First(c => c.Type == "UserID").Value);
-            int adminId = 1;
+            int adminId = Convert.ToInt32(User.Claims.First(c => c.Type == "UserID").Value);
 
             try
             {
                 await _appUserService.DeleteAccountAsync(id, adminId);
             }
-            catch(Exception)
+            catch (Exception)
             {
-                return NotFound(new ResponseDto
+                return BadRequest(new ResponseDto
                 {
-                    StatusCode = 404,
+                    StatusCode = 400,
                     Message = "User's profile with id " + id + " wasn't found."
                 });
             }
@@ -221,9 +223,7 @@ namespace WTP.WebAPI.Controllers
         [Route("users/{id}/block")]
         public async Task<IActionResult> LockUser([FromBody]LockDto formDate, [FromRoute]int id)
         {
-            //int userId = Convert.ToInt32(User.Claims.First(c => c.Type == "UserID").Value);
-            int adminId = 1;
-
+            int adminId = Convert.ToInt32(User.Claims.First(c => c.Type == "UserID").Value);
             bool success = await _appUserService.LockAsync(id, formDate.Days, adminId);
 
             if (success)
@@ -247,9 +247,7 @@ namespace WTP.WebAPI.Controllers
         [Route("users/{id}/unblock")]
         public async Task<IActionResult> UnLockUser([FromRoute]int id)
         {
-            //int userId = Convert.ToInt32(User.Claims.First(c => c.Type == "UserID").Value);
-            int adminId = 1;
-
+            int adminId = Convert.ToInt32(User.Claims.First(c => c.Type == "UserID").Value);
             bool success = await _appUserService.UnLockAsync(id, adminId);
 
             if (success)

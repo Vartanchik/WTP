@@ -30,12 +30,11 @@ namespace WTP.BLL.Services.Concrete.AdminPlayerService
             return _mapper.Map<IList<PlayerShortDto>>(allPlayers);
         }
 
-        public IQueryable<Player> FilterByName(string name, IQueryable<Player> baseQuery)
+        public IQueryable<Player> FilterByParam(Func<Player, bool> f, IQueryable<Player> baseQuery)
         {
-            if (!String.IsNullOrEmpty(name))
-                return baseQuery.Where(p => p.Name.Contains(name));
-
-            return null;
+            //if (!String.IsNullOrEmpty(name))
+                return baseQuery.Where(f).AsQueryable();
+            //return null;
         }
 
         public IQueryable<Player> SortByParam(PlayerSortState sortOrder, IQueryable<Player> baseQuery)
@@ -113,7 +112,9 @@ namespace WTP.BLL.Services.Concrete.AdminPlayerService
 
             try
             {
-                var newQuery = FilterByName(name, query);
+                var newQuery = FilterByParam(p => p.Name.Contains(name), query);
+                //newQuery = FilterByParam(p => p.AppUser.UserName.Contains(name), query);
+                //newQuery = FilterByParam(p => p.Id.Equals(Int32.Parse(name)), query);
                 newQuery = SortByParam(sortOrder, newQuery);
                 newQuery = GetItemsOnPage(page, pageSize, newQuery);
 

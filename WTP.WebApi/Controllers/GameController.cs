@@ -24,11 +24,9 @@ namespace WTP.WebAPI.Controllers
 
         [HttpGet("list")]
         [Authorize(Policy = "RequireAdministratorRole")]
-        public async Task<GameDto[]> GetAllGames()
+        public async Task<IList<GameDto>> GetAllGames()
         {
-            var listOfGames = await _gameService.GetAllGamesAsync();
-
-            return listOfGames.ToArray();
+            return await _gameService.GetAllGamesAsync();
         }
 
         [HttpPost("item")]
@@ -84,11 +82,6 @@ namespace WTP.WebAPI.Controllers
         [Authorize(Policy = "RequireAdministratorRole")]
         public async Task<IActionResult> DeleteGame([FromRoute]int gameId)
         {
-            var game = await _gameService.FindAsync(gameId);
-
-            if (game == null)
-                return NoContent();
-
             await _gameService.DeleteAsync(gameId);
 
             return Ok(new ResponseDto

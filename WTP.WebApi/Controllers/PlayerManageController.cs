@@ -85,20 +85,33 @@ namespace WTP.WebAPI.Controllers
         [Route("item")]
         public async Task<IActionResult> DeletePlayer([FromBody] PlayerShortDto inputPlayer)
         {
-            var result = await _playerService.DeleteAsync(inputPlayer.AppUserId, inputPlayer.GameId);
-            if (result.Succeeded)
-                return Ok(new ResponseDto
-                {
-                    StatusCode = 201,
-                    Message = "Player with id " + inputPlayer.Id + " was deleted.",
-                    Info = "Success."
-                });
-
-            return NotFound(new ResponseDto
+            if (ModelState.IsValid)
             {
-                StatusCode = 404,
-                Message = "Player with id " + inputPlayer.Id + " wasn't found."
-            });
+                var result = await _playerService.DeleteAsync(inputPlayer.AppUserId, inputPlayer.GameId);
+
+                if (result.Succeeded)
+                    return Ok(new ResponseDto
+                    {
+                        StatusCode = 201,
+                        Message = "Player with id " + inputPlayer.Id + " was deleted.",
+                        Info = "Success."
+                    });
+
+                return NotFound(new ResponseDto
+                {
+                    StatusCode = 404,
+                    Message = "Player with id " + inputPlayer.Id + " wasn't found."
+                });
+            }
+            else
+            {
+                return BadRequest(new ResponseDto
+                {
+                    StatusCode = 400,
+                    Message = "Model is not valid.",
+                    Info = "BadRequest."
+                });
+            }
         }
     }
 }
