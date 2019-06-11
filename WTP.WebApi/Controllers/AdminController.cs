@@ -12,6 +12,8 @@ using WTP.BLL.Services.Concrete.AppUserService;
 using WTP.BLL.Services.HistoryService;
 using WTP.BLL.Shared;
 
+using role = WTP.DAL.Repositories.ConcreteRepositories.AppUserRepository;
+
 namespace WTP.WebAPI.Controllers
 {
     [Route("api/[controller]")]
@@ -41,7 +43,7 @@ namespace WTP.WebAPI.Controllers
                 SecurityStamp = Guid.NewGuid().ToString()
             };
 
-            var result = await _appUserService.CreateAdminAsync(user, formdata.Password);
+            var result = await _appUserService.CreatePersonAsync(user, formdata.Password,role.UserType.Admin);
 
             if (result.Succeeded)
                 return Ok(new ResponseDto(201, "Creating admin is success."));
@@ -103,7 +105,7 @@ namespace WTP.WebAPI.Controllers
                 SecurityStamp = Guid.NewGuid().ToString()
             };
 
-            var result = await _appUserService.CreateModeratorAsync(user, formdata.Password);
+            var result = await _appUserService.CreatePersonAsync(user, formdata.Password,role.UserType.Moderator);
 
             if (result.Succeeded)
                 return Ok(new ResponseDto(201, "Creating moderator is success."));
@@ -123,7 +125,7 @@ namespace WTP.WebAPI.Controllers
         ////Get List of all Users
         [HttpGet]
         [Route("users")]
-        //[Authorize(Policy = "RequireAdministratorRole")]
+        [Authorize(Policy = "RequireAdministratorRole")]
         public async Task<IList<AppUserDto>> GetUsersProfile()
         {
             return await _appUserService.GetUsersList();

@@ -9,6 +9,13 @@ using WTP.DAL.Repositories.GenericRepository;
 
 namespace WTP.DAL.Repositories.ConcreteRepositories.AppUserRepository
 {
+    public enum UserType
+    {
+        User,
+        Admin,
+        Moderator
+    }
+
     public class UserRepository : RepositoryBase<AppUser>, IUserRepository<AppUser>
     {
         private readonly UserManager<AppUser> _userManager;
@@ -138,23 +145,13 @@ namespace WTP.DAL.Repositories.ConcreteRepositories.AppUserRepository
                        .FirstOrDefault();
         }
 
-        private async Task<IdentityResult> CreatePersonAsync(AppUser appUser, string password, string role)
+        public async Task<IdentityResult> CreatePersonAsync(AppUser appUser, string password, UserType userType)
         {
             var result = await _userManager.CreateAsync(appUser, password);
 
-            await _userManager.AddToRoleAsync(appUser, role);
+            await _userManager.AddToRoleAsync(appUser, userType.ToString());
 
             return result;
-        }
-
-        public async Task<IdentityResult> CreateAdminAsync(AppUser appUser, string password)
-        {
-            return await CreatePersonAsync(appUser, password, "Admin");
-        }
-
-        public async Task<IdentityResult> CreateModeratorAsync(AppUser appUser, string password)
-        {
-            return await CreatePersonAsync(appUser, password, "Moderator");
         }
 
         public new async Task<bool> DeleteAsync(int id)

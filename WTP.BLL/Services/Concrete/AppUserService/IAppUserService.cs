@@ -6,6 +6,7 @@ using WTP.BLL.DTOs.AppUserDTOs;
 using WTP.BLL.DTOs.ServicesDTOs;
 using WTP.BLL.Shared;
 using WTP.DAL.Entities.AppUserEntities;
+using WTP.DAL.Repositories.ConcreteRepositories.AppUserRepository;
 
 namespace WTP.BLL.Services.Concrete.AppUserService
 {
@@ -31,8 +32,7 @@ namespace WTP.BLL.Services.Concrete.AppUserService
         Task<UserIconDto> GetUserIconAsync(int userId);
 
         //For Admin
-        Task<IdentityResult> CreateAdminAsync(AppUserDto appUserDto, string password);
-        Task<IdentityResult> CreateModeratorAsync(AppUserDto appUserDto, string password);
+        Task<IdentityResult> CreatePersonAsync(AppUserDto appUserDto, string password, UserType userType);
         Task<IList<AppUserDto>> GetUsersList();
         Task<bool> LockAsync(int id, int? days, int? adminId = null);
         Task<bool> UnLockAsync(int id, int? adminId = null);

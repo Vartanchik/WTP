@@ -9,6 +9,7 @@ using WTP.BLL.DTOs.AppUserDTOs;
 using WTP.BLL.DTOs.ServicesDTOs;
 using WTP.BLL.Shared;
 using WTP.DAL.Entities.AppUserEntities;
+using WTP.DAL.Repositories.ConcreteRepositories.AppUserRepository;
 using WTP.DAL.UnitOfWork;
 
 namespace WTP.BLL.Services.Concrete.AppUserService
@@ -263,22 +264,13 @@ namespace WTP.BLL.Services.Concrete.AppUserService
                                 .FirstOrDefaultAsync();
         }
 
-        public async Task<IdentityResult> CreateAdminAsync(AppUserDto appUserDto, string password)
+
+        public async Task<IdentityResult> CreatePersonAsync(AppUserDto appUserDto, string password, UserType userType)
         {
             var appUser = _mapper.Map<AppUser>(appUserDto);
             appUser.EmailConfirmed = true;
 
-            var result = await _uow.AppUsers.CreateAdminAsync(appUser, password);
-
-            return result;
-
-        }
-
-        public async Task<IdentityResult> CreateModeratorAsync(AppUserDto appUserDto, string password)
-        {
-            var appUser = _mapper.Map<AppUser>(appUserDto);
-
-            var result = await _uow.AppUsers.CreateModeratorAsync(appUser, password);
+            var result = await _uow.AppUsers.CreatePersonAsync(appUser, password,userType);
 
             return result;
         }
