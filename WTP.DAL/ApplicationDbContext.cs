@@ -78,14 +78,14 @@ namespace WTP.DAL
                 );
 
             builder.Entity<Rank>().HasData(
-                    new Rank { Id = 1, Name = "Uncalibrated" , Value = 10},
-                    new Rank { Id = 2, Name = "Guardian", Value = 20 },
-                    new Rank { Id = 3, Name = "Crusader", Value = 30 },
-                    new Rank { Id = 4, Name = "Archon", Value = 40 },
-                    new Rank { Id = 5, Name = "Legend", Value = 50 },
-                    new Rank { Id = 6, Name = "Ancient", Value = 60 },
-                    new Rank { Id = 7, Name = "Divine", Value = 70 },
-                    new Rank { Id = 8, Name = "Immortal", Value = 80 }
+                    new Rank { Id = 1, Name = "Uncalibrated" , Value = 0},
+                    new Rank { Id = 2, Name = "Guardian", Value = 10 },
+                    new Rank { Id = 3, Name = "Crusader", Value = 20 },
+                    new Rank { Id = 4, Name = "Archon", Value = 30 },
+                    new Rank { Id = 5, Name = "Legend", Value = 40 },
+                    new Rank { Id = 6, Name = "Ancient", Value = 50 },
+                    new Rank { Id = 7, Name = "Divine", Value = 60 },
+                    new Rank { Id = 8, Name = "Immortal", Value = 70 }
                 );
 
             builder.Entity<AppUserLanguage>()
