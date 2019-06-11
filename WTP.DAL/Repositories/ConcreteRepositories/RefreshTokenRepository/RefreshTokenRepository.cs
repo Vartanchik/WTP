@@ -20,7 +20,7 @@ namespace WTP.DAL.Repositories.ConcreteRepositories.RefreshTokenRepository
         public async Task DeleteUserTokensAsync(int userId)
         {
             var tokens = _context.RefreshTokens.AsQueryable()
-                                               .Where(t => t.UserId == userId);
+                                               .Where(t => t.AppUserId == userId);
 
             if (tokens != null)
             {
@@ -32,14 +32,14 @@ namespace WTP.DAL.Repositories.ConcreteRepositories.RefreshTokenRepository
 
         public async Task<RefreshToken> UserTokenByValue(int userId, string refreshToken)
         {
-            return await _context.RefreshTokens.FirstOrDefaultAsync(t => t.UserId == userId && 
+            return await _context.RefreshTokens.FirstOrDefaultAsync(t => t.AppUserId == userId && 
                                                                          t.Value == refreshToken);
         }
 
         public IQueryable<RefreshToken> GetUserTokensAsync(int id)
         {
             return _context.RefreshTokens.AsQueryable()
-                                         .Where(t => t.UserId == id);
+                                         .Where(t => t.AppUserId == id);
         }
 
         public virtual int GetIdByCondition(Func<RefreshToken, bool> condition)

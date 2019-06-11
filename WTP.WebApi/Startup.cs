@@ -29,6 +29,7 @@ using WTP.DAL.Entities.AppUserEntities;
 using WTP.BLL.Services.Concrete.TeamService;
 using WTP.BLL.DTOs.ServicesDTOs;
 using System.Threading.Tasks;
+using WTP.BLL.Services.Concrete.InvitationService;
 
 namespace WTP.WebAPI
 {
@@ -59,6 +60,7 @@ namespace WTP.WebAPI
             services.AddScoped<IGameService, GameService>();
             services.AddScoped<IPlayerService, PlayerService>();
             services.AddScoped<ITeamService, TeamService>();
+            services.AddScoped<IInvitationService, InvitationService>();
 
             services.AddScoped(provider => new MapperConfiguration(config =>
             {
@@ -181,6 +183,10 @@ namespace WTP.WebAPI
                 });
 
                 c.AddSecurityRequirement(security);
+
+                var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = System.IO.Path.Combine(AppContext.BaseDirectory, xmlFile);
+                c.IncludeXmlComments(xmlPath);
             });
         }
 

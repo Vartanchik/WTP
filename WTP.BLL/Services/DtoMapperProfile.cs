@@ -48,8 +48,6 @@ namespace WTP.BLL.Services.Concrete
             CreateMap<Goal, GoalDto>();
             CreateMap<ServerDto, Server>();
             CreateMap<Server, ServerDto>();
-            CreateMap<CommentDto, Comment>();
-            CreateMap<Comment, CommentDto>();
             CreateMap<MatchDto, Match>();
             CreateMap<Match, MatchDto>();
             CreateMap<Rank, RankDto>();

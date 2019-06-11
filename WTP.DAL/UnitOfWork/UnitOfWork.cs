@@ -26,7 +26,6 @@ namespace WTP.DAL.UnitOfWork
         private IRepository<Player> _players;
         private IRepository<Team> _teams;
         private IRefreshTokenRepository<RefreshToken> _refreshTokens;
-        private IRepository<Comment> _comments;
         private IRepository<Match> _matches;
         private IRepository<Game> _games;
         private IRepository<Server> _servers;
@@ -50,7 +49,6 @@ namespace WTP.DAL.UnitOfWork
         public IRepository<Player> Players => _players ?? (_players = new RepositoryBase<Player>(_context));
         public IRepository<Team> Teams => _teams ?? (_teams = new RepositoryBase<Team>(_context));
         public IRefreshTokenRepository<RefreshToken> RefreshTokens => _refreshTokens ?? (_refreshTokens = new RefreshTokenRepository<RefreshToken>(_context));
-        public IRepository<Comment> Comments => _comments ?? (_comments = new RepositoryBase<Comment>(_context));
         public IRepository<Match> Matches => _matches ?? (_matches = new RepositoryBase<Match>(_context));
         public IRepository<Game> Games => _games ?? (_games = new RepositoryBase<Game>(_context));
         public IRepository<Server> Servers => _servers ?? (_servers = new RepositoryBase<Server>(_context));

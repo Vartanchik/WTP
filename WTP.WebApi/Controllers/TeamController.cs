@@ -40,7 +40,9 @@ namespace WTP.WebAPI.Controllers
         {
             var team = await _teamService.GetTeamAsync(teamId);
 
-            return team == null ? NoContent() : (IActionResult)Ok(team);
+            return team == null 
+                ? NoContent() 
+                : (IActionResult)Ok(team);
         }
 
         /// <summary>
@@ -84,11 +86,11 @@ namespace WTP.WebAPI.Controllers
         /// Delete curren user team by Id
         /// </summary>
         /// <param name="teamId"></param>
-        [HttpDelete]
+        [HttpDelete("{teamId}")]
         [Authorize(Policy = "RequireLoggedIn")]
         [ProducesResponseType(typeof(ResponseDto), 200)]
         [ProducesResponseType(typeof(ResponseDto), 400)]
-        public async Task<IActionResult> Delete(int teamId)
+        public async Task<IActionResult> Delete([FromRoute] int teamId)
         {
             var userId = this.GetCurrentUserId();
             var result = await _teamService.DeleteAsync(teamId, userId);
@@ -96,58 +98,7 @@ namespace WTP.WebAPI.Controllers
             return result.Succeeded
                 ? Ok(new ResponseDto(200, "Completed.", "Team deleted."))
                 : (IActionResult)BadRequest(new ResponseDto(400, "Failed.", result.Error));
-        }
-
-        /// <summary>
-        /// Create an invitation to join the team
-        /// </summary>
-        /// <param name="playerId"></param>
-        /// <param name="teamId"></param>
-        [HttpPost("[action]")]
-        [Authorize(Policy = "RequireLoggedIn")]
-        [ProducesResponseType(typeof(ResponseDto), 200)]
-        [ProducesResponseType(typeof(ResponseDto), 400)]
-        public async Task<IActionResult> Invite(int playerId, int teamId)
-        {
-            var userId = this.GetCurrentUserId();
-            var result = await _teamService.CreateInvitationAsync(new TeamActionDto
-            {
-                PlayerId = playerId,
-                TeamId = teamId,
-                UserId = userId
-            });
-
-            return result.Succeeded
-                ? Ok(new ResponseDto(200, "Completed.", "Invite created."))
-                : (IActionResult)BadRequest(new ResponseDto(400, "Failed.", result.Error));
-        }
-
-        /// <summary>
-        /// Accept invitations to join the team
-        /// </summary>
-        /// <param name="dto"></param>
-        [HttpPut("[action]")]
-        [Authorize(Policy = "RequireLoggedIn")]
-        [ProducesResponseType(typeof(ResponseDto), 200)]
-        [ProducesResponseType(typeof(ResponseDto), 400)]
-        public async Task<IActionResult> AcceptInvitation(InvitationResponseDto dto)
-        {
-            var userId = this.GetCurrentUserId();
-
-            var invitation = new InviteActionDto
-            {
-                InvitationId = dto.InvitationId,
-                UserId = userId
-            };
-
-            var result = dto.Accept 
-                ? await _teamService.AcceptInvitationAsync(invitation)
-                : await _teamService.DeclineInvitationAsync(invitation);
-
-            return result.Succeeded
-                ? Ok(new ResponseDto(200, "Completed.", "Invite accept."))
-                : (IActionResult)BadRequest(new ResponseDto(400, "Failed.", result.Error));
-        }
+        } 
 
         /// <summary>
         /// Remove player from team
@@ -179,11 +130,11 @@ namespace WTP.WebAPI.Controllers
         /// </summary>
         /// <param name="formData"></param>
         /// <param name="teamId"></param>
-        [HttpPost("[action]")]
+        [HttpPost("[action]/{teamId}")]
         [Authorize(Policy = "RequireLoggedIn")]
         [ProducesResponseType(typeof(ResponseDto), 200)]
         [ProducesResponseType(typeof(ResponseDto), 400)]
-        public async Task<IActionResult> UpdateLogo([FromForm] PhotoFormDataDto formData, int teamId)
+        public async Task<IActionResult> UpdateLogo([FromForm] PhotoFormDataDto formData, [FromRoute] int teamId)
         {
             var azureStorageConfig = new AzureBlobStorageConfigDto(_configuration["AzureBlobStorage:AccountName"],
                                                                    _configuration["AzureBlobStorage:AccountKey"],
@@ -231,9 +182,14 @@ namespace WTP.WebAPI.Controllers
         /// <param name="userId"></param>
         [HttpGet("[action]/{userId}")]
         [ProducesResponseType(typeof(IList<TeamListItemDto>), 200)]
-        public async Task<IList<TeamListItemDto>> UserTeams([FromRoute] int userId)
+        [ProducesResponseType(204)]
+        public async Task<IActionResult> UserTeams([FromRoute] int userId)
         {
-            return await _teamService.GetListByUserIdAsync(userId);
+            var list = await _teamService.GetListByUserIdAsync(userId);
+
+            return list == null
+                ? (IActionResult)NoContent()
+                : Ok(list);
         }
     }
 }
