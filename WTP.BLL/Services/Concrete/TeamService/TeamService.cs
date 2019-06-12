@@ -24,7 +24,16 @@ namespace WTP.BLL.Services.Concrete.TeamService
 
         public async Task<TeamDto> GetTeamAsync(int teamId)
         {
-            var team = await _uow.Teams.GetByIdAsync(teamId);
+            var team = await _uow.Teams.AsQueryable()
+                                       .Include(t => t.Game)
+                                       .Include(t => t.Server)
+                                       .Include(t => t.Goal)
+                                       .Include(t => t.Players)
+                                         .ThenInclude(p => p.Rank)
+                                       .Include(t => t.Players)
+                                         .ThenInclude(p => p.AppUser)
+                                       .Where(t => t.Id == teamId)
+                                       .FirstOrDefaultAsync();
 
             var dto = _mapper.Map<TeamDto>(team);
 

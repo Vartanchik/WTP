@@ -112,7 +112,7 @@ namespace WTP.BLL.Services.Concrete.InvitationService
             if (invitation == null) return new ServiceResult("Invitation not found.");
 
             var userIsPlayer = await _uow.Players.AsQueryable()
-                                                 .AnyAsync(p => p.Id == invitation.TeamId &&
+                                                 .AnyAsync(p => p.Id == invitation.PlayerId &&
                                                                 p.AppUserId == dto.UserId);
 
             var userIsTeam = await _uow.Teams.AsQueryable()

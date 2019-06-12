@@ -26,7 +26,6 @@ namespace WTP.WebAPI.Controllers
         /// </summary>
         /// <param name="playerId"></param>
         [HttpGet("{playerId}")]
-        [Authorize(Policy = "RequireLoggedIn")]
         [ProducesResponseType(typeof(PlayerDto), 200)]
         [ProducesResponseType(204)]
         public async Task<IActionResult> Get([FromRoute] int playerId)

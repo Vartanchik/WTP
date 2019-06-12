@@ -38,8 +38,18 @@ namespace WTP.BLL.Services.Concrete
             CreateMap<Country, CountryDto>();
             CreateMap<GenderDto, Gender>();
             CreateMap<Gender, GenderDto>();
-            CreateMap<TeamDto, Team>();
-            CreateMap<Team, TeamDto>();
+            CreateMap<Team, TeamDto>()
+                .ForMember(dest => dest.Game,
+                           config => config.MapFrom(src => src.Game.Name))
+                .ForMember(dest => dest.Server,
+                           config => config.MapFrom(src => src.Server.Name))
+                .ForMember(dest => dest.Goal,
+                           config => config.MapFrom(src => src.Goal.Name))
+                .ForMember(dest => dest.Photo,
+                           config => config.MapFrom(src => TeamPhotoToView(src)))
+                .ForMember(dest => dest.Players,
+                           config => config.MapFrom(src => GetListOfPlayersForTeam(src.Players)));
+
             CreateMap<RefreshTokenDto, RefreshToken>();
             CreateMap<RefreshToken, RefreshTokenDto>();
             CreateMap<GameDto, Game>();
@@ -161,7 +171,21 @@ namespace WTP.BLL.Services.Concrete
                     Server = x.Server.Name,
                     Goal = x.Goal.Name,
                     About = x.About,
-                    Decency = (int)x.Decency
+                    Decency = x.Decency
+                }));
+        }
+
+        private List<PlayerListItemOnTeamPageDto> GetListOfPlayersForTeam(List<Player> players)
+        {
+            return new List<PlayerListItemOnTeamPageDto>(players.Select(x =>
+                new PlayerListItemOnTeamPageDto
+                {
+                    Id = x.Id,
+                    Photo = PhotoToView(x.AppUser),
+                    Age = AgeCalculation(x.AppUser),
+                    Name = x.Name,
+                    Rank = x.Rank.Name,
+                    Decency = x.Decency
                 }));
         }
 

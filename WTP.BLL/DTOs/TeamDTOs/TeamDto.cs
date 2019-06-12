@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using WTP.BLL.DTOs.PlayerDTOs;
 
 namespace WTP.BLL.DTOs.TeamDTOs
 {
@@ -11,7 +12,7 @@ namespace WTP.BLL.DTOs.TeamDTOs
         public string Game { get; set; }
         public string Server { get; set; }
         public string Goal { get; set; }
-        [Range(1, 100)]
+        public IList<PlayerListItemOnTeamPageDto> Players { get; set; }
         public int WinRate { get; set; }
     }
 }
