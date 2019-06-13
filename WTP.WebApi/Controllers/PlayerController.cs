@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WTP.BLL.DTOs.PlayerDTOs;
 using WTP.BLL.DTOs.ServicesDTOs;
-using WTP.BLL.Services.Concrete.AppUserService;
+using WTP.BLL.DTOs.TeamDTOs;
 using WTP.BLL.Services.Concrete.PlayerSrvice;
 using WTP.WebAPI.Utility.Extensions;
 
@@ -18,12 +16,9 @@ namespace WTP.WebAPI.Controllers
     {
         private readonly IPlayerService _playerService;
 
-        private readonly IAppUserService _appUserService;
-
-        public PlayerController(IPlayerService playerService, IAppUserService appUserService)
+        public PlayerController(IPlayerService playerService)
         {
             _playerService = playerService;
-            _appUserService = appUserService;
         }
 
         /// <summary>
@@ -35,7 +30,7 @@ namespace WTP.WebAPI.Controllers
         [Authorize(Policy = "RequireLoggedIn")]
         [ProducesResponseType(typeof(ResponseDto), 200)]
         [ProducesResponseType(typeof(ResponseDto), 400)]
-        public async Task<IActionResult> PostUser([FromBody] CreateUpdatePlayerDto dto)
+        public async Task<IActionResult> Create([FromBody] CreatePlayerDto dto)
         {
             if (!ModelState.IsValid)
             {
@@ -43,7 +38,31 @@ namespace WTP.WebAPI.Controllers
             }
 
             var userId = this.GetCurrentUserId();
-            var result = await _playerService.CreateOrUpdateAsync(dto, userId);
+            var result = await _playerService.CreateAsync(dto, userId);
+
+            return result.Succeeded
+                ? Ok(new ResponseDto(200, "Completed.", "Player created."))
+                : (IActionResult)BadRequest(new ResponseDto(400, "Failed.", result.Error));
+        }
+
+        /// <summary>
+        /// Create new player
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns>Response DTO</returns>
+        [HttpPut]
+        [Authorize(Policy = "RequireLoggedIn")]
+        [ProducesResponseType(typeof(ResponseDto), 200)]
+        [ProducesResponseType(typeof(ResponseDto), 400)]
+        public async Task<IActionResult> Update([FromBody] UpdatePlayerDto dto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new ResponseDto(400, "Failed.", "Redisplay form."));
+            }
+
+            var userId = this.GetCurrentUserId();
+            var result = await _playerService.UpdateAsync(dto, userId);
 
             return result.Succeeded
                 ? Ok(new ResponseDto(200, "Completed.", "Player created."))
@@ -73,29 +92,26 @@ namespace WTP.WebAPI.Controllers
         /// Get all user's players 
         /// </summary>
         /// <returns>List of players</returns>
-        /// <returns>Response DTO</returns>
-        /// <response code="200">Returns list of players</response>
-        /// <response code="400">Get players failed</response>
-        [HttpGet("[action]/{userId:int}")]
-        [Authorize(Policy = "RequireLoggedIn")]
+        /// <returns>List<PlayerListItemDto></returns>
+        [HttpGet("[action]")]
         [ProducesResponseType(typeof(IList<PlayerListItemDto>), 200)]
         [ProducesResponseType(typeof(ResponseDto), 400)]
-        public async Task<IList<PlayerListItemDto>> GetPlayersOfUser(int userId)
+        public async Task<IList<PlayerListItemDto>> GetPlayersByUser(int userId)
         {
             return await _playerService.GetListByUserIdAsync(userId);
         }
 
+        /// <summary>
+        /// Get list players by team
+        /// </summary>
+        /// <param name="teamId"></param>
+        /// <returns>List<PlayerListItemDto></returns>
         [HttpGet("[action]")]
-        [Authorize(Policy = "RequireLoggedIn")]
-        [ProducesResponseType(typeof(IList<PlayerDto>), 200)]
+        [ProducesResponseType(typeof(IList<PlayerListItemDto>), 200)]
         [ProducesResponseType(typeof(ResponseDto), 400)]
-        public async Task<IActionResult> DeletePlayer(int playerId)
+        public async Task<IList<PlayerListItemDto>> GetPlayersByTeam(int teamId)
         {
-            int userId = this.GetCurrentUserId();
-
-            await _playerService.DeleteAsync(userId, playerId);
-
-            return Ok();
+            return await _playerService.GetListByTeamIdAsync(teamId);
         }
 
         //Get List of all players by game with filers and sorting
@@ -131,6 +147,18 @@ namespace WTP.WebAPI.Controllers
             };
 
             return viewModel;
+        }
+
+        /// <summary>
+        /// Get list of player's invitations
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        [HttpGet("[action]")]
+        [ProducesResponseType(typeof(IList<InvitationListItemDto>), 200)]
+        public async Task<IList<InvitationListItemDto>> InvitationPlayerListByUserId(int userId)
+        {
+            return await _playerService.GetAllPlayerInvitetionByUserId(userId);
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Identity;
+using WTP.DAL.Entities.TeamEntities;
 
 namespace WTP.DAL.Entities.AppUserEntities
 {

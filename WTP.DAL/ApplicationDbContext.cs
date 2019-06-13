@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using WTP.DAL.Entities;
 using WTP.DAL.Entities.AppUserEntities;
+using WTP.DAL.Entities.TeamEntities;
 
 namespace WTP.DAL
 {
@@ -20,11 +21,50 @@ namespace WTP.DAL
         public DbSet<Goal> Goals { get; set; }
         public DbSet<Rank> Ranks { get; set; }
         public DbSet<RestoreToken> RestoreTokens { get; set; }
+        public DbSet<Invitation> Invitations { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
 
+            SetDefaultData(builder);
+            ManyToManyTablesCongiguration(builder);
+        }
+
+        private void ManyToManyTablesCongiguration(ModelBuilder builder)
+        {
+            // Users and Languages
+            builder.Entity<AppUserLanguage>()
+                .HasKey(_ => new { _.AppUserId, _.LanguageId });
+            builder.Entity<AppUserLanguage>()
+                .HasOne(_ => _.AppUser)
+                .WithMany(_ => _.AppUserLanguages)
+                .HasForeignKey(_ => _.AppUserId);
+            builder.Entity<AppUserLanguage>()
+                .HasOne(_ => _.Language)
+                .WithMany(_ => _.AppUserLanguages)
+                .HasForeignKey(_ => _.LanguageId);
+
+            // Players, Teams and Invitations
+            builder.Entity<Invitation>()
+                .Property(_ => _.Id)
+                .ValueGeneratedOnAdd();
+            builder.Entity<Invitation>()
+                .HasKey(_ => new { _.PlayerId, _.TeamId });
+            builder.Entity<Invitation>()
+                .HasOne(_ => _.Player)
+                .WithMany(_ => _.Invitations)
+                .HasForeignKey(_ => _.PlayerId)
+                .OnDelete(DeleteBehavior.Cascade);
+            builder.Entity<Invitation>()
+                .HasOne(_ => _.Team)
+                .WithMany(_ => _.Invitations)
+                .HasForeignKey(_ => _.TeamId)
+                .OnDelete(DeleteBehavior.Restrict);
+        }
+
+        private void SetDefaultData(ModelBuilder builder)
+        {
             builder.Entity<IdentityRole<int>>().HasData(
                     new { Id = 1, Name = "Admin", NormalizedName = "ADMIN" },
                     new { Id = 2, Name = "User", NormalizedName = "USER" },
@@ -33,15 +73,17 @@ namespace WTP.DAL
 
             builder.Entity<Gender>().HasData(
                     new Gender { Id = 1, Name = "Male" },
-                    new Gender { Id = 2, Name = "Female"}
+                    new Gender { Id = 2, Name = "Female" }
                 );
 
             builder.Entity<Country>().HasData(
                     new Country { Id = 1, Name = "Ukraine" },
-                    new Country { Id = 2, Name = "Spanish" },
+                    new Country { Id = 2, Name = "Spain" },
                     new Country { Id = 3, Name = "USA" },
                     new Country { Id = 4, Name = "Brazil" },
-                    new Country { Id = 5, Name = "German" }
+                    new Country { Id = 5, Name = "Germany" },
+                    new Country { Id = 6, Name = "China" },
+                    new Country { Id = 7, Name = "Poland" }
                 );
 
             builder.Entity<Language>().HasData(
@@ -66,15 +108,18 @@ namespace WTP.DAL
                 );
 
             builder.Entity<Server>().HasData(
-                    new Server { Id = 1, Name = "East" },
-                    new Server { Id = 2, Name = "West" },
-                    new Server { Id = 3, Name = "North" },
-                    new Server { Id = 4, Name = "South" }
+                    new Server { Id = 1, Name = "EU East" },
+                    new Server { Id = 2, Name = "EU West" },
+                    new Server { Id = 3, Name = "South America" },
+                    new Server { Id = 4, Name = "Norht America" },
+                    new Server { Id = 5, Name = "Middle East" },
+                    new Server { Id = 6, Name = "Asia" }
                 );
 
             builder.Entity<Goal>().HasData(
-                    new Goal { Id = 1, Name = "Fun" },
-                    new Goal { Id = 2, Name = "Profi" }
+                    new Goal { Id = 1, Name = "To have fun" },
+                    new Goal { Id = 2, Name = "To become a pro" },
+                    new Goal { Id = 3, Name = "To play competitlvely" }
                 );
 
             builder.Entity<Rank>().HasData(
@@ -87,17 +132,6 @@ namespace WTP.DAL
                     new Rank { Id = 7, Name = "Divine", Value = 60 },
                     new Rank { Id = 8, Name = "Immortal", Value = 70 }
                 );
-
-            builder.Entity<AppUserLanguage>()
-                .HasKey(_ => new { _.AppUserId, _.LanguageId });
-            builder.Entity<AppUserLanguage>()
-                .HasOne(_ => _.AppUser)
-                .WithMany(_ => _.AppUserLanguages)
-                .HasForeignKey(_ => _.AppUserId);
-            builder.Entity<AppUserLanguage>()
-                .HasOne(_ => _.Language)
-                .WithMany(_ => _.AppUserLanguages)
-                .HasForeignKey(_ => _.LanguageId);
         }
     }
 }

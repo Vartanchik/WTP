@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using WTP.BLL.DTOs.AppUserDTOs;
@@ -8,14 +7,15 @@ using WTP.BLL.DTOs.ServicesDTOs;
 using WTP.BLL.DTOs.TeamDTOs;
 using WTP.DAL.Entities;
 using WTP.DAL.Entities.AppUserEntities;
+using WTP.DAL.Entities.TeamEntities;
 
 namespace WTP.BLL.Services.Concrete
 {
-    public class DtoProfile : Profile
+    public class DtoMapperProfile : Profile
     {
         private readonly string _defaultPhoto;
 
-        public DtoProfile(string defaultPhoto)
+        public DtoMapperProfile(string defaultPhoto)
         {
             this._defaultPhoto = defaultPhoto;
 
@@ -55,7 +55,7 @@ namespace WTP.BLL.Services.Concrete
             CreateMap<Match, MatchDto>();
             CreateMap<Rank, RankDto>();
             CreateMap<RankDto, Rank>();
-            CreateMap<CreateUpdatePlayerDto, Player>();
+            CreateMap<CreatePlayerDto, Player>();
             CreateMap<Player, PlayerListItemDto>()
                 .ForMember(dest => dest.Game,
                            config => config.MapFrom(src => src.Game.Name))
@@ -65,7 +65,21 @@ namespace WTP.BLL.Services.Concrete
                            config => config.MapFrom(src => src.Server.Name))
                 .ForMember(dest => dest.Goal,
                            config => config.MapFrom(src => src.Goal.Name));
-
+            CreateMap<CreateTeamDto, Team>();
+            CreateMap<Team, TeamListItemDto>()
+                .ForMember(dest => dest.Game,
+                           config => config.MapFrom(src => src.Game.Name))
+                .ForMember(dest => dest.Server,
+                           config => config.MapFrom(src => src.Server.Name))
+                .ForMember(dest => dest.Goal,
+                           config => config.MapFrom(src => src.Goal.Name))
+                .ForMember(dest => dest.Photo,
+                           config => config.MapFrom(src => TeamLogoToView(src)));
+            CreateMap<Invitation, InvitationListItemDto>()
+                .ForMember(dest => dest.PlayerName,
+                           config => config.MapFrom(src => src.Player.Name))
+                .ForMember(dest => dest.TeamName,
+                           config => config.MapFrom(src => src.Team.Name));
         }
 
         private string PhotoToView(AppUser user)
@@ -102,6 +116,29 @@ namespace WTP.BLL.Services.Concrete
                     Name = x.Language.Name
                 }));
 
+        }
+
+        private string TeamLogoToView(Team team)
+        {
+            return string.IsNullOrEmpty(team.Photo)
+                ? _defaultPhoto
+                : team.Photo;
+        }
+
+        private List<PlayerListItemDto> GetListOfPlayers(List<Player> players)
+        {
+            return new List<PlayerListItemDto>(players.Select(x =>
+                new PlayerListItemDto
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    Game = x.Game.Name,
+                    Rank = x.Rank.Name,
+                    Server = x.Server.Name,
+                    Goal = x.Goal.Name,
+                    About = x.About,
+                    Decency = (int)x.Decency
+                }));
         }
     }
 }

@@ -3,13 +3,14 @@ using System.Threading.Tasks;
 using WTP.DAL.Entities;
 using WTP.DAL.Repositories.GenericRepository;
 using Microsoft.AspNetCore.Identity;
-using WTP.DAL.Repositories.ConcreteRepositories.PlayerRepository;
 using WTP.DAL.Entities.AppUserEntities;
 using WTP.DAL.Repositories.ConcreteRepositories.AppUserRepository;
 using WTP.DAL.Repositories.ConcreteRepositories.RefreshTokenRepository;
 using WTP.DAL.Repositories.ConcreteRepositories.RestoreTokenRepository;
+using WTP.DAL.Repositories.ConcreteRepositories.InvitationRepository;
 using WTP.DAL.Repositories.ConcreteRepositories;
 using Microsoft.Extensions.Caching.Distributed;
+using WTP.DAL.Entities.TeamEntities;
 
 namespace WTP.DAL.UnitOfWork
 {
@@ -22,7 +23,7 @@ namespace WTP.DAL.UnitOfWork
         private IRepository<Country> _countries;
         private IRepository<Gender> _genders;
         private IRepository<Language> _languages;
-        private IPlayerRepository<Player> _players;
+        private IRepository<Player> _players;
         private IRepository<Team> _teams;
         private IRefreshTokenRepository<RefreshToken> _refreshTokens;
         private IRepository<Comment> _comments;
@@ -32,6 +33,7 @@ namespace WTP.DAL.UnitOfWork
         private IRepository<Goal> _goals;
         private IRepository<Rank> _ranks;
         private IRestoreTokenRepository<RestoreToken> _restoreAccountTokens;
+        private IRepository<Invitation> _invitations;
         private bool _disposed = false;
 
         public UnitOfWork(ApplicationDbContext context, UserManager<AppUser> userManager, IDistributedCache distributedCache)
@@ -45,7 +47,7 @@ namespace WTP.DAL.UnitOfWork
         public IRepository<Country> Countries => _countries ?? (_countries = new RepositoryBase<Country>(_context));
         public IRepository<Gender> Genders => _genders ?? (_genders = new RepositoryBase<Gender>(_context));
         public IRepository<Language> Languages => _languages ?? (_languages = new RepositoryBase<Language>(_context));
-        public IPlayerRepository<Player> Players => _players ?? (_players = new PlayerRepository<Player>(_context));
+        public IRepository<Player> Players => _players ?? (_players = new RepositoryBase<Player>(_context));
         public IRepository<Team> Teams => _teams ?? (_teams = new RepositoryBase<Team>(_context));
         public IRefreshTokenRepository<RefreshToken> RefreshTokens => _refreshTokens ?? (_refreshTokens = new RefreshTokenRepository<RefreshToken>(_context));
         public IRepository<Comment> Comments => _comments ?? (_comments = new RepositoryBase<Comment>(_context));
@@ -55,7 +57,7 @@ namespace WTP.DAL.UnitOfWork
         public IRepository<Goal> Goals => _goals ?? (_goals = new RepositoryBase<Goal>(_context));
         public IRepository<Rank> Ranks => _ranks ?? (_ranks = new RepositoryBase<Rank>(_context));
         public IRestoreTokenRepository<RestoreToken> RestoreTokens => _restoreAccountTokens ?? (_restoreAccountTokens = new RestoreTokenRepository<RestoreToken>(_context));
-
+        public IRepository<Invitation> Invitations => _invitations ?? (_invitations = new InvitationRepository(_context));
         public void Commit()
         {
             _context.SaveChanges();

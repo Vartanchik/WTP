@@ -10,14 +10,14 @@ using WTP.DAL;
 namespace WTP.DAL.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20190525092713_InitalCreate")]
-    partial class InitalCreate
+    [Migration("20190606161058_SomeFixTeam")]
+    partial class SomeFixTeam
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.2.4-servicing-10062")
+                .HasAnnotation("ProductVersion", "2.2.3-servicing-35854")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -221,7 +221,7 @@ namespace WTP.DAL.Migrations
 
             modelBuilder.Entity("WTP.DAL.Entities.AppUserEntities.AppUserLanguage", b =>
                 {
-                    b.Property<int?>("AppUserId");
+                    b.Property<int>("AppUserId");
 
                     b.Property<int>("LanguageId");
 
@@ -253,7 +253,7 @@ namespace WTP.DAL.Migrations
                         new
                         {
                             Id = 2,
-                            Name = "Spanish"
+                            Name = "Spain"
                         },
                         new
                         {
@@ -268,7 +268,17 @@ namespace WTP.DAL.Migrations
                         new
                         {
                             Id = 5,
-                            Name = "German"
+                            Name = "Germany"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Name = "China"
+                        },
+                        new
+                        {
+                            Id = 7,
+                            Name = "Poland"
                         });
                 });
 
@@ -461,12 +471,17 @@ namespace WTP.DAL.Migrations
                         new
                         {
                             Id = 1,
-                            Name = "Fun"
+                            Name = "To have fun"
                         },
                         new
                         {
                             Id = 2,
-                            Name = "Profi"
+                            Name = "To become a pro"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "To play competitlvely"
                         });
                 });
 
@@ -480,7 +495,7 @@ namespace WTP.DAL.Migrations
 
                     b.Property<int>("AppUserId");
 
-                    b.Property<int?>("Decency");
+                    b.Property<int>("Decency");
 
                     b.Property<int>("GameId");
 
@@ -519,6 +534,8 @@ namespace WTP.DAL.Migrations
 
                     b.Property<string>("Name");
 
+                    b.Property<int?>("Value");
+
                     b.HasKey("Id");
 
                     b.ToTable("Ranks");
@@ -527,42 +544,50 @@ namespace WTP.DAL.Migrations
                         new
                         {
                             Id = 1,
-                            Name = "Uncalibrated"
+                            Name = "Uncalibrated",
+                            Value = 10
                         },
                         new
                         {
                             Id = 2,
-                            Name = "Guardian"
+                            Name = "Guardian",
+                            Value = 20
                         },
                         new
                         {
                             Id = 3,
-                            Name = "Crusader"
+                            Name = "Crusader",
+                            Value = 30
                         },
                         new
                         {
                             Id = 4,
-                            Name = "Archon"
+                            Name = "Archon",
+                            Value = 40
                         },
                         new
                         {
                             Id = 5,
-                            Name = "Legend"
+                            Name = "Legend",
+                            Value = 50
                         },
                         new
                         {
                             Id = 6,
-                            Name = "Ancient"
+                            Name = "Ancient",
+                            Value = 60
                         },
                         new
                         {
                             Id = 7,
-                            Name = "Divine"
+                            Name = "Divine",
+                            Value = 70
                         },
                         new
                         {
                             Id = 8,
-                            Name = "Immortal"
+                            Name = "Immortal",
+                            Value = 80
                         });
                 });
 
@@ -582,38 +607,84 @@ namespace WTP.DAL.Migrations
                         new
                         {
                             Id = 1,
-                            Name = "East"
+                            Name = "EU East"
                         },
                         new
                         {
                             Id = 2,
-                            Name = "West"
+                            Name = "EU West"
                         },
                         new
                         {
                             Id = 3,
-                            Name = "North"
+                            Name = "South America"
                         },
                         new
                         {
                             Id = 4,
-                            Name = "South"
+                            Name = "Norht America"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Name = "Middle East"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Name = "Asia"
                         });
                 });
 
-            modelBuilder.Entity("WTP.DAL.Entities.Team", b =>
+            modelBuilder.Entity("WTP.DAL.Entities.TeamEntities.Invitation", b =>
+                {
+                    b.Property<int>("PlayerId");
+
+                    b.Property<int>("TeamId");
+
+                    b.Property<int>("Author");
+
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.HasKey("PlayerId", "TeamId");
+
+                    b.HasIndex("TeamId");
+
+                    b.ToTable("Invitations");
+                });
+
+            modelBuilder.Entity("WTP.DAL.Entities.TeamEntities.Team", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int?>("AppUserId");
+                    b.Property<int>("AppUserId");
+
+                    b.Property<int>("GameId");
+
+                    b.Property<int>("GoalId");
 
                     b.Property<string>("Name");
+
+                    b.Property<string>("Photo")
+                        .HasColumnType("varchar(250)");
+
+                    b.Property<int>("ServerId");
+
+                    b.Property<int>("WinRate");
 
                     b.HasKey("Id");
 
                     b.HasIndex("AppUserId");
+
+                    b.HasIndex("GameId");
+
+                    b.HasIndex("GoalId");
+
+                    b.HasIndex("ServerId");
 
                     b.ToTable("Team");
                 });
@@ -730,16 +801,45 @@ namespace WTP.DAL.Migrations
                         .HasForeignKey("ServerId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("WTP.DAL.Entities.Team", "Team")
-                        .WithMany()
+                    b.HasOne("WTP.DAL.Entities.TeamEntities.Team", "Team")
+                        .WithMany("Players")
                         .HasForeignKey("TeamId");
                 });
 
-            modelBuilder.Entity("WTP.DAL.Entities.Team", b =>
+            modelBuilder.Entity("WTP.DAL.Entities.TeamEntities.Invitation", b =>
                 {
-                    b.HasOne("WTP.DAL.Entities.AppUserEntities.AppUser")
+                    b.HasOne("WTP.DAL.Entities.Player", "Player")
+                        .WithMany("Invitations")
+                        .HasForeignKey("PlayerId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("WTP.DAL.Entities.TeamEntities.Team", "Team")
+                        .WithMany("Invitations")
+                        .HasForeignKey("TeamId")
+                        .OnDelete(DeleteBehavior.Restrict);
+                });
+
+            modelBuilder.Entity("WTP.DAL.Entities.TeamEntities.Team", b =>
+                {
+                    b.HasOne("WTP.DAL.Entities.AppUserEntities.AppUser", "AppUser")
                         .WithMany("Teams")
-                        .HasForeignKey("AppUserId");
+                        .HasForeignKey("AppUserId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("WTP.DAL.Entities.Game", "Game")
+                        .WithMany()
+                        .HasForeignKey("GameId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("WTP.DAL.Entities.Goal", "Goal")
+                        .WithMany()
+                        .HasForeignKey("GoalId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("WTP.DAL.Entities.Server", "Server")
+                        .WithMany()
+                        .HasForeignKey("ServerId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 #pragma warning restore 612, 618
         }
