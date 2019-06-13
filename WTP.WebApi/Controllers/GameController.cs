@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using EntityFrameworkPaginateCore;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using WTP.BLL.DTOs.PlayerDTOs;
 using WTP.BLL.DTOs.ServicesDTOs;
 using WTP.BLL.Services.Concrete.GameService;
+using WTP.DAL.Entities;
 
 namespace WTP.WebAPI.Controllers
 {
@@ -89,6 +91,16 @@ namespace WTP.WebAPI.Controllers
                 StatusCode = 200,
                 Message = "Game with id " + gameId + " was deleted."
             });
+        }
+
+        [HttpGet]
+        [Authorize(Policy = "RequireAdministratorRole")]
+        [Route("games/paging")]
+        public async Task<Page<Game>> GetRecordsListOnPage(int pageSize, int currentPage, string sortBy,
+                                        string name, int id,
+                                        bool sortOrder)
+        {
+            return await _gameService.GetFilteredSortedGamesOnPage(pageSize, currentPage, sortBy, name, id, sortOrder);
         }
     }
 }

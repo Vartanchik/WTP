@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using EntityFrameworkPaginateCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -413,6 +414,26 @@ namespace WTP.BLL.Services.Concrete.AppUserService
                 Users = items
             };
             return viewModel;
+        }
+
+        public async Task<Page<AppUser>> GetFilteredSortedUsersOnPage(int pageSize, int currentPage, string sortBy
+                                       , string userName, string email, string enableLock, bool sortOrder)
+        {
+            Page<AppUser> users;
+            var filters = new Filters<AppUser>();
+            filters.Add(!string.IsNullOrEmpty(userName), x => x.UserName.Contains(userName));
+            filters.Add(!string.IsNullOrEmpty(email), x => x.Email.Contains(email));
+            filters.Add(!string.IsNullOrEmpty(enableLock), x => x.LockoutEnabled.Equals(enableLock));
+
+            var sorts = new Sorts<AppUser>();
+
+            sorts.Add(sortBy == "UseName", x => x.UserName, sortOrder);
+            sorts.Add(sortBy == "Email", x => x.Email, sortOrder);
+            sorts.Add(sortBy == "LockoutEnabled", x => x.LockoutEnabled, sortOrder);
+
+            users = await _uow.AppUsers.AsQueryable().PaginateAsync(currentPage, pageSize, sorts, filters);
+
+            return users;
         }
     }
 }

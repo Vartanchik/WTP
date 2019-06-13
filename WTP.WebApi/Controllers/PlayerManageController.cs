@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using EntityFrameworkPaginateCore;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -11,6 +12,7 @@ using WTP.BLL.DTOs.ServicesDTOs;
 using WTP.BLL.Services.Concrete.AdminPlayerService;
 using WTP.BLL.Services.Concrete.PlayerSrvice;
 using WTP.BLL.Shared;
+using WTP.DAL.Entities;
 
 namespace WTP.WebAPI.Controllers
 {
@@ -36,6 +38,17 @@ namespace WTP.WebAPI.Controllers
             PlayerSortState sortOrder = PlayerSortState.IdAsc)
         {
             return await _adminPlayerService.GetPageInfo(name, page, pageSize, sortOrder);
+        }
+
+        [HttpGet]
+        [Authorize(Policy = "RequireAdministratorRole")]
+        [Route("paging")]
+        public async Task<Page<Player>> GetPlayersListOnPage(int pageSize, int currentPage, string sortBy
+                                       , string playerName, string userName, string email,
+                                        string gameName, string teamName, string rankName, string goalName, bool sortOrder)
+        {
+            return await _adminPlayerService.GetFilteredSortedPlayersOnPage(pageSize,currentPage,sortBy,playerName,userName,
+                email,gameName,teamName,rankName,goalName,sortOrder);
         }
 
         [HttpPost]

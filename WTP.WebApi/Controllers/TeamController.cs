@@ -10,6 +10,8 @@ using WTP.BLL.DTOs.TeamDTOs;
 using WTP.BLL.Services.AzureBlobStorageService;
 using WTP.BLL.Services.Concrete.TeamService;
 using WTP.WebAPI.Utility.Extensions;
+using EntityFrameworkPaginateCore;
+using WTP.DAL.Entities.TeamEntities;
 
 namespace WTP.WebAPI.Controllers
 {
@@ -244,6 +246,16 @@ namespace WTP.WebAPI.Controllers
         public async Task<IList<TeamListItemDto>> ListByUserId(int userId)
         {
             return await _teamService.GetListByUserIdAsync(userId);
+        }
+
+        [HttpGet]
+        [Authorize(Policy = "RequireAdministratorRole")]
+        [Route("teams/paging")]
+        public async Task<Page<Team>> GetRecordsListOnPage(int pageSize, int currentPage, string sortBy,
+                                        string name, int id, string game, int winRate,
+                                        bool sortOrder)
+        {
+            return await _teamService.GetFilteredSortedTeamsOnPage(pageSize, currentPage, sortBy, name, id, game, winRate, sortOrder);
         }
     }
 }

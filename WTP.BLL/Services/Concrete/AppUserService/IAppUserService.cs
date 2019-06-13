@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using EntityFrameworkPaginateCore;
+using Microsoft.AspNetCore.Identity;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -43,5 +44,8 @@ namespace WTP.BLL.Services.Concrete.AppUserService
         Task<IQueryable<AppUser>> SortByParam(SortState sortOrder, bool enableDeleted, bool enableLocked, IQueryable<AppUser> baseQuery);
         Task<UserIndexDto> GetPageInfo(string name, int page, int pageSize,
             SortState sortOrder, bool enableDeleted, bool enableLocked);
+
+        Task<Page<AppUser>> GetFilteredSortedUsersOnPage(int pageSize, int currentPage, string sortBy
+                                       , string userName, string email, string enableLock, bool sortOrder);
     }
 }

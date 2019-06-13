@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using EntityFrameworkPaginateCore;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -49,6 +50,26 @@ namespace WTP.BLL.Services.Concrete.RankService
         public async Task<RankDto> GetByIdAsync(int rankId)
         {
             return _mapper.Map<RankDto>(await _uow.Ranks.GetByIdAsync(rankId));
+        }
+
+        public async Task<Page<Rank>> GetFilteredSortedRanksOnPage(int pageSize, int currentPage, string sortBy
+                                      , string name, int id, int value, bool sortOrder)
+        {
+            Page<Rank> ranks;
+            var filters = new Filters<Rank>();
+            filters.Add(!string.IsNullOrEmpty(name), x => x.Name.Contains(name));
+            filters.Add(id != 0, x => x.Id.Equals(id));
+            filters.Add(value != 0, x => x.Id.Equals(value));
+
+            var sorts = new Sorts<Rank>();
+
+            sorts.Add(sortBy == "Name", x => x.Name, sortOrder);
+            sorts.Add(sortBy == "Id", x => x.Id, sortOrder);
+            sorts.Add(sortBy == "Value", x => x.Value, sortOrder);
+
+            ranks = await _uow.Ranks.AsQueryable().PaginateAsync(currentPage, pageSize, sorts, filters);
+
+            return ranks;
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using EntityFrameworkPaginateCore;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -135,6 +136,35 @@ namespace WTP.BLL.Services.Concrete.AdminPlayerService
                 Players = items
             };
             return viewModel;
+        }
+
+        public async Task<Page<Player>> GetFilteredSortedPlayersOnPage(int pageSize, int currentPage, string sortBy
+                                       , string playerName, string userName, string email,
+                                        string gameName, string teamName, string rankName, string goalName, bool sortOrder)
+        {
+            Page<Player> players;
+            var filters = new Filters<Player>();
+            filters.Add(!string.IsNullOrEmpty(playerName), x => x.Name.Contains(playerName));
+            filters.Add(!string.IsNullOrEmpty(userName), x => x.AppUser.UserName.Contains(userName));
+            filters.Add(!string.IsNullOrEmpty(email), x => x.AppUser.Email.Contains(email));
+            filters.Add(!string.IsNullOrEmpty(gameName), x => x.Game.Name.Contains(gameName));
+            filters.Add(!string.IsNullOrEmpty(teamName), x => x.Team.Name.Contains(teamName));
+            filters.Add(!string.IsNullOrEmpty(rankName), x => x.Rank.Name.Contains(rankName));
+            filters.Add(!string.IsNullOrEmpty(goalName), x => x.Goal.Name.Contains(goalName));
+
+            var sorts = new Sorts<Player>();
+
+            sorts.Add(sortBy == "Name", x => x.Name, sortOrder);
+            sorts.Add(sortBy == "AppUser", x => x.AppUser.UserName, sortOrder);
+            sorts.Add(sortBy == "Email", x => x.AppUser.UserName, sortOrder);
+            sorts.Add(sortBy == "Game", x => x.AppUser.UserName, sortOrder);
+            sorts.Add(sortBy == "Team", x => x.AppUser.UserName, sortOrder);
+            sorts.Add(sortBy == "Rank", x => x.AppUser.UserName, sortOrder);
+            sorts.Add(sortBy == "Goal", x => x.AppUser.UserName, sortOrder);
+
+            players = await _uow.Players.AsQueryable().PaginateAsync(currentPage, pageSize, sorts, filters);
+            
+            return players;
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using EntityFrameworkPaginateCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -18,5 +19,9 @@ namespace WTP.BLL.Services.Concrete.AdminPlayerService
         IQueryable<Player> SortByParam(PlayerSortState sortOrder, IQueryable<Player> baseQuery);
         Task<PlayerManageDto> GetPageInfo(string name, int page, int pageSize,
             PlayerSortState sortOrder);
+
+        Task<Page<Player>> GetFilteredSortedPlayersOnPage(int pageSize, int currentPage, string sortBy
+                                       , string playerName, string userName, string email,
+                                        string gameName, string teamName, string rankName, string goalName, bool sortOrder);
     }
 }

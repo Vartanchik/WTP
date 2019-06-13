@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using EntityFrameworkPaginateCore;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -11,7 +12,7 @@ using WTP.BLL.DTOs.ServicesDTOs;
 using WTP.BLL.Services.Concrete.AppUserService;
 using WTP.BLL.Services.HistoryService;
 using WTP.BLL.Shared;
-
+using WTP.DAL.Entities.AppUserEntities;
 using role = WTP.DAL.Repositories.ConcreteRepositories.AppUserRepository;
 
 namespace WTP.WebAPI.Controllers
@@ -66,6 +67,7 @@ namespace WTP.WebAPI.Controllers
         public async Task<IActionResult> CreateUserProfile([FromBody] RegisterDto formdata)
         {
             int adminId = Convert.ToInt32(User.Claims.First(c => c.Type == "UserID").Value);
+            //int adminId = 1;
             StringBuilder sb = new StringBuilder();
 
             var user = new AppUserDto
@@ -125,7 +127,7 @@ namespace WTP.WebAPI.Controllers
         ////Get List of all Users
         [HttpGet]
         [Route("users")]
-        [Authorize(Policy = "RequireAdministratorRole")]
+        //[Authorize(Policy = "RequireAdministratorRole")]
         public async Task<IList<AppUserDto>> GetUsersProfile()
         {
             return await _appUserService.GetUsersList();
@@ -138,6 +140,7 @@ namespace WTP.WebAPI.Controllers
         public async Task<IActionResult> UpdateUser([FromBody] AppUserDto formdata, [FromRoute]int id)
         {
             int adminId = Convert.ToInt32(User.Claims.First(c => c.Type == "UserID").Value);
+            //int adminId = 1;
             StringBuilder sb = new StringBuilder();
 
             if (!ModelState.IsValid)
@@ -198,6 +201,7 @@ namespace WTP.WebAPI.Controllers
         public async Task<IActionResult> DeleteUser([FromRoute]int id)
         {
             int adminId = Convert.ToInt32(User.Claims.First(c => c.Type == "UserID").Value);
+            //int adminId = 1;
 
             try
             {
@@ -226,6 +230,7 @@ namespace WTP.WebAPI.Controllers
         public async Task<IActionResult> LockUser([FromBody]LockDto formDate, [FromRoute]int id)
         {
             int adminId = Convert.ToInt32(User.Claims.First(c => c.Type == "UserID").Value);
+            //int adminId = 1;
             bool success = await _appUserService.LockAsync(id, formDate.Days, adminId);
 
             if (success)
@@ -250,6 +255,7 @@ namespace WTP.WebAPI.Controllers
         public async Task<IActionResult> UnLockUser([FromRoute]int id)
         {
             int adminId = Convert.ToInt32(User.Claims.First(c => c.Type == "UserID").Value);
+            //int adminId = 1;
             bool success = await _appUserService.UnLockAsync(id, adminId);
 
             if (success)
@@ -282,6 +288,29 @@ namespace WTP.WebAPI.Controllers
             HistorySortState sortOrder = HistorySortState.DateDesc)
         {
             return await _historyService.GetPageInfo(name, page, pageSize, sortOrder);
+        }
+
+        [HttpGet]
+        [Authorize(Policy = "RequireAdministratorRole")]
+        [Route("users/paging")]
+        public async Task<Page<AppUser>> GetUsersListOnPage(int pageSize, int currentPage, string sortBy,
+                                        string userName, string email, string enableLock,
+                                        bool sortOrder)
+        {
+            return await _appUserService.GetFilteredSortedUsersOnPage(pageSize, currentPage, sortBy, userName,
+                email, enableLock, sortOrder);
+        }
+
+        [HttpGet]
+        [Authorize(Policy = "RequireAdministratorRole")]
+        [Route("history/paging")]
+        public async Task<Page<History>> GetRecordsListOnPage(int pageSize, int currentPage, string sortBy,
+                                        string userName, string email, string operationName, string newUserName,
+                                        string newUserEmail, int id, int adminId,
+                                        bool sortOrder)
+        {
+            return await _historyService.GetFilteredSortedRecordsOnPage(pageSize, currentPage, sortBy, userName,
+                email, operationName, newUserName,newUserEmail,id, adminId, sortOrder);
         }
     }
 }
