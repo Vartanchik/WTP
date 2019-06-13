@@ -182,12 +182,17 @@ namespace WTP.BLL.Services.Concrete.PlayerSrvice
             }
 
             //add filter fields 
-            bool filterOperator(Player player) => player.GameId == inputValues.GameId
-                                               && player.Name.Contains(inputValues.NameValue)
-                                               && player.Rank.Value <= inputValues.RankRightValue
-                                               && player.Rank.Value >= inputValues.RankLeftValue
-                                               && player.Decency <= inputValues.DecencyRightValue
-                                               && player.Decency >= inputValues.DecencyLeftValue;
+            bool filterOperator(Player player) {
+
+                inputValues.NameValue = inputValues.NameValue == null ? "" : inputValues.NameValue;
+
+                return player.GameId == inputValues.GameId
+                       && player.Name.Contains(inputValues.NameValue)                       && player.Rank.Value <= inputValues.RankRightValue
+                       && player.Rank.Value >= inputValues.RankLeftValue
+                       && player.Decency <= inputValues.DecencyRightValue
+                       && player.Decency >= inputValues.DecencyLeftValue;
+
+            }
             //sorting by ASC
             if (inputValues.SortType == "asc")
             {
