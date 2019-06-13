@@ -9,6 +9,13 @@ using WTP.DAL.Repositories.GenericRepository;
 
 namespace WTP.DAL.Repositories.ConcreteRepositories.AppUserRepository
 {
+    public enum UserType
+    {
+        User,
+        Admin,
+        Moderator
+    }
+
     public class UserRepository : RepositoryBase<AppUser>, IUserRepository<AppUser>
     {
         private readonly UserManager<AppUser> _userManager;
@@ -138,6 +145,56 @@ namespace WTP.DAL.Repositories.ConcreteRepositories.AppUserRepository
                        .Where(condition)
                        .Select(x => x.Id)
                        .FirstOrDefault();
+        }
+
+        public async Task<IdentityResult> CreatePersonAsync(AppUser appUser, string password, UserType userType)
+        {
+            var result = await _userManager.CreateAsync(appUser, password);
+
+            await _userManager.AddToRoleAsync(appUser, userType.ToString());
+
+            return result;
+        }
+
+        public new async Task<bool> DeleteAsync(int id)
+        {
+            var user = await GetByIdAsync(id);
+
+            if (user == null || user.IsDeleted)
+                return false;
+
+            user.IsDeleted = true;
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> LockAsync(int id, int? days)
+        {
+            var user = await GetByIdAsync(id);
+            if (user == null)
+                return false;
+
+            if (user.IsDeleted)
+                return false;
+
+            await _userManager.SetLockoutEnabledAsync(user, true);
+
+            if (days == null)
+                await _userManager.SetLockoutEndDateAsync(user, null);
+            else
+            {
+                if (days < 0)
+                    days = 0;
+                await _userManager.SetLockoutEndDateAsync(user, DateTimeOffset.UtcNow.AddDays(days.Value));
+            }
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+
+        public async Task<bool> UnLockAsync(int id)
+        {
+            return await LockAsync(id, null);
         }
     }
 }

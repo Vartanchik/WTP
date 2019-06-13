@@ -27,6 +27,10 @@ namespace WTP.DAL.UnitOfWork
         IRestoreTokenRepository<RestoreToken> RestoreTokens { get; }
         IRepository<Invitation> Invitations { get; }
 
+        //For Admin
+        IRepository<History> Histories { get; }
+        IRepository<Operation> Operations { get; }
+
         void Commit();
 
         Task CommitAsync();

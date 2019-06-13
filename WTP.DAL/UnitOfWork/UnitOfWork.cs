@@ -33,6 +33,8 @@ namespace WTP.DAL.UnitOfWork
         private IRepository<Rank> _ranks;
         private IRestoreTokenRepository<RestoreToken> _restoreAccountTokens;
         private IRepository<Invitation> _invitations;
+        private IRepository<History> _histories;
+        private IRepository<Operation> _operations;
         private bool _disposed = false;
 
         public UnitOfWork(ApplicationDbContext context, UserManager<AppUser> userManager, IDistributedCache distributedCache)
@@ -56,6 +58,9 @@ namespace WTP.DAL.UnitOfWork
         public IRepository<Rank> Ranks => _ranks ?? (_ranks = new RepositoryBase<Rank>(_context));
         public IRestoreTokenRepository<RestoreToken> RestoreTokens => _restoreAccountTokens ?? (_restoreAccountTokens = new RestoreTokenRepository<RestoreToken>(_context));
         public IRepository<Invitation> Invitations => _invitations ?? (_invitations = new InvitationRepository(_context));
+        public IRepository<History> Histories => _histories ?? (_histories = new RepositoryBase<History>(_context));
+        public IRepository<Operation> Operations => _operations ?? (_operations = new RepositoryBase<Operation>(_context));
+
         public void Commit()
         {
             _context.SaveChanges();

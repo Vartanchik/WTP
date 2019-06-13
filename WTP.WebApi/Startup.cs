@@ -29,6 +29,10 @@ using WTP.DAL.Entities.AppUserEntities;
 using WTP.BLL.Services.Concrete.TeamService;
 using WTP.BLL.DTOs.ServicesDTOs;
 using System.Threading.Tasks;
+using WTP.BLL.Services.HistoryService;
+using WTP.BLL.Services.Concrete.RankService;
+using WTP.BLL.Services.Concrete.GoalService;
+using WTP.BLL.Services.Concrete.AdminPlayerService;
 using WTP.BLL.Services.Concrete.InvitationService;
 
 namespace WTP.WebAPI
@@ -60,6 +64,10 @@ namespace WTP.WebAPI
             services.AddScoped<IGameService, GameService>();
             services.AddScoped<IPlayerService, PlayerService>();
             services.AddScoped<ITeamService, TeamService>();
+            services.AddScoped<IHistoryService, HistoryService>();
+            services.AddScoped<IRankService, RankService>();
+            services.AddScoped<IGoalService, GoalService>();
+            services.AddScoped<IAdminPlayerService, AdminPlayerService>();
             services.AddScoped<IInvitationService, InvitationService>();
 
             services.AddScoped(provider => new MapperConfiguration(config =>

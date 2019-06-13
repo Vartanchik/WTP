@@ -23,5 +23,8 @@ namespace WTP.DAL.Entities.AppUserEntities
         public virtual List<RefreshToken> Tokens { get; set; }
         public bool IsDeleted { get; set; }
         public DateTime? DeletedTime { get; set; }
+        //public override bool LockoutEnabled { get { return base.LockoutEnabled; } set { base.LockoutEnabled = value; } }
+        public override DateTimeOffset? LockoutEnd { get { return base.LockoutEnd; } set { base.LockoutEnd = value; } }
+        public List<History> Histories { get; set; }
     }
 }
