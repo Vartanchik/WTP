@@ -12,9 +12,10 @@ namespace WTP.DAL.Repositories.ConcreteRepositories.InvitationRepository
         {
         }
 
-        public async override Task<Invitation> GetByIdAsync(int id)
+        public override async Task<Invitation> GetByIdAsync(int id)
         {
-            return await base.AsQueryable().FirstOrDefaultAsync(x => x.Id == id);
+            return await base.AsQueryable()
+                             .FirstOrDefaultAsync(x => x.Id == id);
         }
     }
 }

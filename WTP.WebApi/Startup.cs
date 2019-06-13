@@ -33,6 +33,7 @@ using WTP.BLL.Services.HistoryService;
 using WTP.BLL.Services.Concrete.RankService;
 using WTP.BLL.Services.Concrete.GoalService;
 using WTP.BLL.Services.Concrete.AdminPlayerService;
+using WTP.BLL.Services.Concrete.InvitationService;
 
 namespace WTP.WebAPI
 {
@@ -67,6 +68,7 @@ namespace WTP.WebAPI
             services.AddScoped<IRankService, RankService>();
             services.AddScoped<IGoalService, GoalService>();
             services.AddScoped<IAdminPlayerService, AdminPlayerService>();
+            services.AddScoped<IInvitationService, InvitationService>();
 
             services.AddScoped(provider => new MapperConfiguration(config =>
             {
@@ -189,6 +191,10 @@ namespace WTP.WebAPI
                 });
 
                 c.AddSecurityRequirement(security);
+
+                var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = System.IO.Path.Combine(AppContext.BaseDirectory, xmlFile);
+                c.IncludeXmlComments(xmlPath);
             });
         }
 

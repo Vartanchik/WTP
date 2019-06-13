@@ -19,7 +19,6 @@ namespace WTP.DAL.UnitOfWork
         IRepository<Player> Players { get; }
         IRepository<Team> Teams { get; }
         IRefreshTokenRepository<RefreshToken> RefreshTokens { get; }
-        IRepository<Comment> Comments { get; }
         IRepository<Match> Matches { get; }
         IRepository<Game> Games { get; }
         IRepository<Server> Servers { get; }

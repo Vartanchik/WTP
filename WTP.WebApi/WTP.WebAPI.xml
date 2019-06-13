@@ -1,0 +1,219 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>WTP.WebAPI</name>
+    </assembly>
+    <members>
+        <member name="M:WTP.WebAPI.Controllers.AccountController.Register(WTP.BLL.DTOs.ServicesDTOs.RegisterDto)">
+            <summary>
+            Registration of new user
+            </summary>
+            <param name="dot"></param>
+        </member>
+        <member name="M:WTP.WebAPI.Controllers.AccountController.ConfirmEmail(System.String,System.String)">
+            <summary>
+            Confirmation user email
+            </summary>
+            <param name="userId"></param>
+            <param name="token"></param>
+        </member>
+        <member name="M:WTP.WebAPI.Controllers.AccountController.ConfirmEmailUI(System.String,System.String)">
+            <summary>
+            Confirmation user email
+            </summary>
+            <param name="userId"></param>
+            <param name="token"></param>
+        </member>
+        <member name="M:WTP.WebAPI.Controllers.AccountController.ForgotPassword(WTP.BLL.DTOs.ServicesDTOs.ForgotPasswordDto)">
+            <summary>
+            Send email to reset password
+            </summary>
+            <param name="dto"></param>
+        </member>
+        <member name="M:WTP.WebAPI.Controllers.AccountController.ResetPassword(System.String,System.String)">
+            <summary>
+            No description
+            </summary>
+            <param name="userId"></param>
+            <param name="code"></param>
+        </member>
+        <member name="M:WTP.WebAPI.Controllers.AccountController.ResetPassword(WTP.BLL.DTOs.ServicesDTOs.ResetPasswordDto)">
+            <summary>
+            Reset user password by email 
+            </summary>
+            <param name="dto"></param>
+        </member>
+        <member name="M:WTP.WebAPI.Controllers.AccountController.ChangePassword(WTP.BLL.DTOs.ServicesDTOs.ChangePasswordDto)">
+            <summary>
+            Change password of current user
+            </summary>
+            <param name="dto"></param>
+        </member>
+        <member name="M:WTP.WebAPI.Controllers.AccountController.Delete">
+            <summary>
+            Delete current user account
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:WTP.WebAPI.Controllers.AccountController.Restore(System.String)">
+            <summary>
+            Generate restore token and send it to user email
+            </summary>
+            <param name="email"></param>
+        </member>
+        <!-- Badly formed XML comment ignored for member "M:WTP.WebAPI.Controllers.AccountController.Restore(System.String,System.String)" -->
+        <member name="M:WTP.WebAPI.Controllers.InfoController.GetAllGames">
+            <summary>
+            Get all games
+            </summary>
+        </member>
+        <member name="M:WTP.WebAPI.Controllers.InfoController.UserIcon(System.Int32)">
+            <summary>
+            Get username and user photo
+            </summary>
+            <param name="userId"></param>
+        </member>
+        <member name="M:WTP.WebAPI.Controllers.InvitationController.GetInvitationById(System.Int32)">
+            <summary>
+            Get invitation by id
+            </summary>
+            <param name="invitationId"></param>
+        </member>
+        <member name="M:WTP.WebAPI.Controllers.InvitationController.GetPlayerInvitationsById(System.Int32)">
+            <summary>
+            Get invitations by player id
+            </summary>
+            <param name="playerId"></param>
+        </member>
+        <member name="M:WTP.WebAPI.Controllers.InvitationController.GetTeamInvitationsById(System.Int32)">
+            <summary>
+            Get all invitations by team id
+            </summary>
+            <param name="teamId"></param>
+        </member>
+        <member name="M:WTP.WebAPI.Controllers.InvitationController.CreateInvitation(WTP.BLL.DTOs.TeamDTOs.CreateInvitationDto)">
+            <summary>
+            Create an invitation to join the team
+            </summary>
+            <param name="playerId"></param>
+            <param name="teamId"></param>
+        </member>
+        <member name="M:WTP.WebAPI.Controllers.InvitationController.InvitationResponse(WTP.BLL.DTOs.ServicesDTOs.InvitationResponseDto)">
+            <summary>
+            Accept invitations to join the team
+            </summary>
+            <param name="dto"></param>
+        </member>
+        <member name="M:WTP.WebAPI.Controllers.PlayerController.Get(System.Int32)">
+            <summary>
+            Get player by id
+            </summary>
+            <param name="playerId"></param>
+        </member>
+        <member name="M:WTP.WebAPI.Controllers.PlayerController.Create(WTP.BLL.DTOs.ServicesDTOs.CreatePlayerDto)">
+            <summary>
+            Create new player
+            </summary>
+            <param name="dto"></param>
+            <returns>Response DTO</returns>
+        </member>
+        <member name="M:WTP.WebAPI.Controllers.PlayerController.Update(WTP.BLL.DTOs.PlayerDTOs.UpdatePlayerDto)">
+            <summary>
+            Create new player
+            </summary>
+            <param name="dto"></param>
+            <returns>Response DTO</returns>
+        </member>
+        <member name="M:WTP.WebAPI.Controllers.PlayerController.Delete(System.Int32)">
+            <summary>
+            Delete player
+            </summary>
+            <param name="playerGameId"></param>
+        </member>
+        <!-- Badly formed XML comment ignored for member "M:WTP.WebAPI.Controllers.PlayerController.GetPlayersByUser(System.Int32)" -->
+        <!-- Badly formed XML comment ignored for member "M:WTP.WebAPI.Controllers.PlayerController.GetPlayersByTeam(System.Int32)" -->
+        <member name="M:WTP.WebAPI.Controllers.TeamController.Get(System.Int32)">
+            <summary>
+            Get team DTO by team Id
+            </summary>
+            <param name="teamId"></param>
+        </member>
+        <member name="M:WTP.WebAPI.Controllers.TeamController.Create(WTP.BLL.DTOs.TeamDTOs.CreateTeamDto)">
+            <summary>
+            Create team for current user
+            </summary>
+            <param name="dto"></param>
+        </member>
+        <member name="M:WTP.WebAPI.Controllers.TeamController.Update(WTP.BLL.DTOs.TeamDTOs.UpdateTeamDto)">
+            <summary>
+            Update team of current user
+            </summary>
+            <param name="dto"></param>
+        </member>
+        <member name="M:WTP.WebAPI.Controllers.TeamController.Delete(System.Int32)">
+            <summary>
+            Delete curren user team by Id
+            </summary>
+            <param name="teamId"></param>
+        </member>
+        <member name="M:WTP.WebAPI.Controllers.TeamController.RemovePlayerFromTeam(System.Int32,System.Int32)">
+            <summary>
+            Remove player from team
+            </summary>
+            <param name="playerId"></param>
+            <param name="teamId"></param>
+        </member>
+        <member name="M:WTP.WebAPI.Controllers.TeamController.UpdateLogo(WTP.BLL.DTOs.ServicesDTOs.PhotoFormDataDto,System.Int32)">
+            <summary>
+            Update team logo
+            </summary>
+            <param name="formData"></param>
+            <param name="teamId"></param>
+        </member>
+        <member name="M:WTP.WebAPI.Controllers.TeamController.Logo">
+            <summary>
+            Get team logo
+            </summary>
+        </member>
+        <member name="M:WTP.WebAPI.Controllers.TeamController.UserTeams(System.Int32)">
+            <summary>
+            Get all user teams
+            </summary>
+            <param name="userId"></param>
+        </member>
+        <member name="M:WTP.WebAPI.Controllers.TokenController.GetAccess(WTP.BLL.DTOs.ServicesDTOs.LoginDto)">
+            <summary>
+            Get access and refresh tokens
+            </summary>
+            <param name="dto"></param>
+        </member>
+        <member name="M:WTP.WebAPI.Controllers.TokenController.RefreshAccess(System.String)">
+            <summary>
+            Update access and refresh tokens
+            </summary>
+            <param name="refreshToken"></param>
+        </member>
+        <member name="M:WTP.WebAPI.Dto.Controllers.UserProfileController.GetUserProfile">
+            <summary>
+            Get Userprofile of current user
+            </summary>
+        </member>
+        <member name="M:WTP.WebAPI.Dto.Controllers.UserProfileController.UpdateUserProfile(WTP.BLL.DTOs.AppUserDTOs.AppUserDto)">
+            <summary>
+            Update current user Userprofile
+            </summary>
+            <param name="user"></param>
+        </member>
+        <member name="M:WTP.WebAPI.Dto.Controllers.UserProfileController.UpdatePhoto(WTP.BLL.DTOs.ServicesDTOs.PhotoFormDataDto)">
+            <summary>
+            Update current user photo
+            </summary>
+            <param name="formData"></param>
+        </member>
+        <member name="M:WTP.WebAPI.Dto.Controllers.UserProfileController.Photo">
+            <summary>
+            Get photo by url
+            </summary>
+        </member>
+    </members>
+</doc>

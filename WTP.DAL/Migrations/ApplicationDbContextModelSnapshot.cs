@@ -475,11 +475,13 @@ namespace WTP.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<int>("AppUserId");
+
                     b.Property<DateTime>("CreatedDate");
 
                     b.Property<DateTime>("ExpiryTime");
 
-                    b.Property<int>("UserId");
+                    b.Property<int?>("UserId");
 
                     b.Property<string>("Value")
                         .IsRequired();
@@ -861,8 +863,7 @@ namespace WTP.DAL.Migrations
                 {
                     b.HasOne("WTP.DAL.Entities.AppUserEntities.AppUser", "AppUser")
                         .WithMany("Tokens")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("UserId");
                 });
 
             modelBuilder.Entity("WTP.DAL.Entities.AppUserEntities.RestoreToken", b =>
@@ -910,7 +911,7 @@ namespace WTP.DAL.Migrations
                     b.HasOne("WTP.DAL.Entities.Player", "Player")
                         .WithMany("Invitations")
                         .HasForeignKey("PlayerId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("WTP.DAL.Entities.TeamEntities.Team", "Team")
                         .WithMany("Invitations")
