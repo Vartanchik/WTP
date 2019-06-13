@@ -17,9 +17,9 @@
             <param name="userId"></param>
             <param name="token"></param>
         </member>
-        <member name="M:WTP.WebAPI.Controllers.AccountController.ConfirmEmailUI(System.String,System.String)">
+        <member name="M:WTP.WebAPI.Controllers.AccountController.EmailConfirmation(System.String,System.String)">
             <summary>
-            Confirmation user email
+            Confirmation user email by swagger
             </summary>
             <param name="userId"></param>
             <param name="token"></param>
@@ -32,7 +32,7 @@
         </member>
         <member name="M:WTP.WebAPI.Controllers.AccountController.ResetPassword(System.String,System.String)">
             <summary>
-            No description
+            Generate reset token and send it to user email
             </summary>
             <param name="userId"></param>
             <param name="code"></param>
@@ -61,7 +61,13 @@
             </summary>
             <param name="email"></param>
         </member>
-        <!-- Badly formed XML comment ignored for member "M:WTP.WebAPI.Controllers.AccountController.Restore(System.String,System.String)" -->
+        <member name="M:WTP.WebAPI.Controllers.AccountController.Restore(System.String,System.String)">
+            <summary>
+            Restore your account by id and restore token
+            </summary>
+            <param name="userId"></param>
+            <param name="token"></param>
+        </member>
         <member name="M:WTP.WebAPI.Controllers.InfoController.GetAllGames">
             <summary>
             Get all games
@@ -130,8 +136,8 @@
             </summary>
             <param name="playerGameId"></param>
         </member>
-        <!-- Badly formed XML comment ignored for member "M:WTP.WebAPI.Controllers.PlayerController.GetPlayersByUser(System.Int32)" -->
-        <!-- Badly formed XML comment ignored for member "M:WTP.WebAPI.Controllers.PlayerController.GetPlayersByTeam(System.Int32)" -->
+        <!-- Badly formed XML comment ignored for member "M:WTP.WebAPI.Controllers.PlayerController.UserPlayers(System.Int32)" -->
+        <!-- Badly formed XML comment ignored for member "M:WTP.WebAPI.Controllers.PlayerController.TeamPlayers(System.Int32)" -->
         <member name="M:WTP.WebAPI.Controllers.TeamController.Get(System.Int32)">
             <summary>
             Get team DTO by team Id
@@ -140,6 +146,7 @@
         </member>
         <member name="M:WTP.WebAPI.Controllers.TeamController.Create(WTP.BLL.DTOs.TeamDTOs.CreateTeamDto)">
             <summary>
+            Create team
             Create team for current user
             </summary>
             <param name="dto"></param>

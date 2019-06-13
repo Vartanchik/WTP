@@ -33,7 +33,7 @@ namespace WTP.WebAPI.Controllers
         /// Get team DTO by team Id
         /// </summary>
         /// <param name="teamId"></param>
-        [HttpGet("[action]/{teamId}")]
+        [HttpGet("{teamId}")]
         [ProducesResponseType(typeof(TeamDto), 200)]
         [ProducesResponseType(204)]
         public async Task<IActionResult> Get([FromRoute] int teamId)
@@ -46,6 +46,7 @@ namespace WTP.WebAPI.Controllers
         }
 
         /// <summary>
+        /// Create team
         /// Create team for current user
         /// </summary>
         /// <param name="dto"></param>
@@ -85,11 +86,11 @@ namespace WTP.WebAPI.Controllers
         /// Delete curren user team by Id
         /// </summary>
         /// <param name="teamId"></param>
-        [HttpDelete]
+        [HttpDelete("{teamId}")]
         [Authorize(Policy = "RequireLoggedIn")]
         [ProducesResponseType(typeof(ResponseDto), 200)]
         [ProducesResponseType(typeof(ResponseDto), 400)]
-        public async Task<IActionResult> Delete(int teamId)
+        public async Task<IActionResult> Delete([FromRoute] int teamId)
         {
             var userId = this.GetCurrentUserId();
             var result = await _teamService.DeleteAsync(teamId, userId);
@@ -129,11 +130,11 @@ namespace WTP.WebAPI.Controllers
         /// </summary>
         /// <param name="formData"></param>
         /// <param name="teamId"></param>
-        [HttpPost("[action]")]
+        [HttpPost("[action]/{teamId}")]
         [Authorize(Policy = "RequireLoggedIn")]
         [ProducesResponseType(typeof(ResponseDto), 200)]
         [ProducesResponseType(typeof(ResponseDto), 400)]
-        public async Task<IActionResult> UpdateLogo([FromForm] PhotoFormDataDto formData, int teamId)
+        public async Task<IActionResult> UpdateLogo([FromForm] PhotoFormDataDto formData, [FromRoute] int teamId)
         {
             var azureStorageConfig = new AzureBlobStorageConfigDto(_configuration["AzureBlobStorage:AccountName"],
                                                                    _configuration["AzureBlobStorage:AccountKey"],

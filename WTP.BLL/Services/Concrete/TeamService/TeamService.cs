@@ -1,11 +1,11 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using WTP.BLL.DTOs.PlayerDTOs;
 using WTP.BLL.DTOs.TeamDTOs;
-using WTP.DAL.Entities;
 using WTP.DAL.Entities.TeamEntities;
 using WTP.DAL.UnitOfWork;
 
@@ -24,7 +24,16 @@ namespace WTP.BLL.Services.Concrete.TeamService
 
         public async Task<TeamDto> GetTeamAsync(int teamId)
         {
-            var team = await _uow.Teams.GetByIdAsync(teamId);
+            var team = await _uow.Teams.AsQueryable()
+                                       .Include(t => t.Game)
+                                       .Include(t => t.Server)
+                                       .Include(t => t.Goal)
+                                       .Include(t => t.Players)
+                                         .ThenInclude(p => p.Rank)
+                                       .Include(t => t.Players)
+                                         .ThenInclude(p => p.AppUser)
+                                       .Where(t => t.Id == teamId)
+                                       .FirstOrDefaultAsync();
 
             var dto = _mapper.Map<TeamDto>(team);
 
@@ -112,22 +121,6 @@ namespace WTP.BLL.Services.Concrete.TeamService
             return new ServiceResult();
         }
 
-        public async Task<ServiceResult> UpdateLogoAsync(int userId, int teamId, string logo)
-        {
-            var team = await _uow.Teams.AsQueryable()
-                                       .Where(t => t.AppUserId == userId && t.Id == teamId)
-                                       .FirstOrDefaultAsync();
-
-            if (team == null) return new ServiceResult("Team not found.");
-
-            team.Photo = logo;
-
-            await _uow.Teams.CreateOrUpdate(team);
-            await _uow.CommitAsync();
-
-            return new ServiceResult();
-        }
-
         public async Task<IList<PlayerListItemDto>> GetTeamPlayers(int teamId)
         {
             var players = await _uow.Teams.AsQueryable()
@@ -146,36 +139,31 @@ namespace WTP.BLL.Services.Concrete.TeamService
                                               .Include(t => t.Game)
                                               .Include(t => t.Server)
                                               .Include(t => t.Goal)
+                                              .Include(t => t.Invitations)
+                                                .ThenInclude(i => i.Player)
+                                              .Include(t => t.Invitations)
+                                                .ThenInclude(i => i.Team)
+                                              .Where(t => t.AppUserId == userId)
                                               .AsNoTracking()
-                                              .Where(p => p.AppUserId == userId)
                                               .ToListAsync();
-
+            
             return _mapper.Map<IList<TeamListItemDto>>(listOfTeams);
         }
 
-        public async Task<IList<InvitationListItemDto>> GetAllTeamInvitetionByUserId(int userId)
+        public async Task<ServiceResult> UpdateLogoAsync(int userId, int teamId, string logo)
         {
-            var listOfTeamId = await _uow.Teams.AsQueryable()
-                                                 .Where(t => t.AppUserId == userId)
-                                                 .Select(t => t.Id)
-                                                 .ToListAsync();
+            var team = await _uow.Teams.AsQueryable()
+                                       .Where(t => t.AppUserId == userId && t.Id == teamId)
+                                       .FirstOrDefaultAsync();
 
-            if (listOfTeamId == null) return null;
+            if (team == null) return new ServiceResult("Team not found.");
 
-            var listOfInvitations = new List<Invitation>();
+            team.Photo = logo;
 
-            foreach (var teamId in listOfTeamId)
-            {
-                var invitationsOfTeams = await _uow.Invitations.AsQueryable()
-                                                               .Include(i => i.Player)
-                                                               .Include(i => i.Team)
-                                                               .Where(i => i.TeamId == teamId)
-                                                               .ToListAsync();
+            await _uow.Teams.CreateOrUpdate(team);
+            await _uow.CommitAsync();
 
-                listOfInvitations.AddRange(invitationsOfTeams);
-            }
-
-            return _mapper.Map<List<InvitationListItemDto>>(listOfInvitations);
+            return new ServiceResult();
         }
     }
 }

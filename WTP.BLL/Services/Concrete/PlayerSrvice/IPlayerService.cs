@@ -12,11 +12,10 @@ namespace WTP.BLL.Services.Concrete.PlayerSrvice
         Task<PlayerDto> GetPlayerAsync(int playerId);
         Task<ServiceResult> CreateAsync(CreatePlayerDto dto, int userId);
         Task<ServiceResult> UpdateAsync(UpdatePlayerDto dto, int userId);
-        Task<ServiceResult> DeleteAsync(int userId, int playerGameId);
+        Task<ServiceResult> DeleteAsync(int userId, int gameId);
         Task<IList<PlayerListItemDto>> GetListByUserIdAsync(int userId);
         Task<IList<PlayerListItemDto>> GetPlayersList();
         Task<IList<PlayerListItemDto>> GetListByTeamIdAsync(int teamId);
         Task<PlayerPaginationDto> GetFilteredPlayersByGameIdAsync(PlayerInputValuesModelDto inputValues);
-        Task<IList<InvitationListItemDto>> GetAllPlayerInvitetionByUserId(int userId);
     }
 }

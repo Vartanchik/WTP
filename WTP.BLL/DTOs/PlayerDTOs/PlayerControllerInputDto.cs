@@ -12,9 +12,9 @@ namespace WTP.BLL.DTOs.PlayerDTOs
         public string SortField { get; set; } = "";
         public string SortType { get; set; } = "";
         public string NameValue { get; set; } = "";
-        public int RankLeftValue { get; set; } = 0;
-        public int RankRightValue { get; set; } = 100;
-        public int DecencyLeftValue { get; set; } = 0;
-        public int DecencyRightValue { get; set; } = 10000;
+        public int RankLeftValue { get; set; }
+        public int RankRightValue { get; set; }
+        public int DecencyLeftValue { get; set; }
+        public int DecencyRightValue { get; set; } 
     }
 }

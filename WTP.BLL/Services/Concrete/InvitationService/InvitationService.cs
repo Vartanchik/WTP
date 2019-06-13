@@ -112,7 +112,7 @@ namespace WTP.BLL.Services.Concrete.InvitationService
             if (invitation == null) return new ServiceResult("Invitation not found.");
 
             var userIsPlayer = await _uow.Players.AsQueryable()
-                                                 .AnyAsync(p => p.Id == invitation.TeamId &&
+                                                 .AnyAsync(p => p.Id == invitation.PlayerId &&
                                                                 p.AppUserId == dto.UserId);
 
             var userIsTeam = await _uow.Teams.AsQueryable()
@@ -134,7 +134,7 @@ namespace WTP.BLL.Services.Concrete.InvitationService
             if (invitation == null) return new ServiceResult("Invitation not found.");
 
             var playerUserId = await _uow.Players.AsQueryable()
-                                                  .Where(p => p.AppUserId == invitation.PlayerId)
+                                                  .Where(p => p.Id == invitation.PlayerId)
                                                   .Select(p => p.AppUserId)
                                                   .FirstOrDefaultAsync();
 
@@ -150,7 +150,15 @@ namespace WTP.BLL.Services.Concrete.InvitationService
             if (playerUserId == dto.UserId && invitation.Author == Author.Coach ||
                 teamUserId == dto.UserId && invitation.Author == Author.Player)
             {
-                return await AddToTeamAsync(invitation.PlayerId, invitation.TeamId);
+                var result = await AddToTeamAsync(invitation.PlayerId, invitation.TeamId);
+
+                if (!result.Succeeded) return result;
+
+                await _uow.Invitations.DeleteAsync(dto.InvitationId);
+                await _uow.CommitAsync();
+
+                return new ServiceResult();
+
             }
             else
             {

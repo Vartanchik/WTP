@@ -108,7 +108,7 @@ namespace WTP.WebAPI.Controllers
         }
 
         /// <summary>
-        /// Confirmation user email
+        /// Confirmation user email by swagger
         /// </summary>
         /// <param name="userId"></param>
         /// <param name="token"></param>
@@ -116,7 +116,7 @@ namespace WTP.WebAPI.Controllers
         [AllowAnonymous]
         [ProducesResponseType(typeof(ResponseDto), 200)]
         [ProducesResponseType(typeof(ResponseDto), 400)]
-        public async Task<IActionResult> ConfirmEmailUI(string userId, string token)
+        public async Task<IActionResult> EmailConfirmation(string userId, string token)
         {
             var result = await _appUserService.ConfirmEmailAsync(Convert.ToInt32(userId), HttpUtility.UrlDecode(token));
 
@@ -178,6 +178,7 @@ namespace WTP.WebAPI.Controllers
         /// </summary>
         /// <param name="userId"></param>
         /// <param name="code"></param>
+        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpGet("[action]")]
         [AllowAnonymous]
         [ProducesResponseType(302)]
