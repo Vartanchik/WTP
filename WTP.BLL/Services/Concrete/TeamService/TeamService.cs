@@ -289,5 +289,94 @@ namespace WTP.BLL.Services.Concrete.TeamService
 
             return _mapper.Map<List<InvitationListItemDto>>(listOfInvitations);
         }
+
+        public async Task<TeamPaginationDto> GetFilteredTeamsByGameIdAsync(TeamInputValuesModelDto inputValues)
+        {
+            IList<Team> listOfTeams = null;
+
+            //chose sort field 
+            int? sortOperator(Team team)
+            {
+                if (inputValues.SortField == "rate")
+                    return team.WinRate;
+
+                else
+                    return null;
+            }
+
+            //add filter fields 
+            bool filterOperator(Team team)
+            {
+
+                inputValues.NameValue = inputValues.NameValue == null ? "" : inputValues.NameValue;
+
+                return team.GameId == inputValues.GameId
+                       && team.Name.Contains(inputValues.NameValue)
+                       && team.WinRate <= inputValues.WinRateRightValue
+                       && team.WinRate >= inputValues.WinRateLeftValue;
+                      // && team.Players.Count() >= inputValues.MembersLeftValue
+                      // && team.Players.Count() <= inputValues.MembersRightValue;
+            }
+            //sorting by ASC
+            if (inputValues.SortType == "asc")
+            {
+                listOfTeams = _uow.Teams.AsQueryable()
+                                            .Include(p => p.Game)
+                                            .Include(p => p.Server)
+                                            .Include(p => p.Goal)
+                                            .OrderBy(sortOperator)
+                                            .Where(filterOperator)
+                                            .Skip((inputValues.Page - 1) * inputValues.PageSize)
+                                            .Take(inputValues.PageSize)
+                                            .ToList();
+            }
+
+            //sorting by DESC
+            else if (inputValues.SortType == "desc")
+            {
+                listOfTeams = _uow.Teams.AsQueryable()
+                                            .Include(p => p.Game)
+                                            .Include(p => p.Server)
+                                            .Include(p => p.Goal)
+                                            .OrderByDescending(sortOperator)
+                                            .Where(filterOperator)
+                                            .Skip((inputValues.Page - 1) * inputValues.PageSize)
+                                            .Take(inputValues.PageSize)
+                                            .ToList();
+            }
+
+            //get filtered players without sorting
+            else
+            {
+                listOfTeams = _uow.Teams.AsQueryable()
+                                            .Include(p => p.Game)
+                                            .Include(p => p.Server)
+                                            .Include(p => p.Goal)
+                                            .Where(filterOperator)
+                                            .Skip((inputValues.Page - 1) * inputValues.PageSize)
+                                            .Take(inputValues.PageSize)
+                                            .ToList();
+            }
+
+            var mappedTeamsList = _mapper.Map<IList<TeamListItemDto>>(listOfTeams);
+
+            //Count total quantity of filtered players 
+            int teamsQuantity = await _uow.Teams.AsQueryable()
+                                                        .Where(p => p.GameId == inputValues.GameId
+                                                        && p.Name.Contains(inputValues.NameValue)
+                                                        && p.WinRate <= inputValues.WinRateRightValue
+                                                        && p.WinRate >= inputValues.WinRateLeftValue
+                                                        && p.Players.Count() >= inputValues.MembersLeftValue
+                                                        && p.Players.Count() <= inputValues.MembersRightValue)
+                                                        .CountAsync();
+
+            var resultModel = new TeamPaginationDto
+            {
+                Teams = mappedTeamsList,
+                TeamsQuantity = teamsQuantity
+            };
+
+            return resultModel;
+        }
     }
 }

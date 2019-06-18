@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace WTP.DAL.Migrations
 {
-    public partial class SomeFixTeam : Migration
+    public partial class InitialCreate : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -538,14 +538,14 @@ namespace WTP.DAL.Migrations
                 columns: new[] { "Id", "Name", "Value" },
                 values: new object[,]
                 {
-                    { 3, "Crusader", 30 },
-                    { 8, "Immortal", 80 },
-                    { 7, "Divine", 70 },
-                    { 6, "Ancient", 60 },
-                    { 1, "Uncalibrated", 10 },
-                    { 4, "Archon", 40 },
-                    { 2, "Guardian", 20 },
-                    { 5, "Legend", 50 }
+                    { 3, "Crusader", 20 },
+                    { 8, "Immortal", 70 },
+                    { 7, "Divine", 60 },
+                    { 6, "Ancient", 50 },
+                    { 1, "Uncalibrated", 0 },
+                    { 4, "Archon", 30 },
+                    { 2, "Guardian", 10 },
+                    { 5, "Legend", 40 }
                 });
 
             migrationBuilder.InsertData(

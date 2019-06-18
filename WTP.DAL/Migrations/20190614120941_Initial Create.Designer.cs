@@ -10,14 +10,14 @@ using WTP.DAL;
 namespace WTP.DAL.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20190606161058_SomeFixTeam")]
-    partial class SomeFixTeam
+    [Migration("20190614120941_Initial Create")]
+    partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.2.3-servicing-35854")
+                .HasAnnotation("ProductVersion", "2.2.4-servicing-10062")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -545,49 +545,49 @@ namespace WTP.DAL.Migrations
                         {
                             Id = 1,
                             Name = "Uncalibrated",
-                            Value = 10
+                            Value = 0
                         },
                         new
                         {
                             Id = 2,
                             Name = "Guardian",
-                            Value = 20
+                            Value = 10
                         },
                         new
                         {
                             Id = 3,
                             Name = "Crusader",
-                            Value = 30
+                            Value = 20
                         },
                         new
                         {
                             Id = 4,
                             Name = "Archon",
-                            Value = 40
+                            Value = 30
                         },
                         new
                         {
                             Id = 5,
                             Name = "Legend",
-                            Value = 50
+                            Value = 40
                         },
                         new
                         {
                             Id = 6,
                             Name = "Ancient",
-                            Value = 60
+                            Value = 50
                         },
                         new
                         {
                             Id = 7,
                             Name = "Divine",
-                            Value = 70
+                            Value = 60
                         },
                         new
                         {
                             Id = 8,
                             Name = "Immortal",
-                            Value = 80
+                            Value = 70
                         });
                 });
 
