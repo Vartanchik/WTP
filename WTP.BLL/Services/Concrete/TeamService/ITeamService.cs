@@ -17,6 +17,7 @@ namespace WTP.BLL.Services.Concrete.TeamService
         Task<IList<PlayerListItemDto>> GetTeamPlayers(int teamId);
         Task<IList<TeamListItemDto>> GetListByUserIdAsync(int userId);
         Task<ServiceResult> UpdateLogoAsync(int userId, int teamId, string logo);
+        Task<TeamPaginationDto> GetFilteredTeamsByGameIdAsync(TeamInputValuesModelDto inputValues);
 
         //For admin
         Task<Page<Team>> GetFilteredSortedTeamsOnPage(int pageSize, int currentPage, string sortBy

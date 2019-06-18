@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WTP.DAL;
 
 namespace WTP.DAL.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20190618133751_Initial Create")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -475,13 +477,11 @@ namespace WTP.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("AppUserId");
-
                     b.Property<DateTime>("CreatedDate");
 
                     b.Property<DateTime>("ExpiryTime");
 
-                    b.Property<int?>("UserId");
+                    b.Property<int>("UserId");
 
                     b.Property<string>("Value")
                         .IsRequired();
@@ -863,7 +863,8 @@ namespace WTP.DAL.Migrations
                 {
                     b.HasOne("WTP.DAL.Entities.AppUserEntities.AppUser", "AppUser")
                         .WithMany("Tokens")
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("WTP.DAL.Entities.AppUserEntities.RestoreToken", b =>
@@ -911,7 +912,7 @@ namespace WTP.DAL.Migrations
                     b.HasOne("WTP.DAL.Entities.Player", "Player")
                         .WithMany("Invitations")
                         .HasForeignKey("PlayerId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("WTP.DAL.Entities.TeamEntities.Team", "Team")
                         .WithMany("Invitations")

@@ -194,6 +194,43 @@ namespace WTP.WebAPI.Controllers
                 : Ok(list);
         }
 
+        //Get List of all players by game with filers and sorting
+        [HttpGet("teams/pagination")]
+        public async Task<TeamIndexDto> TeamIndex([FromQuery] TeamControllerInputDto valuesFromUi)
+        {
+            TeamInputValuesModelDto inputValues = new TeamInputValuesModelDto()
+            {
+                GameId = valuesFromUi.IdGame,
+                Page = valuesFromUi.Page,
+                PageSize = valuesFromUi.PageSize,
+                SortField = valuesFromUi.SortField,
+                SortType = valuesFromUi.SortType,
+                NameValue = valuesFromUi.NameValue,
+                WinRateLeftValue = valuesFromUi.WinRateLeftValue,
+                WinRateRightValue = valuesFromUi.WinRateRightValue,
+                MembersLeftValue = valuesFromUi.MembersLeftValue,
+                MembersRightValue = valuesFromUi.MembersRightValue,
+                GoalDtos = valuesFromUi.GoalDtos
+            };
+
+            TeamPaginationDto inputModel = await _teamService.GetFilteredTeamsByGameIdAsync(inputValues);
+
+            List<TeamListItemDto> teams = new List<TeamListItemDto>(inputModel.Teams);
+            if (teams == null)
+                return null;
+
+
+            // representation model
+            TeamIndexDto viewModel = new TeamIndexDto
+            {
+                PageViewModel = new PageDto(inputModel.TeamsQuantity, valuesFromUi.Page, valuesFromUi.PageSize),
+                Teams = teams
+            };
+
+            return viewModel;
+        }
+
+
         [HttpGet]
         [Authorize(Policy = "RequireAdministratorRole")]
         [Route("teams/paging")]
