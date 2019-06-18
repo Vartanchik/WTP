@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using EntityFrameworkPaginateCore;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -44,6 +45,24 @@ namespace WTP.BLL.Services.Concrete.GoalService
         public async Task<GoalDto> GetByIdAsync(int goalId)
         {
             return _mapper.Map<GoalDto>(await _uow.Goals.GetByIdAsync(goalId));
+        }
+
+        public async Task<Page<Goal>> GetFilteredSortedGoalsOnPage(int pageSize, int currentPage, string sortBy
+                                      , string name, int id, bool sortOrder)
+        {
+            Page<Goal> goals;
+            var filters = new Filters<Goal>();
+            filters.Add(!string.IsNullOrEmpty(name), x => x.Name.Contains(name));
+            filters.Add(id != 0, x => x.Id.Equals(id));
+
+            var sorts = new Sorts<Goal>();
+
+            sorts.Add(sortBy == "Name", x => x.Name, sortOrder);
+            sorts.Add(sortBy == "Id", x => x.Id, sortOrder);
+
+            goals = await _uow.Goals.AsQueryable().PaginateAsync(currentPage, pageSize, sorts, filters);
+
+            return goals;
         }
     }
 }

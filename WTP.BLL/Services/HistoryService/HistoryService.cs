@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using EntityFrameworkPaginateCore;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -156,6 +157,36 @@ namespace WTP.BLL.Services.HistoryService
                 Histories = items
             };
             return viewModel;
+        }
+
+
+        public async Task<Page<History>> GetFilteredSortedRecordsOnPage(int pageSize, int currentPage, string sortBy,
+                                       string userName, string email, string operationName, string newUserName,
+                                       string newUserEmail, int id, int adminId, bool sortOrder)
+        {
+            Page<History> players;
+            var filters = new Filters<History>();
+            filters.Add(!string.IsNullOrEmpty(userName), x => x.PreviousUserName.Contains(userName));
+            filters.Add(!string.IsNullOrEmpty(email), x => x.PreviousUserEmail.Contains(email));
+            filters.Add(!string.IsNullOrEmpty(operationName), x => x.Operation.OperationName.Contains(operationName));
+            filters.Add(!string.IsNullOrEmpty(newUserName), x => x.NewUserName.Contains(newUserName));
+            filters.Add(!string.IsNullOrEmpty(newUserEmail), x => x.NewUserEmail.Contains(newUserEmail));
+            filters.Add(id!=0, x => x.Id.Equals(id));
+            filters.Add(adminId!=0, x => x.AdminId.Equals(adminId));
+
+            var sorts = new Sorts<History>();
+
+            sorts.Add(sortBy == "NewUserName", x => x.NewUserName, sortOrder);
+            sorts.Add(sortBy == "NewUserEmail", x => x.NewUserEmail, sortOrder);
+            sorts.Add(sortBy == "PreviousUserName", x => x.PreviousUserName, sortOrder);
+            sorts.Add(sortBy == "PreviousUserEmail", x => x.PreviousUserEmail, sortOrder);
+            sorts.Add(sortBy == "Id", x => x.Id, sortOrder);
+            sorts.Add(sortBy == "OperationName", x => x.Operation.OperationName, sortOrder);
+            sorts.Add(sortBy == "AdminId", x => x.AdminId, sortOrder);
+
+            players = await _uow.Histories.AsQueryable().PaginateAsync(currentPage, pageSize, sorts, filters);
+
+            return players;
         }
     }
 }

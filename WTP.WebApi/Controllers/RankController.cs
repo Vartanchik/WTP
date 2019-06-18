@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using EntityFrameworkPaginateCore;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using WTP.BLL.DTOs.PlayerDTOs;
 using WTP.BLL.DTOs.ServicesDTOs;
 using WTP.BLL.Services.Concrete.RankService;
+using WTP.DAL.Entities;
 
 namespace WTP.WebAPI.Controllers
 {
@@ -97,6 +99,16 @@ namespace WTP.WebAPI.Controllers
                 StatusCode = 200,
                 Message = "Rank with id " + rankId + " was deleted."
             });
+        }
+
+        [HttpGet]
+        [Authorize(Policy = "RequireAdministratorRole")]
+        [Route("ranks/paging")]
+        public async Task<Page<Rank>> GetRecordsListOnPage(int pageSize, int currentPage, string sortBy,
+                                        string name, int id, int value,
+                                        bool sortOrder)
+        {
+            return await _rankService.GetFilteredSortedRanksOnPage(pageSize, currentPage, sortBy, name, id, value, sortOrder);
         }
     }
 }

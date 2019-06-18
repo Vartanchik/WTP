@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using EntityFrameworkPaginateCore;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -43,6 +44,24 @@ namespace WTP.BLL.Services.Concrete.GameService
         public async Task<GameDto> FindAsync(int gameId)
         {
             return _mapper.Map<GameDto>(await _uow.Games.GetByIdAsync(gameId));
+        }
+
+        public async Task<Page<Game>> GetFilteredSortedGamesOnPage(int pageSize, int currentPage, string sortBy
+                                      , string name, int id, bool sortOrder)
+        {
+            Page<Game> games;
+            var filters = new Filters<Game>();
+            filters.Add(!string.IsNullOrEmpty(name), x => x.Name.Contains(name));
+            filters.Add(id!=0, x => x.Id.Equals(id));
+
+            var sorts = new Sorts<Game>();
+
+            sorts.Add(sortBy == "Name", x => x.Name, sortOrder);
+            sorts.Add(sortBy == "Id", x => x.Id, sortOrder);
+
+            games = await _uow.Games.AsQueryable().PaginateAsync(currentPage, pageSize, sorts, filters);
+
+            return games;
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using WTP.BLL.DTOs.AppUserDTOs;
 using WTP.BLL.DTOs.PlayerDTOs;
@@ -21,16 +22,22 @@ namespace WTP.BLL.Services.Concrete
             this._defaultPhoto = defaultPhoto;
 
             CreateMap<AppUser, AppUserDto>()
-                .ForMember(dest => dest.Photo,
-                           config => config.MapFrom(src => PhotoToView(src)))
-                .ForMember(dest => dest.Languages,
-                           config => config.MapFrom(src => GetLanguagesDto(src)));
+               .ForMember(dest => dest.Photo,
+                          config => config.MapFrom(src => PhotoToView(src)))
+               .ForMember(dest => dest.Languages,
+                          config => config.MapFrom(src => GetLanguagesDto(src)))
+               .ForMember(dest => dest.DateOfBirth,
+                   config => config.MapFrom(
+                       src => src.DateOfBirth.HasValue ? src.DateOfBirth.Value.ToString(new CultureInfo("de-DE")) : ""));
 
             CreateMap<AppUserDto, AppUser>()
                 .ForMember(dest => dest.Photo,
                            config => config.MapFrom(src => PhotoToSave(src)))
                 .ForMember(dest => dest.AppUserLanguages,
-                           config => config.MapFrom(src => GetUserToLanguages(src)));
+                           config => config.MapFrom(src => GetUserToLanguages(src)))
+                .ForMember(dest => dest.DateOfBirth,
+                    config => config.MapFrom(src => String.IsNullOrEmpty(src.DateOfBirth) ? (DateTime?)null : DateTime.Parse(src.DateOfBirth, new CultureInfo("de-DE"))));
+
 
             CreateMap<LanguageDto, Language>();
             CreateMap<Language, LanguageDto>();

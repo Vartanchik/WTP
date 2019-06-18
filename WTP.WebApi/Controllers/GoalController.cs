@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using EntityFrameworkPaginateCore;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using WTP.BLL.DTOs.PlayerDTOs;
 using WTP.BLL.DTOs.ServicesDTOs;
 using WTP.BLL.Services.Concrete.GoalService;
+using WTP.DAL.Entities;
 
 namespace WTP.WebAPI.Controllers
 {
@@ -97,6 +99,16 @@ namespace WTP.WebAPI.Controllers
                 StatusCode = 200,
                 Message = "Goal with id " + goalId + " was deleted."
             });
+        }
+
+        [HttpGet]
+        [Authorize(Policy = "RequireAdministratorRole")]
+        [Route("goals/paging")]
+        public async Task<Page<Goal>> GetRecordsListOnPage(int pageSize, int currentPage, string sortBy,
+                                        string name, int id,
+                                        bool sortOrder)
+        {
+            return await _goalService.GetFilteredSortedGoalsOnPage(pageSize, currentPage, sortBy, name, id, sortOrder);
         }
     }
 }
