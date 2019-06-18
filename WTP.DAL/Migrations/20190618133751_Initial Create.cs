@@ -89,6 +89,19 @@ namespace WTP.DAL.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Operations",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    OperationName = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Operations", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Ranks",
                 columns: table => new
                 {
@@ -151,7 +164,6 @@ namespace WTP.DAL.Migrations
                     PhoneNumber = table.Column<string>(nullable: true),
                     PhoneNumberConfirmed = table.Column<bool>(nullable: false),
                     TwoFactorEnabled = table.Column<bool>(nullable: false),
-                    LockoutEnd = table.Column<DateTimeOffset>(nullable: true),
                     LockoutEnabled = table.Column<bool>(nullable: false),
                     AccessFailedCount = table.Column<int>(nullable: false),
                     UserName = table.Column<string>(maxLength: 256, nullable: true),
@@ -162,7 +174,8 @@ namespace WTP.DAL.Migrations
                     CountryId = table.Column<int>(nullable: true),
                     Steam = table.Column<string>(nullable: true),
                     IsDeleted = table.Column<bool>(nullable: false),
-                    DeletedTime = table.Column<DateTime>(nullable: true)
+                    DeletedTime = table.Column<DateTime>(nullable: true),
+                    LockoutEnd = table.Column<DateTimeOffset>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -286,6 +299,39 @@ namespace WTP.DAL.Migrations
                         name: "FK_AspNetUserTokens_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Histories",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    DateOfOperation = table.Column<DateTime>(nullable: false),
+                    Description = table.Column<string>(nullable: true),
+                    PreviousUserEmail = table.Column<string>(nullable: true),
+                    PreviousUserName = table.Column<string>(nullable: true),
+                    NewUserEmail = table.Column<string>(nullable: true),
+                    NewUserName = table.Column<string>(nullable: true),
+                    AppUserId = table.Column<int>(nullable: true),
+                    AdminId = table.Column<int>(nullable: true),
+                    OperationId = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Histories", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Histories_AspNetUsers_AppUserId",
+                        column: x => x.AppUserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Histories_Operations_OperationId",
+                        column: x => x.OperationId,
+                        principalTable: "Operations",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -472,6 +518,11 @@ namespace WTP.DAL.Migrations
                 });
 
             migrationBuilder.InsertData(
+                table: "AspNetUsers",
+                columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "CountryId", "DateOfBirth", "DeletedTime", "Email", "EmailConfirmed", "GenderId", "IsDeleted", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "Photo", "SecurityStamp", "Steam", "TwoFactorEnabled", "UserName" },
+                values: new object[] { 1, 0, "0ac25357-6c11-4e21-806c-e3546c543c1d", null, null, null, "superAdmin@gmail.com", true, null, false, false, null, null, null, "AQAAAAEAACcQAAAAEJoMQ0ORW/30m0eVPZIwxJaTQ9nRyY63AriZTgxrk/xCv32Ewm03oMWQGpzz5CYpuw==", null, false, null, null, null, false, "superAdmin" });
+
+            migrationBuilder.InsertData(
                 table: "Country",
                 columns: new[] { "Id", "Name" },
                 values: new object[,]
@@ -519,18 +570,30 @@ namespace WTP.DAL.Migrations
                 columns: new[] { "Id", "Name" },
                 values: new object[,]
                 {
-                    { 12, "Greek" },
                     { 11, "Swedish" },
                     { 10, "Czech" },
+                    { 12, "Greek" },
                     { 8, "French" },
-                    { 7, "Korean" },
-                    { 6, "Japanese" },
-                    { 5, "Ukrainian" },
-                    { 4, "Spanish" },
-                    { 3, "Russian" },
+                    { 9, "Italian" },
                     { 2, "German" },
+                    { 3, "Russian" },
+                    { 4, "Spanish" },
+                    { 5, "Ukrainian" },
+                    { 6, "Japanese" },
                     { 1, "English" },
-                    { 9, "Italian" }
+                    { 7, "Korean" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Operations",
+                columns: new[] { "Id", "OperationName" },
+                values: new object[,]
+                {
+                    { 4, "Lock" },
+                    { 3, "Delete" },
+                    { 2, "Update" },
+                    { 1, "Create" },
+                    { 5, "UnLock" }
                 });
 
             migrationBuilder.InsertData(
@@ -538,14 +601,14 @@ namespace WTP.DAL.Migrations
                 columns: new[] { "Id", "Name", "Value" },
                 values: new object[,]
                 {
-                    { 3, "Crusader", 20 },
                     { 8, "Immortal", 70 },
                     { 7, "Divine", 60 },
                     { 6, "Ancient", 50 },
-                    { 1, "Uncalibrated", 0 },
+                    { 5, "Legend", 40 },
                     { 4, "Archon", 30 },
                     { 2, "Guardian", 10 },
-                    { 5, "Legend", 40 }
+                    { 1, "Uncalibrated", 0 },
+                    { 3, "Crusader", 20 }
                 });
 
             migrationBuilder.InsertData(
@@ -553,11 +616,11 @@ namespace WTP.DAL.Migrations
                 columns: new[] { "Id", "Name" },
                 values: new object[,]
                 {
-                    { 4, "Norht America" },
-                    { 3, "South America" },
                     { 5, "Middle East" },
                     { 1, "EU East" },
                     { 2, "EU West" },
+                    { 3, "South America" },
+                    { 4, "Norht America" },
                     { 6, "Asia" }
                 });
 
@@ -614,6 +677,16 @@ namespace WTP.DAL.Migrations
                 column: "NormalizedUserName",
                 unique: true,
                 filter: "[NormalizedUserName] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Histories_AppUserId",
+                table: "Histories",
+                column: "AppUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Histories_OperationId",
+                table: "Histories",
+                column: "OperationId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Invitations_TeamId",
@@ -702,6 +775,9 @@ namespace WTP.DAL.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "Histories");
+
+            migrationBuilder.DropTable(
                 name: "Invitations");
 
             migrationBuilder.DropTable(
@@ -715,6 +791,9 @@ namespace WTP.DAL.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
+
+            migrationBuilder.DropTable(
+                name: "Operations");
 
             migrationBuilder.DropTable(
                 name: "Players");

@@ -20,7 +20,12 @@ namespace WTP.DAL.Repositories.GenericRepository
             if (item.Id == 0)
                 await _dbset.AddAsync(item);
             else
-                _context.Entry(item).State = EntityState.Modified;
+            {
+                //_context.Entry(item).State = EntityState.Modified;
+                var entity = await _dbset.FindAsync(item.Id); //To Avoid tracking error
+                var attachedEntry = _context.Entry(entity);
+                attachedEntry.CurrentValues.SetValues(item);
+            }
         }
 
         public virtual async Task DeleteAsync(int id)

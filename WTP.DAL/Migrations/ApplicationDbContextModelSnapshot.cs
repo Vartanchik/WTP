@@ -215,6 +215,22 @@ namespace WTP.DAL.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "0ac25357-6c11-4e21-806c-e3546c543c1d",
+                            Email = "superAdmin@gmail.com",
+                            EmailConfirmed = true,
+                            IsDeleted = false,
+                            LockoutEnabled = false,
+                            PasswordHash = "AQAAAAEAACcQAAAAEJoMQ0ORW/30m0eVPZIwxJaTQ9nRyY63AriZTgxrk/xCv32Ewm03oMWQGpzz5CYpuw==",
+                            PhoneNumberConfirmed = false,
+                            TwoFactorEnabled = false,
+                            UserName = "superAdmin"
+                        });
                 });
 
             modelBuilder.Entity("WTP.DAL.Entities.AppUserEntities.AppUserLanguage", b =>
@@ -305,6 +321,39 @@ namespace WTP.DAL.Migrations
                         });
                 });
 
+            modelBuilder.Entity("WTP.DAL.Entities.AppUserEntities.History", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int?>("AdminId");
+
+                    b.Property<int?>("AppUserId");
+
+                    b.Property<DateTime>("DateOfOperation");
+
+                    b.Property<string>("Description");
+
+                    b.Property<string>("NewUserEmail");
+
+                    b.Property<string>("NewUserName");
+
+                    b.Property<int>("OperationId");
+
+                    b.Property<string>("PreviousUserEmail");
+
+                    b.Property<string>("PreviousUserName");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AppUserId");
+
+                    b.HasIndex("OperationId");
+
+                    b.ToTable("Histories");
+                });
+
             modelBuilder.Entity("WTP.DAL.Entities.AppUserEntities.Language", b =>
                 {
                     b.Property<int>("Id")
@@ -377,6 +426,46 @@ namespace WTP.DAL.Migrations
                         {
                             Id = 12,
                             Name = "Greek"
+                        });
+                });
+
+            modelBuilder.Entity("WTP.DAL.Entities.AppUserEntities.Operation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("OperationName");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Operations");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            OperationName = "Create"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            OperationName = "Update"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            OperationName = "Delete"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            OperationName = "Lock"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            OperationName = "UnLock"
                         });
                 });
 
@@ -753,6 +842,18 @@ namespace WTP.DAL.Migrations
                     b.HasOne("WTP.DAL.Entities.AppUserEntities.Language", "Language")
                         .WithMany("AppUserLanguages")
                         .HasForeignKey("LanguageId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("WTP.DAL.Entities.AppUserEntities.History", b =>
+                {
+                    b.HasOne("WTP.DAL.Entities.AppUserEntities.AppUser", "AppUser")
+                        .WithMany("Histories")
+                        .HasForeignKey("AppUserId");
+
+                    b.HasOne("WTP.DAL.Entities.AppUserEntities.Operation", "Operation")
+                        .WithMany("Histories")
+                        .HasForeignKey("OperationId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 

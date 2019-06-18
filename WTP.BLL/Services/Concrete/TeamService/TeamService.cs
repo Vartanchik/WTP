@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using EntityFrameworkPaginateCore;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
@@ -314,8 +315,8 @@ namespace WTP.BLL.Services.Concrete.TeamService
                        && team.Name.Contains(inputValues.NameValue)
                        && team.WinRate <= inputValues.WinRateRightValue
                        && team.WinRate >= inputValues.WinRateLeftValue;
-                      // && team.Players.Count() >= inputValues.MembersLeftValue
-                      // && team.Players.Count() <= inputValues.MembersRightValue;
+                // && team.Players.Count() >= inputValues.MembersLeftValue
+                // && team.Players.Count() <= inputValues.MembersRightValue;
             }
             //sorting by ASC
             if (inputValues.SortType == "asc")
@@ -377,6 +378,27 @@ namespace WTP.BLL.Services.Concrete.TeamService
             };
 
             return resultModel;
+        }
+        public async Task<Page<Team>> GetFilteredSortedTeamsOnPage(int pageSize, int currentPage, string sortBy
+                                      , string name, int id, string game, int winRate, bool sortOrder)
+        {
+            Page<Team> teams;
+            var filters = new Filters<Team>();
+            filters.Add(!string.IsNullOrEmpty(name), x => x.Name.Contains(name));
+            filters.Add(id != 0, x => x.Id.Equals(id));
+            filters.Add(!string.IsNullOrEmpty(game), x => x.Game.Name.Contains(game));
+            filters.Add(winRate != 0, x => x.WinRate.Equals(winRate));
+
+            var sorts = new Sorts<Team>();
+
+            sorts.Add(sortBy == "Name", x => x.Name, sortOrder);
+            sorts.Add(sortBy == "Id", x => x.Id, sortOrder);
+            sorts.Add(sortBy == "Game", x => x.Game, sortOrder);
+            sorts.Add(sortBy == "WinRate", x => x.WinRate, sortOrder);
+
+            teams = await _uow.Teams.AsQueryable().PaginateAsync(currentPage, pageSize, sorts, filters);
+
+            return teams;
         }
     }
 }
