@@ -25,7 +25,7 @@ namespace WTP.WebAPI.Controllers
         }
 
         [HttpGet("list")]
-        //[Authorize(Policy = "RequireAdministratorRole")]
+        [Authorize(Policy = "RequireAdministratorRole")]
         public async Task<IList<RankDto>> GetAllRanks()
         {
             return await _rankService.GetRanksListAsync();
@@ -33,7 +33,7 @@ namespace WTP.WebAPI.Controllers
 
 
         [HttpPost("item")]
-        //[Authorize(Policy = "RequireAdministratorRole")]
+        [Authorize(Policy = "RequireAdministratorRole")]
         public async Task<IActionResult> CreateRank([FromBody]RankDto rankDto)
         {
             if (!ModelState.IsValid)
@@ -56,7 +56,7 @@ namespace WTP.WebAPI.Controllers
         }
 
         [HttpPut("item/{rankId}")]
-        //[Authorize(Policy = "RequireAdministratorRole")]
+        [Authorize(Policy = "RequireAdministratorRole")]
         public async Task<IActionResult> EditRank([FromBody]RankDto rankDto, [FromRoute]int rankId)
         {
             if (!ModelState.IsValid)
@@ -85,7 +85,7 @@ namespace WTP.WebAPI.Controllers
         }
 
         [HttpDelete("item/{rankId}")]
-        //[Authorize(Policy = "RequireAdministratorRole")]
+        [Authorize(Policy = "RequireAdministratorRole")]
         public async Task<IActionResult> DeleteRank([FromRoute]int rankId)
         {
             var rank = await _rankService.GetByIdAsync(rankId);
@@ -103,7 +103,7 @@ namespace WTP.WebAPI.Controllers
         }
 
         [HttpGet]
-        //[Authorize(Policy = "RequireAdministratorRole")]
+        [Authorize(Policy = "RequireAdministratorRole")]
         [Route("ranks/paging")]
         public async Task<Page<Rank>> GetRecordsListOnPage(int pageSize, int currentPage, string sortBy,
                                         string name, int id, int value,

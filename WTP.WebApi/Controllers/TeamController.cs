@@ -259,7 +259,7 @@ namespace WTP.WebAPI.Controllers
         }
 
         [HttpGet]
-        //[Authorize(Policy = "RequireAdministratorRole")]
+        [Authorize(Policy = "RequireAdministratorRole")]
         [Route("team/list")]
         public async Task<IList<Team>> GetTeamList()
         {

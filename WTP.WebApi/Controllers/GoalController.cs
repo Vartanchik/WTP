@@ -25,7 +25,7 @@ namespace WTP.WebAPI.Controllers
         }
 
         [HttpGet("list")]
-        //[Authorize(Policy = "RequireAdministratorRole")]
+        [Authorize(Policy = "RequireAdministratorRole")]
         public async Task<IList<GoalDto>> GetAllGoals()
         {
             return await _goalService.GetGoalsListAsync();
@@ -33,7 +33,7 @@ namespace WTP.WebAPI.Controllers
 
 
         [HttpPost("")]
-        //[Authorize(Policy = "RequireAdministratorRole")]
+        [Authorize(Policy = "RequireAdministratorRole")]
         public async Task<IActionResult> CreateFoal([FromBody]GoalDto goalDto)
         {
             if (!ModelState.IsValid)
@@ -55,7 +55,7 @@ namespace WTP.WebAPI.Controllers
         }
 
         [HttpPut("item/{goalId}")]
-        //[Authorize(Policy = "RequireAdministratorRole")]
+        [Authorize(Policy = "RequireAdministratorRole")]
         public async Task<IActionResult> EditgGoal([FromBody]GoalDto goalDto, [FromRoute]int goalId)
         {
             if (!ModelState.IsValid)
@@ -84,7 +84,7 @@ namespace WTP.WebAPI.Controllers
         }
 
         [HttpDelete("item/{goalId}")]
-        //[Authorize(Policy = "RequireAdministratorRole")]
+        [Authorize(Policy = "RequireAdministratorRole")]
         public async Task<IActionResult> DeleteGame([FromRoute]int goalId)
         {
             var goal = await _goalService.GetByIdAsync(goalId);
@@ -102,7 +102,7 @@ namespace WTP.WebAPI.Controllers
         }
 
         [HttpGet]
-        //[Authorize(Policy = "RequireAdministratorRole")]
+        [Authorize(Policy = "RequireAdministratorRole")]
         [Route("goals/paging")]
         public async Task<Page<Goal>> GetRecordsListOnPage(int pageSize, int currentPage, string sortBy,
                                         string name, int id,

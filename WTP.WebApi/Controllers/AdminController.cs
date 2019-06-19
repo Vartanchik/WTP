@@ -33,7 +33,7 @@ namespace WTP.WebAPI.Controllers
         //Create Admin account
         [HttpPost]
         [Route("profiles")]
-        //[Authorize(Policy = "RequireAdministratorRole")]
+        [Authorize(Policy = "RequireAdministratorRole")]
         public async Task<IActionResult> CreateAdminAccount([FromBody] RegisterDto formdata)
         {
             StringBuilder sb = new StringBuilder();
@@ -63,7 +63,7 @@ namespace WTP.WebAPI.Controllers
         //Create User account
         [HttpPost]
         [Route("users/profiles")]
-        //[Authorize(Policy = "RequireAdministratorRole")]
+        [Authorize(Policy = "RequireAdministratorRole")]
         public async Task<IActionResult> CreateUserProfile([FromBody] RegisterDto formdata)
         {
             //int adminId = Convert.ToInt32(User.Claims.First(c => c.Type == "UserID").Value);
@@ -96,7 +96,7 @@ namespace WTP.WebAPI.Controllers
         //Create User account
         [HttpPost]
         [Route("users/moderator")]
-        //[Authorize(Policy = "RequireAdministratorRole")]
+        [Authorize(Policy = "RequireAdministratorRole")]
         public async Task<IActionResult> CreateModeratorProfile([FromBody] RegisterDto formdata)
         {
             StringBuilder sb = new StringBuilder();
@@ -127,7 +127,7 @@ namespace WTP.WebAPI.Controllers
         ////Get List of all Users
         [HttpGet]
         [Route("users")]
-        ////[Authorize(Policy = "RequireAdministratorRole")]
+        //[Authorize(Policy = "RequireAdministratorRole")]
         public async Task<IList<AppUserDto>> GetUsersProfile()
         {
             return await _appUserService.GetUsersList();
@@ -135,7 +135,7 @@ namespace WTP.WebAPI.Controllers
 
         //Update user's account
         [HttpPut]
-        //[Authorize(Policy = "RequireAdministratorRole")]
+        [Authorize(Policy = "RequireAdministratorRole")]
         [Route("users/{id}")]
         public async Task<IActionResult> UpdateUser([FromBody] AppUserDto formdata, [FromRoute]int id)
         {
@@ -196,7 +196,7 @@ namespace WTP.WebAPI.Controllers
 
         //Delete user's account by id
         [HttpDelete]
-        //[Authorize(Policy = "RequireAdministratorRole")]
+        [Authorize(Policy = "RequireAdministratorRole")]
         [Route("users/{id}")]
         public async Task<IActionResult> DeleteUser([FromRoute]int id)
         {
@@ -225,7 +225,7 @@ namespace WTP.WebAPI.Controllers
 
         //Lock users account by id
         [HttpPut]
-        //[Authorize(Policy = "RequireAdministratorRole")]
+        [Authorize(Policy = "RequireAdministratorRole")]
         [Route("users/{id}/block")]
         public async Task<IActionResult> LockUser([FromBody]LockDto formDate, [FromRoute]int id)
         {
@@ -250,7 +250,7 @@ namespace WTP.WebAPI.Controllers
 
         //UnLock user's account by id
         [HttpPut]
-        //[Authorize(Policy = "RequireAdministratorRole")]
+        [Authorize(Policy = "RequireAdministratorRole")]
         [Route("users/{id}/unblock")]
         public async Task<IActionResult> UnLockUser([FromRoute]int id)
         {
@@ -273,7 +273,7 @@ namespace WTP.WebAPI.Controllers
         }
 
         [HttpGet]
-        //[Authorize(Policy = "RequireAdministratorRole")]
+        [Authorize(Policy = "RequireAdministratorRole")]
         [Route("list")]
         public async Task<UserIndexDto> UserIndex(string name, int page = 1, int pageSize = 3,
             SortState sortOrder = SortState.NameAsc, bool enableDeleted = true, bool enableLocked = true)
@@ -282,7 +282,7 @@ namespace WTP.WebAPI.Controllers
         }
 
         [HttpGet]
-        //[Authorize(Policy = "RequireAdministratorRole")]
+        [Authorize(Policy = "RequireAdministratorRole")]
         [Route("history")]
         public async Task<HistoryIndexDto> HistoryIndex(string name, int page = 1, int pageSize = 3,
             HistorySortState sortOrder = HistorySortState.DateDesc)
@@ -291,7 +291,7 @@ namespace WTP.WebAPI.Controllers
         }
 
         [HttpGet]
-        //[Authorize(Policy = "RequireAdministratorRole")]
+        [Authorize(Policy = "RequireAdministratorRole")]
         [Route("history/list")]
         public async Task<IList<HistoryDto>> GetHistoryList()
         {
@@ -299,7 +299,7 @@ namespace WTP.WebAPI.Controllers
         }
 
         [HttpGet]
-        //[Authorize(Policy = "RequireAdministratorRole")]
+        [Authorize(Policy = "RequireAdministratorRole")]
         [Route("users/paging")]
         public async Task<Page<AppUser>> GetUsersListOnPage(int pageSize, int currentPage, string sortBy,
                                         string userName, string email, string enableLock,
@@ -310,7 +310,7 @@ namespace WTP.WebAPI.Controllers
         }
 
         [HttpGet]
-        //[Authorize(Policy = "RequireAdministratorRole")]
+        [Authorize(Policy = "RequireAdministratorRole")]
         [Route("history/paging")]
         public async Task<Page<History>> GetRecordsListOnPage(int pageSize, int currentPage, string sortBy,
                                         string userName, string email, string operationName, string newUserName,
