@@ -44,7 +44,7 @@ namespace WTP.WebAPI.Controllers
                     Message = "Model is not valid."
                 });
             }
-
+            goalDto.Id = 0;
             await _goalService.CreateOrUpdateAsync(goalDto);
 
             return Ok(new ResponseDto

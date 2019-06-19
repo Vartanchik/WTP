@@ -15,7 +15,7 @@ using WTP.Logging;
 
 namespace WTP.BLL.Services.HistoryService
 {
-    public class HistoryService:IHistoryService
+    public class HistoryService : IHistoryService
     {
         private IUnitOfWork _uow;
         private readonly IMapper _mapper;
@@ -171,8 +171,8 @@ namespace WTP.BLL.Services.HistoryService
             filters.Add(!string.IsNullOrEmpty(operationName), x => x.Operation.OperationName.Contains(operationName));
             filters.Add(!string.IsNullOrEmpty(newUserName), x => x.NewUserName.Contains(newUserName));
             filters.Add(!string.IsNullOrEmpty(newUserEmail), x => x.NewUserEmail.Contains(newUserEmail));
-            filters.Add(id!=0, x => x.Id.Equals(id));
-            filters.Add(adminId!=0, x => x.AdminId.Equals(adminId));
+            filters.Add(id != 0, x => x.Id.Equals(id));
+            filters.Add(adminId != 0, x => x.AdminId.Equals(adminId));
 
             var sorts = new Sorts<History>();
 

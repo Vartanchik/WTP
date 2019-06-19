@@ -45,6 +45,7 @@ namespace WTP.WebAPI.Controllers
                 });
             }
 
+            rankDto.Id = 0;
             await _rankService.CreateOrUpdateAsync(rankDto);
 
             return Ok(new ResponseDto

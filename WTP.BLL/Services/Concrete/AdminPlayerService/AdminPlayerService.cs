@@ -27,7 +27,8 @@ namespace WTP.BLL.Services.Concrete.AdminPlayerService
 
         public async Task<IList<PlayerShortDto>> GetJoinedPlayersListAsync()
         {
-            var allPlayers = await _uow.Players.AsQueryable().ToListAsync();
+            var allPlayers = await _uow.Players.AsQueryable().Include(u=>u.AppUser).Include(g=>g.Game)
+                .Include(g=>g.Goal).Include(s=>s.Server).Include(r=>r.Rank).Include(t=>t.Team).ToListAsync();
             return _mapper.Map<IList<PlayerShortDto>>(allPlayers);
         }
 
