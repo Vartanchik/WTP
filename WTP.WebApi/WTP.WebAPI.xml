@@ -32,7 +32,7 @@
         </member>
         <member name="M:WTP.WebAPI.Controllers.AccountController.ResetPassword(System.String,System.String)">
             <summary>
-            No description
+            Generate reset token and send it to user email
             </summary>
             <param name="userId"></param>
             <param name="code"></param>
@@ -61,7 +61,13 @@
             </summary>
             <param name="email"></param>
         </member>
-        <!-- Badly formed XML comment ignored for member "M:WTP.WebAPI.Controllers.AccountController.Restore(System.String,System.String)" -->
+        <member name="M:WTP.WebAPI.Controllers.AccountController.Restore(System.String,System.String)">
+            <summary>
+            Restore your account by id and restore token
+            </summary>
+            <param name="userId"></param>
+            <param name="token"></param>
+        </member>
         <member name="M:WTP.WebAPI.Controllers.InfoController.GetAllGames">
             <summary>
             Get all games
