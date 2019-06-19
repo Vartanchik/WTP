@@ -45,10 +45,8 @@ namespace WTP.BLL.Services.Concrete.RefreshTokenService
 
         public async Task<string> GenerateRefreshTokenAsync(int userId)
         {
-            // delete curren user tokens
             await _uow.RefreshTokens.DeleteUserTokensAsync(userId);
 
-            // create new token
             var refreshToken = new RefreshToken
             {
                 Value = Guid.NewGuid().ToString("N"),
@@ -89,8 +87,6 @@ namespace WTP.BLL.Services.Concrete.RefreshTokenService
 
         public async Task<AccessDto> GetAccessAsync(string email)
         {
-            var access = new AccessDto();
-
             var userId = await _uow.AppUsers.AsQueryable()
                                             .Where(u => u.Email == email)
                                             .Select(u => u.Id)
@@ -107,8 +103,6 @@ namespace WTP.BLL.Services.Concrete.RefreshTokenService
 
         public async Task<AccessDto> UpdateAccessAsync(AccessOperationDto dto)
         {
-            var access = new AccessDto();
-
             var exist = await _uow.RefreshTokens.AsQueryable()
                                                 .AnyAsync(t => t.AppUserId == dto.UserId &&
                                                                t.Value == dto.RefreshToken);

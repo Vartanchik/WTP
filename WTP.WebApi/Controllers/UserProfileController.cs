@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using AutoMapper;
 using WTP.BLL.DTOs.AppUserDTOs;
 using WTP.BLL.DTOs.AzureDTOs;
 using WTP.BLL.DTOs.ServicesDTOs;

@@ -61,9 +61,9 @@ namespace WTP.BLL.Services.Concrete.InvitationService
         public async Task<ServiceResult> CreateInvitationAsync(TeamActionDto dto)
         {
             var playerChecker = await _uow.Players.AsQueryable()
-                                                 .Where(p => p.Id == dto.PlayerId)
-                                                 .Select(p => new { p.AppUserId, p.GameId })
-                                                 .FirstOrDefaultAsync();
+                                                  .Where(p => p.Id == dto.PlayerId)
+                                                  .Select(p => new { p.AppUserId, p.GameId })
+                                                  .FirstOrDefaultAsync();
 
             if (playerChecker == null) return new ServiceResult("Player not found.");
 
@@ -134,16 +134,16 @@ namespace WTP.BLL.Services.Concrete.InvitationService
             if (invitation == null) return new ServiceResult("Invitation not found.");
 
             var playerUserId = await _uow.Players.AsQueryable()
-                                                  .Where(p => p.Id == invitation.PlayerId)
-                                                  .Select(p => p.AppUserId)
-                                                  .FirstOrDefaultAsync();
+                                                 .Where(p => p.Id == invitation.PlayerId)
+                                                 .Select(p => p.AppUserId)
+                                                 .FirstOrDefaultAsync();
 
             if (playerUserId == 0) return new ServiceResult("Player not found.");
 
             var teamUserId = await _uow.Teams.AsQueryable()
-                                              .Where(t => t.Id == invitation.TeamId)
-                                              .Select(t => t.AppUserId)
-                                              .FirstOrDefaultAsync();
+                                             .Where(t => t.Id == invitation.TeamId)
+                                             .Select(t => t.AppUserId)
+                                             .FirstOrDefaultAsync();
 
             if (teamUserId == 0) return new ServiceResult("Team not found.");
 

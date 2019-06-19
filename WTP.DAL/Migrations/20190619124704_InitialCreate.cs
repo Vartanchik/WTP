@@ -344,15 +344,15 @@ namespace WTP.DAL.Migrations
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     Value = table.Column<string>(nullable: false),
                     CreatedDate = table.Column<DateTime>(nullable: false),
-                    UserId = table.Column<int>(nullable: false),
+                    AppUserId = table.Column<int>(nullable: false),
                     ExpiryTime = table.Column<DateTime>(nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_RefreshTokens", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_RefreshTokens_AspNetUsers_UserId",
-                        column: x => x.UserId,
+                        name: "FK_RefreshTokens_AspNetUsers_AppUserId",
+                        column: x => x.AppUserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -498,7 +498,7 @@ namespace WTP.DAL.Migrations
                         column: x => x.PlayerId,
                         principalTable: "Players",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Invitations_Team_TeamId",
                         column: x => x.TeamId,
@@ -520,7 +520,7 @@ namespace WTP.DAL.Migrations
             migrationBuilder.InsertData(
                 table: "AspNetUsers",
                 columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "CountryId", "DateOfBirth", "DeletedTime", "Email", "EmailConfirmed", "GenderId", "IsDeleted", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "Photo", "SecurityStamp", "Steam", "TwoFactorEnabled", "UserName" },
-                values: new object[] { 1, 0, "0ac25357-6c11-4e21-806c-e3546c543c1d", null, null, null, "superAdmin@gmail.com", true, null, false, false, null, null, null, "AQAAAAEAACcQAAAAEJoMQ0ORW/30m0eVPZIwxJaTQ9nRyY63AriZTgxrk/xCv32Ewm03oMWQGpzz5CYpuw==", null, false, null, null, null, false, "superAdmin" });
+                values: new object[] { 1, 0, "9a7947df-b8e8-4f35-b6fa-63d3e35eb771", null, null, null, "superAdmin@gmail.com", true, null, false, false, null, null, null, "AQAAAAEAACcQAAAAEJoMQ0ORW/30m0eVPZIwxJaTQ9nRyY63AriZTgxrk/xCv32Ewm03oMWQGpzz5CYpuw==", null, false, null, null, null, false, "superAdmin" });
 
             migrationBuilder.InsertData(
                 table: "Country",
@@ -724,9 +724,9 @@ namespace WTP.DAL.Migrations
                 column: "TeamId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_RefreshTokens_UserId",
+                name: "IX_RefreshTokens_AppUserId",
                 table: "RefreshTokens",
-                column: "UserId");
+                column: "AppUserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_RestoreTokens_AppUserId",

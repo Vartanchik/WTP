@@ -15,7 +15,7 @@ namespace WTP.DAL.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.2.4-servicing-10062")
+                .HasAnnotation("ProductVersion", "2.2.3-servicing-35854")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -221,7 +221,7 @@ namespace WTP.DAL.Migrations
                         {
                             Id = 1,
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "0ac25357-6c11-4e21-806c-e3546c543c1d",
+                            ConcurrencyStamp = "9a7947df-b8e8-4f35-b6fa-63d3e35eb771",
                             Email = "superAdmin@gmail.com",
                             EmailConfirmed = true,
                             IsDeleted = false,
@@ -481,14 +481,12 @@ namespace WTP.DAL.Migrations
 
                     b.Property<DateTime>("ExpiryTime");
 
-                    b.Property<int?>("UserId");
-
                     b.Property<string>("Value")
                         .IsRequired();
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("AppUserId");
 
                     b.ToTable("RefreshTokens");
                 });
@@ -863,7 +861,8 @@ namespace WTP.DAL.Migrations
                 {
                     b.HasOne("WTP.DAL.Entities.AppUserEntities.AppUser", "AppUser")
                         .WithMany("Tokens")
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("AppUserId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("WTP.DAL.Entities.AppUserEntities.RestoreToken", b =>
