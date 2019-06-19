@@ -195,6 +195,9 @@ namespace WTP.WebAPI.Controllers
         }
 
         //Get List of all players by game with filers and sorting
+        /// <summary>
+        /// Get all teams with filters and sorting
+        /// </summary>
         [HttpGet("teams/pagination")]
         public async Task<TeamIndexDto> TeamIndex([FromQuery] TeamControllerInputDto valuesFromUi)
         {
