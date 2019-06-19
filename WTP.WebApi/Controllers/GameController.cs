@@ -25,14 +25,14 @@ namespace WTP.WebAPI.Controllers
         }
 
         [HttpGet("list")]
-        [Authorize(Policy = "RequireAdministratorRole")]
+        //[Authorize(Policy = "RequireAdministratorRole")]
         public async Task<IList<GameDto>> GetAllGames()
         {
             return await _gameService.GetAllGamesAsync();
         }
 
         [HttpPost("item")]
-        [Authorize(Policy = "RequireAdministratorRole")]
+        //[Authorize(Policy = "RequireAdministratorRole")]
         public async Task<IActionResult> CreateGame([FromBody]GameDto gameDto)
         {
             if (!ModelState.IsValid)
@@ -54,7 +54,7 @@ namespace WTP.WebAPI.Controllers
         }
 
         [HttpPut("item/{gameId}")]
-        [Authorize(Policy = "RequireAdministratorRole")]
+        //[Authorize(Policy = "RequireAdministratorRole")]
         public async Task<IActionResult> EditGame([FromBody]GameDto gameDto, [FromRoute]int gameId)
         {
             if (!ModelState.IsValid)
@@ -81,7 +81,7 @@ namespace WTP.WebAPI.Controllers
         }
 
         [HttpDelete("item/{gameId}")]
-        [Authorize(Policy = "RequireAdministratorRole")]
+        //[Authorize(Policy = "RequireAdministratorRole")]
         public async Task<IActionResult> DeleteGame([FromRoute]int gameId)
         {
             await _gameService.DeleteAsync(gameId);
@@ -94,7 +94,7 @@ namespace WTP.WebAPI.Controllers
         }
 
         [HttpGet]
-        [Authorize(Policy = "RequireAdministratorRole")]
+        //[Authorize(Policy = "RequireAdministratorRole")]
         [Route("games/paging")]
         public async Task<Page<Game>> GetRecordsListOnPage(int pageSize, int currentPage, string sortBy,
                                         string name, int id,

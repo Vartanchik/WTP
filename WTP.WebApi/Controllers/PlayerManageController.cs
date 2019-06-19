@@ -32,7 +32,7 @@ namespace WTP.WebAPI.Controllers
         }
 
         [HttpGet]
-        [Authorize(Policy = "RequireAdministratorRole")]
+        //[Authorize(Policy = "RequireAdministratorRole")]
         [Route("list")]
         public async Task<PlayerManageDto> GetPlayersList(string name, int page = 1, int pageSize = 3,
             PlayerSortState sortOrder = PlayerSortState.IdAsc)
@@ -41,7 +41,7 @@ namespace WTP.WebAPI.Controllers
         }
 
         [HttpGet]
-        [Authorize(Policy = "RequireAdministratorRole")]
+        //[Authorize(Policy = "RequireAdministratorRole")]
         [Route("paging")]
         public async Task<Page<Player>> GetPlayersListOnPage(int pageSize, int currentPage, string sortBy
                                        , string playerName, string userName, string email,
@@ -52,7 +52,7 @@ namespace WTP.WebAPI.Controllers
         }
 
         [HttpPost]
-        [Authorize(Policy = "RequireAdministratorRole")]
+        //[Authorize(Policy = "RequireAdministratorRole")]
         [Route("item")]
         public async Task<IActionResult> CreatePlayer([FromBody] PlayerShortDto inputPlayer)
         {
@@ -72,8 +72,18 @@ namespace WTP.WebAPI.Controllers
             });
         }
 
+
+        //GetJoinedPlayersListAsync
+        [HttpGet]
+        //[Authorize(Policy = "RequireAdministratorRole")]
+        [Route("list/info")]
+        public async Task<IList<PlayerShortDto>> GetJoinedPlayersList()
+        {
+            return await _adminPlayerService.GetJoinedPlayersListAsync();
+        }
+
         [HttpPut]
-        [Authorize(Policy = "RequireAdministratorRole")]
+        //[Authorize(Policy = "RequireAdministratorRole")]
         [Route("item")]
         public async Task<IActionResult> EditPlayer([FromBody] PlayerShortDto inputPlayer)
         {
@@ -94,7 +104,7 @@ namespace WTP.WebAPI.Controllers
         }
 
         [HttpDelete]
-        [Authorize(Policy = "RequireAdministratorRole")]
+        //[Authorize(Policy = "RequireAdministratorRole")]
         [Route("item")]
         public async Task<IActionResult> DeletePlayer([FromBody] PlayerShortDto inputPlayer)
         {

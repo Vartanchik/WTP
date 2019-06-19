@@ -249,13 +249,21 @@ namespace WTP.WebAPI.Controllers
         }
 
         [HttpGet]
-        [Authorize(Policy = "RequireAdministratorRole")]
+        //[Authorize(Policy = "RequireAdministratorRole")]
         [Route("teams/paging")]
         public async Task<Page<Team>> GetRecordsListOnPage(int pageSize, int currentPage, string sortBy,
                                         string name, int id, string game, int winRate,
                                         bool sortOrder)
         {
             return await _teamService.GetFilteredSortedTeamsOnPage(pageSize, currentPage, sortBy, name, id, game, winRate, sortOrder);
+        }
+
+        [HttpGet]
+        //[Authorize(Policy = "RequireAdministratorRole")]
+        [Route("team/list")]
+        public async Task<IList<Team>> GetTeamList()
+        {
+            return await _teamService.GetTeamList();
         }
     }
 }
