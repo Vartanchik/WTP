@@ -72,6 +72,16 @@ namespace WTP.WebAPI.Controllers
             });
         }
 
+
+        //GetJoinedPlayersListAsync
+        [HttpGet]
+        [Authorize(Policy = "RequireAdministratorRole")]
+        [Route("list/info")]
+        public async Task<IList<PlayerShortDto>> GetJoinedPlayersList()
+        {
+            return await _adminPlayerService.GetJoinedPlayersListAsync();
+        }
+
         [HttpPut]
         [Authorize(Policy = "RequireAdministratorRole")]
         [Route("item")]

@@ -66,8 +66,8 @@ namespace WTP.WebAPI.Controllers
         [Authorize(Policy = "RequireAdministratorRole")]
         public async Task<IActionResult> CreateUserProfile([FromBody] RegisterDto formdata)
         {
-            int adminId = Convert.ToInt32(User.Claims.First(c => c.Type == "UserID").Value);
-            //int adminId = 1;
+            //int adminId = Convert.ToInt32(User.Claims.First(c => c.Type == "UserID").Value);
+            int adminId = 1;
             StringBuilder sb = new StringBuilder();
 
             var user = new AppUserDto
@@ -139,8 +139,8 @@ namespace WTP.WebAPI.Controllers
         [Route("users/{id}")]
         public async Task<IActionResult> UpdateUser([FromBody] AppUserDto formdata, [FromRoute]int id)
         {
-            int adminId = Convert.ToInt32(User.Claims.First(c => c.Type == "UserID").Value);
-            //int adminId = 1;
+            //int adminId = Convert.ToInt32(User.Claims.First(c => c.Type == "UserID").Value);
+            int adminId = 1;
             StringBuilder sb = new StringBuilder();
 
             if (!ModelState.IsValid)
@@ -200,8 +200,8 @@ namespace WTP.WebAPI.Controllers
         [Route("users/{id}")]
         public async Task<IActionResult> DeleteUser([FromRoute]int id)
         {
-            int adminId = Convert.ToInt32(User.Claims.First(c => c.Type == "UserID").Value);
-            //int adminId = 1;
+            //int adminId = Convert.ToInt32(User.Claims.First(c => c.Type == "UserID").Value);
+            int adminId = 1;
 
             try
             {
@@ -229,8 +229,8 @@ namespace WTP.WebAPI.Controllers
         [Route("users/{id}/block")]
         public async Task<IActionResult> LockUser([FromBody]LockDto formDate, [FromRoute]int id)
         {
-            int adminId = Convert.ToInt32(User.Claims.First(c => c.Type == "UserID").Value);
-            //int adminId = 1;
+            //int adminId = Convert.ToInt32(User.Claims.First(c => c.Type == "UserID").Value);
+            int adminId = 1;
             bool success = await _appUserService.LockAsync(id, formDate.Days, adminId);
 
             if (success)
@@ -254,8 +254,8 @@ namespace WTP.WebAPI.Controllers
         [Route("users/{id}/unblock")]
         public async Task<IActionResult> UnLockUser([FromRoute]int id)
         {
-            int adminId = Convert.ToInt32(User.Claims.First(c => c.Type == "UserID").Value);
-            //int adminId = 1;
+            //int adminId = Convert.ToInt32(User.Claims.First(c => c.Type == "UserID").Value);
+            int adminId = 1;
             bool success = await _appUserService.UnLockAsync(id, adminId);
 
             if (success)
@@ -288,6 +288,14 @@ namespace WTP.WebAPI.Controllers
             HistorySortState sortOrder = HistorySortState.DateDesc)
         {
             return await _historyService.GetPageInfo(name, page, pageSize, sortOrder);
+        }
+
+        [HttpGet]
+        [Authorize(Policy = "RequireAdministratorRole")]
+        [Route("history/list")]
+        public async Task<IList<HistoryDto>> GetHistoryList()
+        {
+            return await _historyService.GetHistoryList();
         }
 
         [HttpGet]

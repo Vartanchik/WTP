@@ -156,6 +156,7 @@ namespace WTP.WebAPI.Controllers
         /// <returns></returns>
         [HttpGet("[action]")]
         [ProducesResponseType(typeof(IList<InvitationListItemDto>), 200)]
+        [Authorize(Policy = "RequireAdministratorRole")]
         public async Task<IList<InvitationListItemDto>> InvitationPlayerListByUserId(int userId)
         {
             return await _playerService.GetAllPlayerInvitetionByUserId(userId);

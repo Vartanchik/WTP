@@ -312,5 +312,10 @@ namespace WTP.BLL.Services.Concrete.TeamService
 
             return teams;
         }
+
+        public async Task<IList<Team>> GetTeamList()
+        {
+            return await _uow.Teams.AsQueryable().ToListAsync();
+        }
     }
 }
