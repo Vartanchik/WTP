@@ -30,7 +30,6 @@ namespace WTP.BLL.Services.Concrete.GameService
         public async Task CreateOrUpdateAsync(GameDto dto, int? adminId = null)
         {
             var game = _mapper.Map<Game>(dto);
-            game.Id = 0;
 
             await _uow.Games.CreateOrUpdate(game);
             await _uow.CommitAsync();
