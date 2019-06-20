@@ -1,4 +1,4 @@
-﻿namespace WTP.DAL
+﻿namespace WTP.DAL.Entities
 {
     public interface IEntity
     {

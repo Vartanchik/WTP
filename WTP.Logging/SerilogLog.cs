@@ -11,7 +11,7 @@ namespace WTP.Logging
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Verbose()
                 .WriteTo.ColoredConsole()
-                .WriteTo.File(path: @"../WTP.Logging/logs/log.txt", restrictedToMinimumLevel: LogEventLevel.Information, rollingInterval: RollingInterval.Day)
+                .WriteTo.File(path: @"../WTP.Logging/logs/log.txt", restrictedToMinimumLevel: LogEventLevel.Error, rollingInterval: RollingInterval.Day)
                 .WriteTo.ApplicationInsights(TelemetryConfiguration.Active, TelemetryConverter.Traces)
                 .CreateLogger();
         }

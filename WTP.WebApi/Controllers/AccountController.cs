@@ -32,11 +32,11 @@ namespace WTP.WebAPI.Controllers
         /// <summary>
         /// Registration of new user
         /// </summary>
-        /// <param name="dot"></param>
+        /// <param name="dto"></param>
         [HttpPost("[action]")]
         [ProducesResponseType(typeof(ResponseDto), 200)]
         [ProducesResponseType(typeof(ResponseDto), 400)]
-        public async Task<IActionResult> Register([FromBody] RegisterDto dot)
+        public async Task<IActionResult> Register([FromBody] RegisterDto dto)
         {
             if (!ModelState.IsValid)
             {
@@ -45,16 +45,16 @@ namespace WTP.WebAPI.Controllers
 
             var user = new AppUserDto
             {
-                Email = dot.Email,
-                UserName = dot.UserName,
+                Email = dto.Email,
+                UserName = dto.UserName,
                 SecurityStamp = Guid.NewGuid().ToString()
             };
 
-            var result = await _appUserService.CreateAsync(user, dot.Password);
+            var result = await _appUserService.CreateAsync(user, dto.Password);
 
             if (result.Succeeded)
             {
-                var userForConfirmEmail = await _appUserService.GetByEmailAsync(dot.Email);
+                var userForConfirmEmail = await _appUserService.GetByEmailAsync(dto.Email);
 
                 var token = await _appUserService.GenerateEmailConfirmationTokenAsync(userForConfirmEmail);
 
@@ -69,7 +69,7 @@ namespace WTP.WebAPI.Controllers
                                                         _configuration["Email:Port"]);
 
                 await _emailService.SendEmailAsync(
-                    dot.Email,
+                    dto.Email,
                     "Just one click and you're on WTP",
                     $"Thanks for registering to be a part of evolving esports with WTP. After you: " +
                     $"<a href='{callbackUrl}'>confirm your email</a> you'll be able to enjoy all the benefits of the WTP platform.",

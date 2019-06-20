@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
+using WTP.DAL.Entities;
 
 namespace WTP.DAL.Repositories.GenericRepository
 {
@@ -21,8 +22,7 @@ namespace WTP.DAL.Repositories.GenericRepository
                 await _dbset.AddAsync(item);
             else
             {
-                //_context.Entry(item).State = EntityState.Modified;
-                var entity = await _dbset.FindAsync(item.Id); //To Avoid tracking error
+                var entity = await _dbset.FindAsync(item.Id);
                 var attachedEntry = _context.Entry(entity);
                 attachedEntry.CurrentValues.SetValues(item);
             }

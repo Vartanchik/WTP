@@ -89,8 +89,6 @@ namespace WTP.BLL.Services.Concrete.RefreshTokenService
 
         public async Task<AccessDto> GetAccessAsync(string email)
         {
-            var access = new AccessDto();
-
             var userId = await _uow.AppUsers.AsQueryable()
                                             .Where(u => u.Email == email)
                                             .Select(u => u.Id)
@@ -107,8 +105,6 @@ namespace WTP.BLL.Services.Concrete.RefreshTokenService
 
         public async Task<AccessDto> UpdateAccessAsync(AccessOperationDto dto)
         {
-            var access = new AccessDto();
-
             var exist = await _uow.RefreshTokens.AsQueryable()
                                                 .AnyAsync(t => t.AppUserId == dto.UserId &&
                                                                t.Value == dto.RefreshToken);

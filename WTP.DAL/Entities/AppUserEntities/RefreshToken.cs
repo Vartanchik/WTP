@@ -18,7 +18,6 @@ namespace WTP.DAL.Entities.AppUserEntities
         [Required]
         public int AppUserId { get; set; }
 
-        [ForeignKey("UserId")]
         public AppUser AppUser { get; set; }
 
         [Required]

@@ -86,7 +86,7 @@ namespace WTP.DAL.Repositories.ConcreteRepositories.AppUserRepository
             var user = await _context.AppUsers.Include(u => u.Country)
                                               .Include(u => u.Gender)
                                               .Include(u => u.AppUserLanguages)
-                                                .ThenInclude(l => l.Language)
+                                              .ThenInclude(l => l.Language)
                                               .FirstOrDefaultAsync(u => u.Id == userId);
 
             return user;
@@ -139,14 +139,6 @@ namespace WTP.DAL.Repositories.ConcreteRepositories.AppUserRepository
             return await _userManager.ConfirmEmailAsync(user, token);
         }
 
-        public virtual int GetIdByCondition(Func<AppUser, bool> condition)
-        {
-            return base.AsQueryable()
-                       .Where(condition)
-                       .Select(x => x.Id)
-                       .FirstOrDefault();
-        }
-
         public async Task<IdentityResult> CreatePersonAsync(AppUser appUser, string password, UserType userType)
         {
             var result = await _userManager.CreateAsync(appUser, password);
@@ -179,12 +171,11 @@ namespace WTP.DAL.Repositories.ConcreteRepositories.AppUserRepository
 
             await _userManager.SetLockoutEnabledAsync(user, true);
 
-            if (days == null)
-                await _userManager.SetLockoutEndDateAsync(user, null);
+            if (days == null) await _userManager.SetLockoutEndDateAsync(user, null);
             else
             {
-                if (days < 0)
-                    days = 0;
+                if (days < 0) days = 0;
+
                 await _userManager.SetLockoutEndDateAsync(user, DateTimeOffset.UtcNow.AddDays(days.Value));
             }
             await _context.SaveChangesAsync();

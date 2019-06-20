@@ -20,7 +20,6 @@ using WTP.BLL.Services.Concrete.RefreshTokenService;
 using WTP.BLL.Services.EmailService;
 using WTP.DAL;
 using WTP.DAL.UnitOfWork;
-using WTP.WebAPI.Helpers;
 using WTP.BLL.Services.AzureBlobStorageService;
 using WTP.BLL.Services.DeleteService;
 using WTP.BLL.Services.Concrete.GameService;
@@ -119,13 +118,6 @@ namespace WTP.WebAPI
 
             }).AddRoles<IdentityRole<int>>()
               .AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
-
-            // Configure strongly typed settings objects
-            var appSettingsSection = Configuration.GetSection("AppSettings");
-            services.Configure<AppSettings>(appSettingsSection);
-
-            var appSettings = appSettingsSection.Get<AppSettings>();
-            var key = Encoding.ASCII.GetBytes(appSettings.Secret);
 
             // Authentication Middleware
             services.AddAuthentication(options =>

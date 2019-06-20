@@ -20,7 +20,6 @@ namespace WTP.BLL.Services.Concrete.AppUserService
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _uow;
 
-
         public AppUserService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _uow = unitOfWork;
@@ -47,7 +46,6 @@ namespace WTP.BLL.Services.Concrete.AppUserService
                 AdminId = adminId
             };
 
-            //await _uow.Histories.CreateOrUpdate(history);
             var record = _mapper.Map<History>(history);
             await _uow.Histories.CreateOrUpdate(record);
             if (result.Succeeded)
@@ -267,7 +265,6 @@ namespace WTP.BLL.Services.Concrete.AppUserService
                                 .FirstOrDefaultAsync();
         }
 
-
         public async Task<IdentityResult> CreatePersonAsync(AppUserDto appUserDto, string password, UserType userType)
         {
             var appUser = _mapper.Map<AppUser>(appUserDto);
@@ -277,7 +274,6 @@ namespace WTP.BLL.Services.Concrete.AppUserService
 
             return result;
         }
-
 
         public async Task<bool> LockAsync(int id, int? days, int? adminId = null)
         {
@@ -373,11 +369,9 @@ namespace WTP.BLL.Services.Concrete.AppUserService
             return query;
         }
 
-        public async Task<IQueryable<AppUser>> GetItemsOnPage(int page, int pageSize, IQueryable<AppUser> baseQuery)
+        public IQueryable<AppUser> GetItemsOnPage(int page, int pageSize, IQueryable<AppUser> baseQuery)
         {
-            IQueryable<AppUser> query = Enumerable.Empty<AppUser>().AsQueryable();
-            query = baseQuery.Skip((page - 1) * pageSize).Take(pageSize);
-            return query;
+            return baseQuery.Skip((page - 1) * pageSize).Take(pageSize);
         }
 
         public async Task<int> GetCountOfPlayers()
@@ -397,7 +391,7 @@ namespace WTP.BLL.Services.Concrete.AppUserService
                 var newQuery = await FilterByName(name, query);
                 count = await query.CountAsync();
                 newQuery = await SortByParam(sortOrder, enableDeleted, enableLocked, newQuery);
-                newQuery = await GetItemsOnPage(page, pageSize, newQuery);
+                newQuery = GetItemsOnPage(page, pageSize, newQuery);
 
                 items = _mapper.Map<List<AppUserDto>>(newQuery.ToList());
             }

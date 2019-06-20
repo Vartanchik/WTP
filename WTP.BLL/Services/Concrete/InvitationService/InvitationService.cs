@@ -60,13 +60,15 @@ namespace WTP.BLL.Services.Concrete.InvitationService
 
         public async Task<ServiceResult> CreateInvitationAsync(TeamActionDto dto)
         {
+            // object to check player existing and player game
             var playerChecker = await _uow.Players.AsQueryable()
-                                                 .Where(p => p.Id == dto.PlayerId)
-                                                 .Select(p => new { p.AppUserId, p.GameId })
-                                                 .FirstOrDefaultAsync();
+                                                  .Where(p => p.Id == dto.PlayerId)
+                                                  .Select(p => new { p.AppUserId, p.GameId })
+                                                  .FirstOrDefaultAsync();
 
             if (playerChecker == null) return new ServiceResult("Player not found.");
 
+            // object to check team existing, team game, team members count
             var teamChecker = await _uow.Teams.AsQueryable()
                                               .Where(t => t.Id == dto.TeamId)
                                               .Select(t => new { t.AppUserId, t.GameId, t.Players.Count })
@@ -76,12 +78,13 @@ namespace WTP.BLL.Services.Concrete.InvitationService
 
             if (playerChecker.GameId != teamChecker.GameId) return new ServiceResult("Player and team must be from same game.");
 
-            var exist = await _uow.Invitations.AsQueryable()
-                                              .AnyAsync(i => i.PlayerId == dto.PlayerId &&
-                                                             i.TeamId == dto.TeamId);
+            var invitationExist = await _uow.Invitations.AsQueryable()
+                                                        .AnyAsync(i => i.PlayerId == dto.PlayerId &&
+                                                                       i.TeamId == dto.TeamId);
 
-            if (exist) return new ServiceResult("Invitation has already been sent.");
+            if (invitationExist) return new ServiceResult("Invitation has already been sent.");
 
+            // invitation creating
             Author author;
 
             if (playerChecker.AppUserId == dto.UserId) author = Author.Player;
@@ -134,19 +137,20 @@ namespace WTP.BLL.Services.Concrete.InvitationService
             if (invitation == null) return new ServiceResult("Invitation not found.");
 
             var playerUserId = await _uow.Players.AsQueryable()
-                                                  .Where(p => p.Id == invitation.PlayerId)
-                                                  .Select(p => p.AppUserId)
-                                                  .FirstOrDefaultAsync();
+                                                 .Where(p => p.Id == invitation.PlayerId)
+                                                 .Select(p => p.AppUserId)
+                                                 .FirstOrDefaultAsync();
 
             if (playerUserId == 0) return new ServiceResult("Player not found.");
 
             var teamUserId = await _uow.Teams.AsQueryable()
-                                              .Where(t => t.Id == invitation.TeamId)
-                                              .Select(t => t.AppUserId)
-                                              .FirstOrDefaultAsync();
+                                             .Where(t => t.Id == invitation.TeamId)
+                                             .Select(t => t.AppUserId)
+                                             .FirstOrDefaultAsync();
 
             if (teamUserId == 0) return new ServiceResult("Team not found.");
 
+            // checking user access to accept invitation
             if (playerUserId == dto.UserId && invitation.Author == Author.Coach ||
                 teamUserId == dto.UserId && invitation.Author == Author.Player)
             {
@@ -179,7 +183,7 @@ namespace WTP.BLL.Services.Concrete.InvitationService
 
             if (player == null) return new ServiceResult("Player not found.");
 
-            if (player.TeamId.GetValueOrDefault() != 0)
+            if (player.TeamId.GetValueOrDefault() == 0)
                 return new ServiceResult("In order to state part of the team you must exit the current one.");
 
             player.Team = team;

@@ -9,6 +9,5 @@ namespace WTP.BLL.Services.DeleteService
         IQueryable<int> FindUsersToDeletedAsync();
         IQueryable<int> FindUsersToDeletedByIntervalAsync(TimeSpan intervalToDelete);
         Task DeleteOverdueUsers();
-        Task DeleteOverdueUser(int userId);
     }
 }

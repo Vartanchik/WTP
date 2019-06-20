@@ -65,8 +65,6 @@ namespace WTP.BLL.Services.Concrete
             CreateMap<Goal, GoalDto>();
             CreateMap<ServerDto, Server>();
             CreateMap<Server, ServerDto>();
-            CreateMap<MatchDto, Match>();
-            CreateMap<Match, MatchDto>();
             CreateMap<Rank, RankDto>();
             CreateMap<RankDto, Rank>();
             CreateMap<CreatePlayerDto, Player>();
@@ -146,8 +144,6 @@ namespace WTP.BLL.Services.Concrete
             CreateMap<ShortUserFormDto, AppUserDto>();
         }
 
-
-
         private string PhotoToView(AppUser user)
         {
             return string.IsNullOrEmpty(user.Photo)
@@ -170,7 +166,6 @@ namespace WTP.BLL.Services.Concrete
                     AppUserId = user.Id,
                     LanguageId = x.Id
                 }));
-
         }
 
         private List<LanguageDto> GetLanguagesDto(AppUser user)
@@ -181,7 +176,6 @@ namespace WTP.BLL.Services.Concrete
                     Id = x.LanguageId,
                     Name = x.Language.Name
                 }));
-
         }
 
         private string TeamPhotoToView(Team team)
@@ -236,7 +230,6 @@ namespace WTP.BLL.Services.Concrete
         private IList<string> GetPlayerLanguages(AppUser user)
         {
             return new List<string>(user.AppUserLanguages.Select(x => x.Language.Name));
-
         }
 
         private int AgeCalculation(AppUser user)

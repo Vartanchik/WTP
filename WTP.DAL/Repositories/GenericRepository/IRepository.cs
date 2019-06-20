@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
+using WTP.DAL.Entities;
 
 namespace WTP.DAL.Repositories.GenericRepository
 {
@@ -8,7 +9,6 @@ namespace WTP.DAL.Repositories.GenericRepository
         Task CreateOrUpdate(TEntity item);
         Task DeleteAsync(int id);
         void Delete(TEntity entity);
-
         Task<TEntity> GetByIdAsync(int id);
         IQueryable<TEntity> AsQueryable();
     }

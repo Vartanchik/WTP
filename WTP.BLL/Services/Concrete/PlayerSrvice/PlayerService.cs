@@ -42,12 +42,12 @@ namespace WTP.BLL.Services.Concrete.PlayerSrvice
 
         public async Task<ServiceResult> CreateAsync(CreatePlayerDto dto, int userId)
         {
+            // no player with same name by game
             bool existedPlayer = _uow.Players.AsQueryable()
-                                              .Any(p => p.Name == dto.Name &&
-                                                        p.GameId == dto.GameId &&
-                                                        p.AppUserId != userId);
+                                             .Any(p => p.Name == dto.Name &&
+                                                       p.GameId == dto.GameId);
 
-            if (existedPlayer) return new ServiceResult("Player already existed.");
+            if (existedPlayer) return new ServiceResult("Player already exists.");
 
             var player = _mapper.Map<Player>(dto);
             player.AppUserId = userId;
@@ -107,31 +107,6 @@ namespace WTP.BLL.Services.Concrete.PlayerSrvice
                                                   .Where(p => p.AppUserId == userId)
                                                   .AsNoTracking()
                                                   .ToListAsync();
-
-            // TODO: consider this variant of query
-            //var listOfPlayers2 = await _uow.Players.AsQueryable()
-            //                             .Where(p => p.AppUserId == userId)
-            //                             .Select(p => new PlayerListItemDto
-            //                             {
-            //                                 Id = p.Id,
-            //                                 Photo = p.AppUser.Photo,
-            //                                 Name = p.Name,
-            //                                 Game = p.Game.Name,
-            //                                 Rank = p.Rank.Name,
-            //                                 Server = p.Server.Name,
-            //                                 Goal = p.Goal.Name,
-            //                                 About = p.About,
-            //                                 Decency = p.Decency,
-            //                                 Invitations = p.Invitations.Select(i => new InvitationListItemDto
-            //                                 {
-            //                                     Id = i.Id,
-            //                                     PlayerName = i.Player.Name,
-            //                                     TeamName = i.Team.Name,
-            //                                     Author = i.Author.ToString()
-            //                                 }).ToList()
-            //                             })
-            //                             .AsNoTracking()
-            //                             .ToListAsync();
 
             return _mapper.Map<IList<PlayerListItemDto>>(listOfPlayers);
         }
@@ -193,6 +168,7 @@ namespace WTP.BLL.Services.Concrete.PlayerSrvice
                        && player.Decency >= inputValues.DecencyLeftValue;
 
             }
+
             //sorting by ASC
             if (inputValues.SortType == "asc")
             {

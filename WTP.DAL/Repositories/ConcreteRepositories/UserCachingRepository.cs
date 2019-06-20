@@ -9,40 +9,31 @@ using WTP.DAL.UnitOfWork;
 
 namespace WTP.DAL.Repositories.ConcreteRepositories
 {
-    /*
-     * MESSAGE FOR YOU !
-     * 
-     * Refactor this repository & its creating in UOW like UserRepository / RefreshTokenRepository or something like that ...
-     * 
-     */
-
     public class UserCachingRepository : UserRepository
     {
-        
-        private readonly IDistributedCache _Cache;
+        private readonly IDistributedCache _cache;
         private readonly UserRepository _baseRepository;
 
         public UserCachingRepository(UserRepository baseRepository, IDistributedCache distributedCache, ApplicationDbContext context, UserManager<AppUser> userManager)
         :base (context, userManager)
         {
-            _Cache = distributedCache;
+            _cache = distributedCache;
             _baseRepository = baseRepository;
         }
 
         private async void RemoveUserFromCacheAsync(int id)
         {
-            await _Cache.RemoveAsync(id.ToString());
+            await _cache.RemoveAsync(id.ToString());
         }
 
         public override async Task<AppUser> GetByIdAsync(int id)
         {
-            string value = await _Cache.GetStringAsync(id.ToString());
+            string value = await _cache.GetStringAsync(id.ToString());
 
             if (value != null)
             {
                 return JsonConvert.DeserializeObject<AppUser>(value);
             }
-                
             else
             {
                 AppUser currentUser = await _baseRepository.GetByIdAsync(id);
@@ -52,7 +43,7 @@ namespace WTP.DAL.Repositories.ConcreteRepositories
                     string CurrentUserStringObject = JsonConvert.SerializeObject(currentUser, Formatting.Indented,
                     new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore });
 
-                    await _Cache.SetStringAsync(id.ToString(), CurrentUserStringObject,
+                    await _cache.SetStringAsync(id.ToString(), CurrentUserStringObject,
                     new DistributedCacheEntryOptions
                     {
                         AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(600)
@@ -88,8 +79,6 @@ namespace WTP.DAL.Repositories.ConcreteRepositories
             RemoveUserFromCacheAsync(userId);
 
             return ResultOfBaseChangePasswordAsync;
-
         }
-        
     }
 }
