@@ -44,6 +44,7 @@ namespace WTP.WebAPI.Controllers
                 });
             }
 
+            gameDto.Id = 0;
             await _gameService.CreateOrUpdateAsync(gameDto);
 
             return Ok(new ResponseDto

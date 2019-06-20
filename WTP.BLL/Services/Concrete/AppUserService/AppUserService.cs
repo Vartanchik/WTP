@@ -85,15 +85,17 @@ namespace WTP.BLL.Services.Concrete.AppUserService
                      
         public async Task<IdentityResult> UpdateAsync(AppUserDto dto, int? adminId = null)
         {
+            var user = await _uow.AppUsers.GetByIdAsync(dto.Id);
+
             if (await _uow.AppUsers.AsQueryable().AnyAsync(u => u.Id == dto.Id))
             {
                 var appUser = _mapper.Map<AppUser>(dto);
                 HistoryDto history = new HistoryDto
                 {
                     DateOfOperation = DateTime.Now,
-                    Description = "Create new user account",
-                    PreviousUserEmail = null,
-                    PreviousUserName = null,
+                    Description = "Update user account",
+                    PreviousUserEmail = user.Email,
+                    PreviousUserName = user.UserName,
                     NewUserEmail = dto.Email,
                     NewUserName = dto.UserName,
                     AppUserId = dto.Id,

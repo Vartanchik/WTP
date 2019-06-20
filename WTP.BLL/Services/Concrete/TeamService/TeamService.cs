@@ -177,6 +177,9 @@ namespace WTP.BLL.Services.Concrete.TeamService
                 if (inputValues.SortField == "rate")
                     return team.WinRate;
 
+                if (inputValues.SortField == "playersCount")
+                    return team.Players.Count();
+
                 else
                     return null;
             }
@@ -190,9 +193,9 @@ namespace WTP.BLL.Services.Concrete.TeamService
                 return team.GameId == inputValues.GameId
                        && team.Name.Contains(inputValues.NameValue)
                        && team.WinRate <= inputValues.WinRateRightValue
-                       && team.WinRate >= inputValues.WinRateLeftValue;
-                // && team.Players.Count() >= inputValues.MembersLeftValue
-                // && team.Players.Count() <= inputValues.MembersRightValue;
+                       && team.WinRate >= inputValues.WinRateLeftValue
+                       && team.Players.Count() >= inputValues.MembersLeftValue
+                       && team.Players.Count() <= inputValues.MembersRightValue;
             }
             //sorting by ASC
             if (inputValues.SortType == "asc")
@@ -201,6 +204,7 @@ namespace WTP.BLL.Services.Concrete.TeamService
                                             .Include(p => p.Game)
                                             .Include(p => p.Server)
                                             .Include(p => p.Goal)
+                                            .Include(p => p.Players)
                                             .OrderBy(sortOperator)
                                             .Where(filterOperator)
                                             .Skip((inputValues.Page - 1) * inputValues.PageSize)
@@ -215,6 +219,7 @@ namespace WTP.BLL.Services.Concrete.TeamService
                                             .Include(p => p.Game)
                                             .Include(p => p.Server)
                                             .Include(p => p.Goal)
+                                            .Include(p => p.Players)
                                             .OrderByDescending(sortOperator)
                                             .Where(filterOperator)
                                             .Skip((inputValues.Page - 1) * inputValues.PageSize)
@@ -229,6 +234,7 @@ namespace WTP.BLL.Services.Concrete.TeamService
                                             .Include(p => p.Game)
                                             .Include(p => p.Server)
                                             .Include(p => p.Goal)
+                                            .Include(p => p.Players)
                                             .Where(filterOperator)
                                             .Skip((inputValues.Page - 1) * inputValues.PageSize)
                                             .Take(inputValues.PageSize)
@@ -275,6 +281,11 @@ namespace WTP.BLL.Services.Concrete.TeamService
             teams = await _uow.Teams.AsQueryable().PaginateAsync(currentPage, pageSize, sorts, filters);
 
             return teams;
+        }
+
+        public async Task<IList<Team>> GetTeamList()
+        {
+            return await _uow.Teams.AsQueryable().ToListAsync();
         }
     }
 }
