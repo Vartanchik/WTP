@@ -10,7 +10,7 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>D:\Work\SoftServeAcademy\kv-050-net\wtp\wtp\WTP.WebApi\WTP.WebAPI.xml</DocumentationFile>
+    <DocumentationFile>WTP.WebAPI.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
