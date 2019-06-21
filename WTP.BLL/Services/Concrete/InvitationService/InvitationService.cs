@@ -183,7 +183,7 @@ namespace WTP.BLL.Services.Concrete.InvitationService
 
             if (player == null) return new ServiceResult("Player not found.");
 
-            if (player.TeamId.GetValueOrDefault() == 0)
+            if (player.TeamId.GetValueOrDefault() != 0)
                 return new ServiceResult("In order to state part of the team you must exit the current one.");
 
             player.Team = team;

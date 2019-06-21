@@ -241,7 +241,7 @@ namespace WTP.WebAPI.Controllers
                 new ChangeUserPasswordDto
                 {
                     UserId = userId,
-                    CurrentPassword = dto.NewPassword,
+                    CurrentPassword = dto.CurrentPassword,
                     NewPassword = dto.NewPassword
                 });
 
